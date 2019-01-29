@@ -1,0 +1,1160 @@
+EESchema Schematic File Version 4
+LIBS:MPPT-cache
+EELAYER 26 0
+EELAYER END
+$Descr User 15748 7874
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Driver_FET:IR2104 U1
+U 1 1 5C186A88
+P 2350 6800
+F 0 "U1" H 2350 7367 50  0000 C CNN
+F 1 "IR2104" H 2350 7276 50  0000 C CNN
+F 2 "Package_DIP:DIP-8_W7.62mm_LongPads" H 2350 6350 50  0001 C CIN
+F 3 "https://www.infineon.com/dgdl/ir2104.pdf?fileId=5546d462533600a4015355c7c1c31671" H 2150 6250 50  0001 C CNN
+	1    2350 6800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0102
+U 1 1 5C186D29
+P 1700 7200
+F 0 "#PWR0102" H 1700 6950 50  0001 C CNN
+F 1 "GND" H 1705 7027 50  0000 C CNN
+F 2 "" H 1700 7200 50  0001 C CNN
+F 3 "" H 1700 7200 50  0001 C CNN
+	1    1700 7200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2300 6050 2650 6050
+Wire Wire Line
+	2650 6050 2650 6500
+$Comp
+L Device:CP C1
+U 1 1 5C190A11
+P 1500 5750
+F 0 "C1" V 1245 5750 50  0000 C CNN
+F 1 "1000uF/25V" V 1336 5750 50  0000 C CNN
+F 2 "mylibrary:C_Radial_D16.0mm_H25.0mm_P7.50mm_mod" H 1538 5600 50  0001 C CNN
+F 3 "~" H 1500 5750 50  0001 C CNN
+	1    1500 5750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2050 6500 1850 6500
+Wire Wire Line
+	1500 6500 1500 7100
+$Comp
+L 000_mylibrary:IRLZ44Z Q1
+U 1 1 5C193B93
+P 2350 5500
+F 0 "Q1" V 2593 5500 50  0000 C CNN
+F 1 "IRLZ44Z" V 2502 5500 50  0000 C CNN
+F 2 "mylibrary:TO-220-3_Vertical" H 2000 5600 50  0001 C CNN
+F 3 "" H 2000 5600 50  0001 C CNN
+	1    2350 5500
+	0    1    -1   0   
+$EndComp
+$Comp
+L Device:R R1
+U 1 1 5C194031
+P 2000 5650
+F 0 "R1" H 2070 5696 50  0000 L CNN
+F 1 "470K" H 2070 5605 50  0000 L CNN
+F 2 "000_mylibrary:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_fatpad" V 1930 5650 50  0001 C CNN
+F 3 "~" H 2000 5650 50  0001 C CNN
+	1    2000 5650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 5500 2000 5500
+Wire Wire Line
+	2000 5800 2350 5800
+$Comp
+L Diode:1N4148 D2
+U 1 1 5C194256
+P 2700 5800
+F 0 "D2" H 2700 5584 50  0000 C CNN
+F 1 "1N4148" H 2700 5675 50  0000 C CNN
+F 2 "mylibrary:D_DO-35_SOD27_P7.62mm_Horizontal_fatpad" H 2700 5625 50  0001 C CNN
+F 3 "http://www.nxp.com/documents/data_sheet/1N4148_1N4448.pdf" H 2700 5800 50  0001 C CNN
+	1    2700 5800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2800 6050 2650 6050
+Connection ~ 2650 6050
+Wire Wire Line
+	2800 6450 2800 7000
+Wire Wire Line
+	2800 7000 2650 7000
+Wire Wire Line
+	2650 6900 3050 6900
+Wire Wire Line
+	3050 6900 3050 5800
+Wire Wire Line
+	3050 5800 2850 5800
+Wire Wire Line
+	2550 5800 2350 5800
+Connection ~ 2350 5800
+$Comp
+L Device:C C2
+U 1 1 5C19588E
+P 1650 6500
+F 0 "C2" V 1398 6500 50  0000 C CNN
+F 1 "0.1uF" V 1489 6500 50  0000 C CNN
+F 2 "mylibrary:C_Disc_D7.5mm_W5.0mm_P10.00mm" H 1688 6350 50  0001 C CNN
+F 3 "~" H 1650 6500 50  0001 C CNN
+	1    1650 6500
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:C C3
+U 1 1 5C195D12
+P 2800 6300
+F 0 "C3" H 2685 6254 50  0000 R CNN
+F 1 "0.1uF" H 2685 6345 50  0000 R CNN
+F 2 "mylibrary:C_Disc_D7.5mm_W5.0mm_P10.00mm" H 2838 6150 50  0001 C CNN
+F 3 "~" H 2800 6300 50  0001 C CNN
+	1    2800 6300
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2000 5500 1850 5500
+Wire Wire Line
+	1850 5500 1850 6050
+Connection ~ 2000 5500
+Connection ~ 1850 6500
+Wire Wire Line
+	1850 6500 1800 6500
+Wire Wire Line
+	2000 6050 1850 6050
+Connection ~ 1850 6050
+Wire Wire Line
+	1850 6050 1850 6500
+$Comp
+L power:GND #PWR0103
+U 1 1 5C1962FE
+P 1500 5950
+F 0 "#PWR0103" H 1500 5700 50  0001 C CNN
+F 1 "GND" H 1505 5777 50  0000 C CNN
+F 2 "" H 1500 5950 50  0001 C CNN
+F 3 "" H 1500 5950 50  0001 C CNN
+	1    1500 5950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1500 5900 1500 5950
+Wire Wire Line
+	1850 5500 1500 5500
+Connection ~ 1850 5500
+$Comp
+L 000_mylibrary:IRLZ44Z Q2
+U 1 1 5C1977AF
+P 3650 5800
+F 0 "Q2" V 3893 5800 50  0000 C CNN
+F 1 "IRLZ44Z" V 3802 5800 50  0000 C CNN
+F 2 "mylibrary:TO-220-3_Vertical" H 3300 5900 50  0001 C CNN
+F 3 "" H 3300 5900 50  0001 C CNN
+	1    3650 5800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3650 5600 3650 5500
+Wire Wire Line
+	3650 5500 2550 5500
+Wire Wire Line
+	3350 5800 3050 5800
+Connection ~ 3050 5800
+$Comp
+L 000_mylibrary:IRLZ44Z Q3
+U 1 1 5C198566
+P 3650 6500
+F 0 "Q3" V 3893 6500 50  0000 C CNN
+F 1 "IRLZ44Z" V 3802 6500 50  0000 C CNN
+F 2 "mylibrary:TO-220-3_Vertical" H 3300 6600 50  0001 C CNN
+F 3 "" H 3300 6600 50  0001 C CNN
+	1    3650 6500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3650 6300 3650 6150
+$Comp
+L power:GND #PWR0104
+U 1 1 5C198DCC
+P 3650 7200
+F 0 "#PWR0104" H 3650 6950 50  0001 C CNN
+F 1 "GND" H 3655 7027 50  0000 C CNN
+F 2 "" H 3650 7200 50  0001 C CNN
+F 3 "" H 3650 7200 50  0001 C CNN
+	1    3650 7200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1500 7100 1700 7100
+Wire Wire Line
+	1700 7200 1700 7100
+Connection ~ 1700 7100
+Wire Wire Line
+	1700 7100 2050 7100
+Wire Wire Line
+	3650 7200 3650 6700
+Wire Wire Line
+	3650 6150 3250 6150
+Wire Wire Line
+	3250 6150 3250 7000
+Wire Wire Line
+	3250 7000 2800 7000
+Connection ~ 3650 6150
+Wire Wire Line
+	3650 6150 3650 6000
+Connection ~ 2800 7000
+Wire Wire Line
+	2650 7100 3350 7100
+Wire Wire Line
+	3350 7100 3350 6500
+$Comp
+L Diode:1N4007 D3
+U 1 1 5C19AE8B
+P 4200 6850
+F 0 "D3" V 4154 6929 50  0000 L CNN
+F 1 "1N4007" V 4245 6929 50  0000 L CNN
+F 2 "mylibrary:D_DO-35_SOD27_P7.62mm_Horizontal_fatpad" H 4200 6675 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88503/1n4001.pdf" H 4200 6850 50  0001 C CNN
+	1    4200 6850
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4200 6150 3650 6150
+$Comp
+L power:GND #PWR0105
+U 1 1 5C19BAB0
+P 4200 7200
+F 0 "#PWR0105" H 4200 6950 50  0001 C CNN
+F 1 "GND" H 4205 7027 50  0000 C CNN
+F 2 "" H 4200 7200 50  0001 C CNN
+F 3 "" H 4200 7200 50  0001 C CNN
+	1    4200 7200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4200 7200 4200 7000
+$Comp
+L Device:C C4
+U 1 1 5C19C1AB
+P 4350 5500
+F 0 "C4" H 4235 5454 50  0000 R CNN
+F 1 "0.1uF" H 4235 5545 50  0000 R CNN
+F 2 "mylibrary:C_Disc_D7.5mm_W5.0mm_P7.50mm" H 4388 5350 50  0001 C CNN
+F 3 "~" H 4350 5500 50  0001 C CNN
+	1    4350 5500
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R4
+U 1 1 5C19C211
+P 4850 5500
+F 0 "R4" H 4920 5546 50  0000 L CNN
+F 1 "220" H 4920 5455 50  0000 L CNN
+F 2 "000_mylibrary:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_fatpad" V 4780 5500 50  0001 C CNN
+F 3 "~" H 4850 5500 50  0001 C CNN
+	1    4850 5500
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4200 5500 4200 6150
+Connection ~ 4200 6150
+Wire Wire Line
+	4700 5500 4500 5500
+$Comp
+L Device:CP C5
+U 1 1 5C19EBAD
+P 5200 6800
+F 0 "C5" V 4945 6800 50  0000 C CNN
+F 1 "220uF/25V" V 5036 6800 50  0000 C CNN
+F 2 "000_mylibrary:C_Radial_D18.0mm_H35.5mm_P7.50mm" H 5238 6650 50  0001 C CNN
+F 3 "~" H 5200 6800 50  0001 C CNN
+	1    5200 6800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5200 6650 5200 6150
+Wire Wire Line
+	5200 5500 5000 5500
+$Comp
+L power:GND #PWR0106
+U 1 1 5C19F915
+P 5200 7200
+F 0 "#PWR0106" H 5200 6950 50  0001 C CNN
+F 1 "GND" H 5205 7027 50  0000 C CNN
+F 2 "" H 5200 7200 50  0001 C CNN
+F 3 "" H 5200 7200 50  0001 C CNN
+	1    5200 7200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5200 7200 5200 6950
+$Comp
+L Device:L L1
+U 1 1 5C1A0B53
+P 4700 6150
+F 0 "L1" V 4522 6150 50  0000 C CNN
+F 1 "L" V 4613 6150 50  0000 C CNN
+F 2 "mylibrary:L_Toroid_Vertical_L21.6mm_W9.1mm_P8.40mm_Bourns_5700_fatpad" H 4700 6150 50  0001 C CNN
+F 3 "~" H 4700 6150 50  0001 C CNN
+	1    4700 6150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4550 6150 4200 6150
+Wire Wire Line
+	4200 6150 4200 6700
+Wire Wire Line
+	4850 6150 5200 6150
+Connection ~ 5200 6150
+Wire Wire Line
+	5200 6150 5200 5500
+$Comp
+L Diode:1N5822 D4
+U 1 1 5C1A3427
+P 5600 6150
+F 0 "D4" H 5600 5934 50  0000 C CNN
+F 1 "1N5822" H 5600 6025 50  0000 C CNN
+F 2 "Diode_THT:D_DO-201AD_P15.24mm_Horizontal" H 5600 5975 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88526/1n5820.pdf" H 5600 6150 50  0001 C CNN
+	1    5600 6150
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	5450 6150 5200 6150
+$Comp
+L power:+5V #PWR0107
+U 1 1 5C19F016
+P 10100 2000
+F 0 "#PWR0107" H 10100 1850 50  0001 C CNN
+F 1 "+5V" H 10115 2173 50  0000 C CNN
+F 2 "" H 10100 2000 50  0001 C CNN
+F 3 "" H 10100 2000 50  0001 C CNN
+	1    10100 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0108
+U 1 1 5C19F04E
+P 5500 350
+F 0 "#PWR0108" H 5500 200 50  0001 C CNN
+F 1 "+5V" H 5515 523 50  0000 C CNN
+F 2 "" H 5500 350 50  0001 C CNN
+F 3 "" H 5500 350 50  0001 C CNN
+	1    5500 350 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	600  7000 2050 7000
+Wire Wire Line
+	750  6900 2050 6900
+Wire Wire Line
+	5100 1500 1150 1500
+Wire Wire Line
+	5100 1400 1050 1400
+Wire Wire Line
+	1050 1400 1050 4100
+$Comp
+L Device:R R2
+U 1 1 5C1AAB29
+P 9700 2000
+F 0 "R2" H 9770 2046 50  0000 L CNN
+F 1 "4.7K" H 9770 1955 50  0000 L CNN
+F 2 "000_mylibrary:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_fatpad" V 9630 2000 50  0001 C CNN
+F 3 "~" H 9700 2000 50  0001 C CNN
+	1    9700 2000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:+5V #PWR0109
+U 1 1 5C1B281F
+P 6600 1350
+F 0 "#PWR0109" H 6600 1200 50  0001 C CNN
+F 1 "+5V" H 6615 1523 50  0000 C CNN
+F 2 "" H 6600 1350 50  0001 C CNN
+F 3 "" H 6600 1350 50  0001 C CNN
+	1    6600 1350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R3
+U 1 1 5C1B2825
+P 6600 1550
+F 0 "R3" H 6670 1596 50  0000 L CNN
+F 1 "4.7K" H 6670 1505 50  0000 L CNN
+F 2 "000_mylibrary:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_fatpad" V 6530 1550 50  0001 C CNN
+F 3 "~" H 6600 1550 50  0001 C CNN
+	1    6600 1550
+	-1   0    0    1   
+$EndComp
+$Comp
+L 000_mylibrary:Heatsink HS1
+U 1 1 5C1F28A8
+P 2300 4800
+F 0 "HS1" H 2442 4921 50  0000 L CNN
+F 1 "Heatsink" H 2442 4830 50  0000 L CNN
+F 2 "000_mylibrary:WAKEFIELD265" H 2312 4800 50  0001 C CNN
+F 3 "" H 2312 4800 50  0001 C CNN
+	1    2300 4800
+	1    0    0    -1  
+$EndComp
+$Comp
+L 000_mylibrary:Heatsink HS2
+U 1 1 5C1F2B3B
+P 2800 4800
+F 0 "HS2" H 2942 4921 50  0000 L CNN
+F 1 "Heatsink" H 2942 4830 50  0000 L CNN
+F 2 "000_mylibrary:WAKEFIELD265" H 2812 4800 50  0001 C CNN
+F 3 "" H 2812 4800 50  0001 C CNN
+	1    2800 4800
+	1    0    0    -1  
+$EndComp
+$Comp
+L 000_mylibrary:Heatsink HS3
+U 1 1 5C1F2B93
+P 3250 4800
+F 0 "HS3" H 3392 4921 50  0000 L CNN
+F 1 "Heatsink" H 3392 4830 50  0000 L CNN
+F 2 "000_mylibrary:WAKEFIELD265" H 3262 4800 50  0001 C CNN
+F 3 "" H 3262 4800 50  0001 C CNN
+	1    3250 4800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1500 5100 1500 5500
+Wire Wire Line
+	1500 5500 1500 5600
+Connection ~ 1500 5500
+Wire Wire Line
+	6650 5700 6650 5800
+Text Label 6650 5700 0    10   ~ 0
+GND
+Wire Wire Line
+	2600 3150 2600 3050
+Text Label 2600 3150 0    10   ~ 0
+GND
+Wire Wire Line
+	6800 3600 6800 4000
+Text Label 6800 3600 0    10   ~ 0
+GND
+Text Label 6450 4000 0    10   ~ 0
+GND
+Wire Wire Line
+	9450 6250 9450 6050
+Text Label 9450 6250 0    10   ~ 0
+GND
+Wire Wire Line
+	8150 6050 8150 6250
+Text Label 8150 6050 0    10   ~ 0
+GND
+Wire Wire Line
+	9450 5000 9250 5000
+Text Label 9450 5000 0    10   ~ 0
+GND
+Text Label 4250 2000 2    10   ~ 0
+GND
+Wire Wire Line
+	4650 4200 4450 4200
+Text Label 4650 4200 0    10   ~ 0
+GND
+Wire Wire Line
+	1700 2850 1500 2850
+Wire Wire Line
+	1500 2850 1500 3150
+Text Label 1700 2850 0    10   ~ 0
+GND
+Wire Wire Line
+	5450 3200 5250 3200
+Wire Wire Line
+	9250 5100 9250 5300
+Wire Wire Line
+	9250 5300 9750 5300
+Wire Wire Line
+	9750 5300 9750 5100
+Text Label 9250 5100 0    10   ~ 0
+5V
+Wire Wire Line
+	2300 2750 2600 2750
+Wire Wire Line
+	9850 5850 9450 5850
+Wire Wire Line
+	9850 5650 9850 5850
+Text Label 2300 2750 0    10   ~ 0
+5V
+Wire Wire Line
+	4150 3600 4050 3600
+Wire Wire Line
+	6750 4800 6750 4900
+Wire Wire Line
+	7250 4900 7950 4900
+Wire Wire Line
+	6350 5000 6350 5100
+Wire Wire Line
+	7550 4800 7950 4800
+Wire Wire Line
+	6050 3500 6050 3200
+Wire Wire Line
+	6050 3200 5850 3200
+Wire Wire Line
+	5850 3500 6050 3500
+Wire Wire Line
+	5250 4300 5850 4300
+Wire Wire Line
+	5850 4300 5850 3500
+Wire Wire Line
+	6650 5600 6950 5600
+Wire Wire Line
+	6950 5000 6950 5600
+Wire Wire Line
+	9250 4800 9450 4800
+Wire Wire Line
+	9250 4900 9550 4900
+Wire Wire Line
+	2600 2950 2300 2950
+Connection ~ 6750 4900
+Connection ~ 6950 5000
+Connection ~ 6050 3500
+Connection ~ 7550 4800
+Connection ~ 7250 4900
+Wire Wire Line
+	10100 2000 9850 2000
+Wire Wire Line
+	6600 1350 6600 1400
+Wire Wire Line
+	6600 1700 6600 1900
+Wire Wire Line
+	6600 1900 6100 1900
+$Comp
+L Device:R R6
+U 1 1 5C205C13
+P 6650 5000
+F 0 "R6" H 6720 5046 50  0000 L CNN
+F 1 "0.1" H 6720 4955 50  0000 L CNN
+F 2 "mylibrary:R_Axial_DIN0309_L9.0mm_D3.2mm_P15.24mm_Horizontal_pad3mm" V 6580 5000 50  0001 C CNN
+F 3 "~" H 6650 5000 50  0001 C CNN
+	1    6650 5000
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6350 5000 6500 5000
+Wire Wire Line
+	6800 5000 6950 5000
+$Comp
+L Device:R R7
+U 1 1 5C21DCED
+P 7050 4800
+F 0 "R7" H 7120 4846 50  0000 L CNN
+F 1 "0.1" H 7120 4755 50  0000 L CNN
+F 2 "mylibrary:R_Axial_DIN0309_L9.0mm_D3.2mm_P15.24mm_Horizontal_pad3mm" V 6980 4800 50  0001 C CNN
+F 3 "~" H 7050 4800 50  0001 C CNN
+	1    7050 4800
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6750 4800 6900 4800
+$Comp
+L Device:R R9
+U 1 1 5C21E7DD
+P 6450 3650
+F 0 "R9" H 6520 3696 50  0000 L CNN
+F 1 "100K" H 6520 3605 50  0000 L CNN
+F 2 "000_mylibrary:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_fatpad" V 6380 3650 50  0001 C CNN
+F 3 "~" H 6450 3650 50  0001 C CNN
+	1    6450 3650
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6050 3500 6450 3500
+Connection ~ 6450 3500
+Wire Wire Line
+	6450 3500 6800 3500
+Wire Wire Line
+	6450 3800 6450 4000
+$Comp
+L Device:R R10
+U 1 1 5C226D5C
+P 1300 2750
+F 0 "R10" H 1370 2796 50  0000 L CNN
+F 1 "2.2K" H 1370 2705 50  0000 L CNN
+F 2 "000_mylibrary:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_fatpad" V 1230 2750 50  0001 C CNN
+F 3 "~" H 1300 2750 50  0001 C CNN
+	1    1300 2750
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	1450 2750 1700 2750
+$Comp
+L Diode:1N5822 D6
+U 1 1 5C248EA2
+P 7450 5850
+F 0 "D6" V 7496 5771 50  0000 R CNN
+F 1 "1N5822" V 7405 5771 50  0000 R CNN
+F 2 "Diode_THT:D_DO-201AD_P15.24mm_Horizontal" H 7450 5675 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88526/1n5820.pdf" H 7450 5850 50  0001 C CNN
+	1    7450 5850
+	-1   0    0    1   
+$EndComp
+$Comp
+L Diode:1N5822 D7
+U 1 1 5C2708A1
+P 7800 5500
+F 0 "D7" V 7754 5579 50  0000 L CNN
+F 1 "1N5822" V 7845 5579 50  0000 L CNN
+F 2 "Diode_THT:D_DO-201AD_P15.24mm_Horizontal" H 7800 5325 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88526/1n5820.pdf" H 7800 5500 50  0001 C CNN
+	1    7800 5500
+	-1   0    0    1   
+$EndComp
+$Comp
+L 000_mylibrary:AQV252G IC1
+U 1 1 5C2095D0
+P 4950 4200
+F 0 "IC1" H 4950 4636 59  0000 C CNN
+F 1 "AQV252G" H 4950 4531 59  0000 C CNN
+F 2 "Package_DIP:DIP-6_W7.62mm_Socket_LongPads" H 4950 4200 50  0001 C CNN
+F 3 "" H 4950 4200 50  0001 C CNN
+	1    4950 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L 000_mylibrary:AQV252G IC2
+U 1 1 5C20A467
+P 2000 2850
+F 0 "IC2" H 2000 3286 59  0000 C CNN
+F 1 "AQV252G" H 2000 3181 59  0000 C CNN
+F 2 "Package_DIP:DIP-6_W7.62mm_Socket_LongPads" H 2000 2850 50  0001 C CNN
+F 3 "" H 2000 2850 50  0001 C CNN
+	1    2000 2850
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R5
+U 1 1 5C20B7B6
+P 4250 4100
+F 0 "R5" H 4320 4146 50  0000 L CNN
+F 1 "2.2K" H 4320 4055 50  0000 L CNN
+F 2 "000_mylibrary:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_fatpad" V 4180 4100 50  0001 C CNN
+F 3 "~" H 4250 4100 50  0001 C CNN
+	1    4250 4100
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	4400 4100 4650 4100
+$Comp
+L Switch:SW_SPDT SW1
+U 1 1 5C21C049
+P 4350 3600
+F 0 "SW1" H 4350 3885 50  0000 C CNN
+F 1 "SW_SPDT" H 4350 3794 50  0000 C CNN
+F 2 "000_mylibrary:SWITCH-SPDT_0.185_INCH" H 4350 3600 50  0001 C CNN
+F 3 "" H 4350 3600 50  0001 C CNN
+	1    4350 3600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5250 3200 5250 3500
+Wire Wire Line
+	4550 3500 5250 3500
+Connection ~ 5250 3500
+Wire Wire Line
+	5250 3500 5250 4100
+$Comp
+L 000_mylibrary:switchpushadafruit S1
+U 1 1 5C20D672
+P 5650 3100
+F 0 "S1" V 5289 3100 59  0000 C CNN
+F 1 "switchpushadafruit" V 5394 3100 59  0000 C CNN
+F 2 "000_mylibrary:B3F-10XX" H 5650 3100 50  0001 C CNN
+F 3 "" H 5650 3100 50  0001 C CNN
+	1    5650 3100
+	0    1    1    0   
+$EndComp
+$Comp
+L 000_mylibrary:screw_terminal_blue U3
+U 1 1 5C20EA8A
+P 6350 5700
+F 0 "U3" H 6456 6086 59  0000 C CNN
+F 1 "Solar" H 6456 5981 59  0000 C CNN
+F 2 "000_mylibrary:W237-132" H 6350 5700 50  0001 C CNN
+F 3 "" H 6350 5700 50  0001 C CNN
+	1    6350 5700
+	1    0    0    -1  
+$EndComp
+$Comp
+L 000_mylibrary:screw_terminal_blue U4
+U 1 1 5C210F3F
+P 3750 3700
+F 0 "U4" H 3856 4086 59  0000 C CNN
+F 1 "Battery" H 3856 3981 59  0000 C CNN
+F 2 "000_mylibrary:W237-132" H 3750 3700 50  0001 C CNN
+F 3 "" H 3750 3700 50  0001 C CNN
+	1    3750 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L 000_mylibrary:screw_terminal_blue U5
+U 1 1 5C2114FA
+P 7100 3600
+F 0 "U5" H 6973 3703 59  0000 R CNN
+F 1 "8V" H 6973 3598 59  0000 R CNN
+F 2 "000_mylibrary:W237-132" H 7100 3600 50  0001 C CNN
+F 3 "" H 7100 3600 50  0001 C CNN
+	1    7100 3600
+	-1   0    0    -1  
+$EndComp
+$Comp
+L 000_mylibrary:screw_terminal_blue U6
+U 1 1 5C21A452
+P 2900 3050
+F 0 "U6" H 2773 3153 59  0000 R CNN
+F 1 "5V" H 2773 3048 59  0000 R CNN
+F 2 "000_mylibrary:W237-132" H 2900 3050 50  0001 C CNN
+F 3 "" H 2900 3050 50  0001 C CNN
+	1    2900 3050
+	-1   0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0115
+U 1 1 5C20D3A4
+P 6450 4000
+F 0 "#PWR0115" H 6450 3750 50  0001 C CNN
+F 1 "GND" H 6455 3827 50  0000 C CNN
+F 2 "" H 6450 4000 50  0001 C CNN
+F 3 "" H 6450 4000 50  0001 C CNN
+	1    6450 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0116
+U 1 1 5C20D62B
+P 6800 4000
+F 0 "#PWR0116" H 6800 3750 50  0001 C CNN
+F 1 "GND" H 6805 3827 50  0000 C CNN
+F 2 "" H 6800 4000 50  0001 C CNN
+F 3 "" H 6800 4000 50  0001 C CNN
+	1    6800 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0117
+U 1 1 5C20D787
+P 4450 4200
+F 0 "#PWR0117" H 4450 3950 50  0001 C CNN
+F 1 "GND" H 4455 4027 50  0000 C CNN
+F 2 "" H 4450 4200 50  0001 C CNN
+F 3 "" H 4450 4200 50  0001 C CNN
+	1    4450 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0118
+U 1 1 5C20D823
+P 4050 3700
+F 0 "#PWR0118" H 4050 3450 50  0001 C CNN
+F 1 "GND" H 4055 3527 50  0000 C CNN
+F 2 "" H 4050 3700 50  0001 C CNN
+F 3 "" H 4050 3700 50  0001 C CNN
+	1    4050 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0119
+U 1 1 5C20DC3C
+P 8150 6250
+F 0 "#PWR0119" H 8150 6000 50  0001 C CNN
+F 1 "GND" H 8155 6077 50  0000 C CNN
+F 2 "" H 8150 6250 50  0001 C CNN
+F 3 "" H 8150 6250 50  0001 C CNN
+	1    8150 6250
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0120
+U 1 1 5C20DCD8
+P 9450 6250
+F 0 "#PWR0120" H 9450 6000 50  0001 C CNN
+F 1 "GND" H 9455 6077 50  0000 C CNN
+F 2 "" H 9450 6250 50  0001 C CNN
+F 3 "" H 9450 6250 50  0001 C CNN
+	1    9450 6250
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0121
+U 1 1 5C20DDD4
+P 1500 3150
+F 0 "#PWR0121" H 1500 2900 50  0001 C CNN
+F 1 "GND" H 1505 2977 50  0000 C CNN
+F 2 "" H 1500 3150 50  0001 C CNN
+F 3 "" H 1500 3150 50  0001 C CNN
+	1    1500 3150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0122
+U 1 1 5C20DF0B
+P 2600 3150
+F 0 "#PWR0122" H 2600 2900 50  0001 C CNN
+F 1 "GND" H 2605 2977 50  0000 C CNN
+F 2 "" H 2600 3150 50  0001 C CNN
+F 3 "" H 2600 3150 50  0001 C CNN
+	1    2600 3150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0123
+U 1 1 5C20E38F
+P 9450 5000
+F 0 "#PWR0123" H 9450 4750 50  0001 C CNN
+F 1 "GND" H 9455 4827 50  0000 C CNN
+F 2 "" H 9450 5000 50  0001 C CNN
+F 3 "" H 9450 5000 50  0001 C CNN
+	1    9450 5000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0124
+U 1 1 5C20E7A8
+P 4000 2100
+F 0 "#PWR0124" H 4000 1850 50  0001 C CNN
+F 1 "GND" H 4005 1927 50  0000 C CNN
+F 2 "" H 4000 2100 50  0001 C CNN
+F 3 "" H 4000 2100 50  0001 C CNN
+	1    4000 2100
+	-1   0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0125
+U 1 1 5C20E90A
+P 6650 5800
+F 0 "#PWR0125" H 6650 5550 50  0001 C CNN
+F 1 "GND" H 6655 5627 50  0000 C CNN
+F 2 "" H 6650 5800 50  0001 C CNN
+F 3 "" H 6650 5800 50  0001 C CNN
+	1    6650 5800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0128
+U 1 1 5C20F40B
+P 9850 5650
+F 0 "#PWR0128" H 9850 5500 50  0001 C CNN
+F 1 "+5V" H 9865 5823 50  0000 C CNN
+F 2 "" H 9850 5650 50  0001 C CNN
+F 3 "" H 9850 5650 50  0001 C CNN
+	1    9850 5650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0129
+U 1 1 5C20FC7F
+P 9750 5100
+F 0 "#PWR0129" H 9750 4950 50  0001 C CNN
+F 1 "+5V" H 9765 5273 50  0000 C CNN
+F 2 "" H 9750 5100 50  0001 C CNN
+F 3 "" H 9750 5100 50  0001 C CNN
+	1    9750 5100
+	1    0    0    -1  
+$EndComp
+$Comp
+L 000_mylibrary:SWITCHDOC_INA3221 X2
+U 1 1 5C20DC32
+P 9050 5200
+F 0 "X2" H 9500 6346 86  0000 C CNN
+F 1 "SWITCHDOC_INA3221" H 9500 6201 86  0000 C CNN
+F 2 "mylibrary:SWITCHDOC_INA3221_NODRILL" H 9050 5200 50  0001 C CNN
+F 3 "" H 9050 5200 50  0001 C CNN
+	1    9050 5200
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	6750 4900 7250 4900
+Wire Wire Line
+	6950 5000 7950 5000
+Wire Wire Line
+	7200 4800 7550 4800
+Connection ~ 6350 5100
+Wire Wire Line
+	5900 4900 5900 6150
+Wire Wire Line
+	5900 4900 6750 4900
+Wire Wire Line
+	5750 6150 5900 6150
+Wire Wire Line
+	1500 5100 6350 5100
+$Comp
+L power:+5V #PWR0110
+U 1 1 5C2EF28E
+P 2600 2750
+F 0 "#PWR0110" H 2600 2600 50  0001 C CNN
+F 1 "+5V" H 2615 2923 50  0000 C CNN
+F 2 "" H 2600 2750 50  0001 C CNN
+F 3 "" H 2600 2750 50  0001 C CNN
+	1    2600 2750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1150 1500 1150 2750
+Wire Wire Line
+	6050 3500 6050 4450
+Wire Wire Line
+	6050 4450 7550 4450
+Wire Wire Line
+	7550 4450 7550 4800
+Wire Wire Line
+	1050 4100 4100 4100
+Wire Wire Line
+	9550 2000 9550 4900
+Wire Wire Line
+	6100 2000 9550 2000
+Connection ~ 9550 2000
+Wire Wire Line
+	9450 1900 6600 1900
+Wire Wire Line
+	9450 1900 9450 4800
+Connection ~ 6600 1900
+Wire Wire Line
+	5500 500  5500 350 
+Wire Wire Line
+	7300 5850 7250 5850
+Wire Wire Line
+	7250 4900 7250 5850
+Wire Wire Line
+	6350 5100 7400 5100
+Wire Wire Line
+	7400 5100 7400 5500
+Wire Wire Line
+	7400 5500 7650 5500
+Connection ~ 7400 5100
+Wire Wire Line
+	7400 5100 7950 5100
+$Comp
+L 000_mylibrary:DROK_BUCKCONV_TWOSTORY_PADS U2
+U 1 1 5C224EEB
+P 8350 6150
+F 0 "U2" H 8400 6200 50  0001 C CNN
+F 1 "DROK_BUCKCONV_TWOSTORY_PADS" H 8874 6630 59  0000 C CNN
+F 2 "000_mylibrary:DROK_BUCKCONV_TWOSTORY_PADS" H 8350 6150 50  0001 C CNN
+F 3 "" H 8350 6150 50  0001 C CNN
+	1    8350 6150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7600 5850 8000 5850
+Wire Wire Line
+	7950 5500 8000 5500
+Wire Wire Line
+	8000 5500 8000 5850
+Connection ~ 8000 5850
+Wire Wire Line
+	8000 5850 8150 5850
+$Comp
+L power:GND #PWR0111
+U 1 1 5C24184F
+P 5400 2600
+F 0 "#PWR0111" H 5400 2350 50  0001 C CNN
+F 1 "GND" H 5405 2427 50  0000 C CNN
+F 2 "" H 5400 2600 50  0001 C CNN
+F 3 "" H 5400 2600 50  0001 C CNN
+	1    5400 2600
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5500 2600 5400 2600
+$Comp
+L Mechanical:MountingHole H1
+U 1 1 5C246F1F
+P 6450 6350
+F 0 "H1" H 6550 6396 50  0000 L CNN
+F 1 "MountingHole" H 6550 6305 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 6450 6350 50  0001 C CNN
+F 3 "~" H 6450 6350 50  0001 C CNN
+	1    6450 6350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole H2
+U 1 1 5C24C35B
+P 6450 6550
+F 0 "H2" H 6550 6596 50  0000 L CNN
+F 1 "MountingHole" H 6550 6505 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 6450 6550 50  0001 C CNN
+F 3 "~" H 6450 6550 50  0001 C CNN
+	1    6450 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole H3
+U 1 1 5C24C3E5
+P 6450 6750
+F 0 "H3" H 6550 6796 50  0000 L CNN
+F 1 "MountingHole" H 6550 6705 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 6450 6750 50  0001 C CNN
+F 3 "~" H 6450 6750 50  0001 C CNN
+	1    6450 6750
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole H4
+U 1 1 5C251700
+P 6450 6950
+F 0 "H4" H 6550 6996 50  0000 L CNN
+F 1 "MountingHole" H 6550 6905 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 6450 6950 50  0001 C CNN
+F 3 "~" H 6450 6950 50  0001 C CNN
+	1    6450 6950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4450 2100 4600 2100
+$Comp
+L Connector:Conn_01x01_Male J1
+U 1 1 5C2908FC
+P 6350 1500
+F 0 "J1" H 6323 1430 50  0000 R CNN
+F 1 "Conn_01x01_Male" H 6323 1521 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 6350 1500 50  0001 C CNN
+F 3 "~" H 6350 1500 50  0001 C CNN
+	1    6350 1500
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6150 1500 6100 1500
+$Comp
+L 000_mylibrary:Arduino_UNO_R3_mylib A1
+U 1 1 5C28B71D
+P 5600 1500
+F 0 "A1" H 5600 2678 50  0000 C CNN
+F 1 "Arduino_UNO_R3_mylib" H 5600 2587 50  0000 C CNN
+F 2 "mylibrary:Arduino_UNO_R3" H 5750 450 50  0001 L CNN
+F 3 "https://www.arduino.cc/en/Main/arduinoBoardUno" H 5400 2550 50  0001 C CNN
+	1    5600 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R8
+U 1 1 5C2065AC
+P 4750 2100
+F 0 "R8" H 4820 2146 50  0000 L CNN
+F 1 "10K" H 4820 2055 50  0000 L CNN
+F 2 "000_mylibrary:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal_fatpad" V 4680 2100 50  0001 C CNN
+F 3 "~" H 4750 2100 50  0001 C CNN
+	1    4750 2100
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	5105 2100 5100 2100
+Connection ~ 5100 2100
+Wire Wire Line
+	5100 2100 4900 2100
+$Comp
+L Connector:Conn_01x03_Male J3
+U 1 1 5C2B559C
+P 7450 750
+F 0 "J3" H 7556 1028 50  0000 C CNN
+F 1 "Conn_01x03_Male" H 7556 937 50  0000 C CNN
+F 2 "mylibrary:PinHeader_1x03_P2.54mm_Vertical" H 7450 750 50  0001 C CNN
+F 3 "~" H 7450 750 50  0001 C CNN
+	1    7450 750 
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_POT_TRIM RV1
+U 1 1 5C2BA958
+P 8000 750
+F 0 "RV1" H 7931 796 50  0000 R CNN
+F 1 "R_POT_TRIM" H 7931 705 50  0000 R CNN
+F 2 "mylibrary:blue_trimpot" H 8000 750 50  0001 C CNN
+F 3 "~" H 8000 750 50  0001 C CNN
+	1    8000 750 
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	7850 750  7650 750 
+Wire Wire Line
+	8000 600  7650 600 
+Wire Wire Line
+	7650 600  7650 650 
+Wire Wire Line
+	8000 900  7650 900 
+Wire Wire Line
+	7650 900  7650 850 
+$Comp
+L power:GND #PWR0114
+U 1 1 5C1C3863
+P 8000 1050
+F 0 "#PWR0114" H 8000 800 50  0001 C CNN
+F 1 "GND" H 8005 877 50  0000 C CNN
+F 2 "" H 8000 1050 50  0001 C CNN
+F 3 "" H 8000 1050 50  0001 C CNN
+	1    8000 1050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8000 1050 8000 900 
+Connection ~ 8000 900 
+$Comp
+L Connector:Conn_01x01_Male J2
+U 1 1 5C2D3C84
+P 6250 350
+F 0 "J2" H 6223 280 50  0000 R CNN
+F 1 "Conn_01x01_Male" H 6223 371 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 6250 350 50  0001 C CNN
+F 3 "~" H 6250 350 50  0001 C CNN
+	1    6250 350 
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6050 350  5500 350 
+Connection ~ 5500 350 
+$Comp
+L Connector:Conn_01x02_Male J4
+U 1 1 5C2962B0
+P 4450 1900
+F 0 "J4" V 4510 1940 50  0000 L CNN
+F 1 "Conn_01x02_Male" V 4601 1940 50  0000 L CNN
+F 2 "mylibrary:PinHeader_1x02_P2.54mm_Vertical_fatpad" H 4450 1900 50  0001 C CNN
+F 3 "~" H 4450 1900 50  0001 C CNN
+	1    4450 1900
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4000 2100 4350 2100
+Wire Wire Line
+	5100 1100 600  1100
+Wire Wire Line
+	600  1100 600  7000
+Wire Wire Line
+	5100 1200 750  1200
+Wire Wire Line
+	750  1200 750  6900
+$Comp
+L Diode:1N4007 D1
+U 1 1 5C345713
+P 2150 6050
+F 0 "D1" V 2104 6129 50  0000 L CNN
+F 1 "1N4007" V 2195 6129 50  0000 L CNN
+F 2 "mylibrary:D_DO-35_SOD27_P7.62mm_Horizontal_fatpad" H 2150 5875 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88503/1n4001.pdf" H 2150 6050 50  0001 C CNN
+	1    2150 6050
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2800 6050 2800 6150
+$EndSCHEMATC

@@ -1,0 +1,12 @@
+
+MPPT Solar:
+
+Arduino model without PC4, PC5 because of standoff
+
+Arduino hole footprint bigger near ioref, trace from R2 interferes
+
+MPPT LCD Pi:
+
+SCL and SDA from A4 and A5, not PC4, PC5
+
+order more short 9mm arduino headers

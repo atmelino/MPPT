@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name MPPT_LCD_Pi-rescue)(type Legacy)(uri ${KIPRJMOD}/MPPT_LCD_Pi-rescue.lib)(options "")(descr ""))
+)
