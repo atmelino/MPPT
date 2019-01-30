@@ -9,7 +9,7 @@
 */
 
 // link to the rtcpi library
-var rtcpi = require('../../lib/rtcpi/rtcpi');
+var rtcpi = require('./lib/rtcpi/rtcpi');
 
 // create an rtc object
 var rtc = new RTCPi();
