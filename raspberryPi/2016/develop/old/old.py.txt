@@ -1,0 +1,86 @@
+            # pwm = chr(newPWM)
+            # pwm = '\xc4'
+
+
+            # arduinoMessageJSON = json.dumps({'PWM':202}, indent=0)
+            # arduinoMessageJSON='{"PWM":203}' 
+
+
+            # self.serial.write(pwm)
+        # socketConn, addr = s.accept()     # Establish connection with client.
+        # print 'Got connection from', addr
+        # socketConn.send('Thank you for connecting %d' %counter) 
+        
+#global simulation
+        print "reader simulation ", self.simulation
+        if self.simulation == True:     
+            simulator.getSerial(self)
+        else:
+                    if 'simulation' in decoded:
+                        if decoded['simulation'] == 1:
+                            self.simulation = True
+                        else:
+                            self.simulation = False                         
+                                self.simulation = False
+        global RTCinstalled
+        simulation = False
+            global deviceWebSocket
+                global myrtc
+        global clientMessage
+        # initialize globals
+clientMessage = ''
+
+                     
+        if 'SERIAL' in message:   
+            print 'SERIAL found'
+            mysocketMessage.status = 'measure'
+            mysocketMessage.Line = message
+            self.sendSocketMessage()
+global counter
+            
+            global decoded
+            
+            
+            
+            
+                parser.add_option("--cr",
+        dest="cr",
+        action="store_true",
+        help="do not send CR+LF, send CR only",
+        default=False
+    )
+
+    parser.add_option("--lf",
+        dest="lf",
+        action="store_true",
+        help="do not send CR+LF, send LF only",
+        default=False
+    )
+                if options.cr and options.lf:
+        parser.error("only one of --cr or --lf can be specified")
+
+                parser.add_option("--menu-char",
+        dest="menu_char",
+        action="store",
+        type='int',
+        help="ASCII code of special character that is used to control deviceWebSocket (menu)",
+        default=0x14
+    )
+                    self.break_state = False
+                    """
+        if self.simulation == True:
+        #if self.simulation == False:
+            self.deviceReader_thread = threading.Thread(target=self.deviceReader)
+            self.deviceReader_thread.setDaemon(1)
+            self.deviceReader_thread.start()
+        else:
+            self.deviceReader_thread = threading.Thread(target=simulator.deviceReader(self))
+            self.deviceReader_thread.setDaemon(1)
+            self.deviceReader_thread.start()
+        """
+        
+        
+            
+               self.newline = 1
+       sys.stdout.write('deviceWriter thread alive %d\n' % self.counter)
+                 

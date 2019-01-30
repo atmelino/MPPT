@@ -1,0 +1,26 @@
+{
+  "name": "MPPT",
+  "version": "0.0.1",
+  "description": "MPPT",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.16.4",
+    "ip": "^1.1.5",
+    "rpio": "^1.0.12",
+    "serialport": "^6.2.2",
+    "ws": "^5.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "serial",
+    "websockets",
+    "ws",
+    "p5js"
+  ],
+  "author": "atmelino",
+  "license": "MIT"
+}

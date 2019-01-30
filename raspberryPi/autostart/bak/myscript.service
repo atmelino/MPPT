@@ -1,0 +1,16 @@
+[Unit]
+Description=My service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/node  /home/pi/github/projects/MPPT/server.js /dev/ttyAMA0
+#ExecStart=/usr/local/bin/node  -v
+WorkingDirectory=/home/pi/github/projects/MPPT
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>MPPT Monitor</title>
+<script src="../../lib/jquery-2.1.1.min.js"></script>
+<link rel="stylesheet" href="../../lib/jquery-ui.css">
+<script src="../../lib/jquery-ui.js"></script>
+<link rel="stylesheet" href="../../lib/spinner-layout/jquery.ui.spinner.css">
+<script src="../../lib/spinner-layout/jquery.ui.spinner.js"></script>
+<link rel="stylesheet" type="text/css" href="MPPTMonitor.css">
+
+<script type="text/javascript">
+	//var tid = setInterval(refreshDataButton, 2000);
+	var tid;
+	var fileName = "ardData0Tmp.txt";
+
+	function onload_function() {
+		listDir();
+	}
+
+	function listDir() {
+		//alert("list dir");
+
+		$.ajax({
+			url : "listdir.php",
+			cache : false,
+			success : function(data) {
+				//$("#fileNames").html(data);
+
+				fileNamesJSON = JSON.parse(data);
+				setFilesComboBox(fileNamesJSON.files);
+
+				var theSelect = document.getElementById('filesComboBox');
+				var lastValue = theSelect.options[theSelect.options.length - 1].value;
+				//alert(lastValue);
+				fileName = lastValue;
+
+				$("#filesComboBox").val(lastValue);
+				filesComboSelect();
+
+				// start autorefresh
+				tid = setInterval(refreshData, 2000);
+			}
+		});
+
+	}
+
+	function setFilesComboBox(items) {
+		// printlnMessage('messages',items);
+
+		elementId = document.getElementById("filesComboBox");
+		elementId.options.length = 0;
+
+		for ( var i = 0; i < items.length; i++) {
+			AddItem("filesComboBox", items[i], items[i]);
+		}
+
+	}
+
+	function filesComboSelect() {
+		//alert("filesComboBox event");
+		fileName = getSelectedText("filesComboBox");
+		refreshData();
+	}
+
+	function AddItem(Element, Text, Value) {
+		// Create an Option object
+		var opt = document.createElement("option");
+
+		// Add an Option object to Drop Down/List Box
+		document.getElementById(Element).options.add(opt);
+
+		// Assign text and value to Option object
+		opt.text = Text;
+		opt.value = Value;
+	}
+
+	function getSelectedText(elementId) {
+
+		// printMessage('messages',"elementId:");
+		// printlnMessage('messages',elementId);
+
+		var elt = document.getElementById(elementId);
+
+		if (elt.selectedIndex == -1)
+			return null;
+
+		return elt.options[elt.selectedIndex].text;
+	}
+
+	//function refreshData(fileName) {
+	function refreshData() {
+		rnd = Math.random();
+		name = "writeFiles/" + fileName + "?rnd=" + rnd;
+		$.get(name, parseData);
+	}
+
+	function parseData(data) {
+		//alert("data is: " + data);
+		str = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+		//$("#data").load();
+		$("#pageContent").html(str);
+		scrollToBottom();
+
+	}
+
+	function scrollToBottom() {
+		$('html,body').animate({
+			scrollTop : document.body.scrollHeight
+		}, "fast");
+	}
+
+	function setPWMButton() {
+
+		myPWM = $("#PWM").spinner("value");
+
+		$.ajax({
+			url : "writePWM.php?PWM=" + myPWM,
+			cache : false,
+			success : function(data) {
+				//alert(data);
+			}
+		});
+	}
+
+	$(function() {
+
+		$("#autoRefresh").click(function() {
+			if (this.checked) {
+				//alert("checked");
+				//tid = setInterval(refreshDataButton, 2000);
+				tid = setInterval(refreshData, 2000);
+			} else {
+				//alert("unchecked");
+				clearInterval(tid);
+			}
+		});
+		$("#PWM").spinner({
+			step : 1,
+			numberFormat : "n",
+			min : 0,
+			max : 244,
+			alignment : 'horizontal',
+		});
+
+	});
+</script>
+
+
+</head>
+<body onload="onload_function()">
+	<div id="menuheader">
+		<input type="checkbox" id='autoRefresh' checked> </input>auto refresh
+		<!--  -->
+		<input type="checkbox" id='scrolltobottom' checked> </input>scroll to bottom
+		<!--  -->
+		<select id="filesComboBox" onchange="filesComboSelect()">
+			<option>default</option>
+		</select>
+		<!-- <button id="refresh" onclick="refreshDataButton()">_ refresh _</button> -->
+		<!-- <button id="listdir" onclick="listDirButton()">list dir</button> -->
+		<!--  -->
+		<label for="spinner">PWM:</label> <input id="PWM" name="value" value="128">
+		<!--  -->
+		<button id="setPWM" onclick="setPWMButton()">set PWM</button>
+	</div>
+	<div id='mainarea'>
+
+		<div id='pageContent'></div>
+	</div>
+
+</body>
+</html>

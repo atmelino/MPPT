@@ -1,0 +1,14 @@
+
+[Unit]
+Description=Mouse Logging Service run curl localhost:8888
+
+[Service]
+#ExecStart=/root/mouse.py
+ExecStart=/home/pi/github/raspberryPi/autostart/mouse.py
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
+Alias=mouselogger.service
+
+

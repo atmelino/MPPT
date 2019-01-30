@@ -1,0 +1,24 @@
+
+
+
+[Unit]
+Description=server.js MPPT application
+Documentation=https://example.com
+After=network.target
+
+[Service]
+Environment=NODE_PORT=3002
+Type=simple
+User=root
+WorkingDirectory=/home/pi/github/raspberryPi/projects/MPPT
+#ExecStart=/usr/local/bin/node "/home/pi/github/raspberryPi/projects/MPPT/server.js /dev/ttyAMA0"
+ExecStart=/usr/local/bin/node /home/pi/github/raspberryPi/projects/MPPT/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+

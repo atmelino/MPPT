@@ -1,0 +1,95 @@
+@CHARSET "UTF-8";
+
+body { /*font-family: Arial;
+    font-size: 14px;*/
+	font-family: monospace;
+	margin: 1px; //
+	margin: 0;
+	padding: 0;
+}
+
+#menuheader {
+	z-index: 100;
+	background: #eeeeff;
+	position: fixed;
+	width: 100%;
+	height: 25px;
+	top: 0;
+}
+
+#mainarea {
+	top: 26px;
+	margin-top: 26px;
+	padding: 0;
+}
+
+#liveData {
+	font-size: 100%;
+}
+
+#storedData {
+	font-size: 100%;
+}
+
+#titleMessages {
+	font-size: 60%;
+}
+
+h4 { /*font-size: 50%;*/
+	
+}
+
+.ui-accordion .ui-accordion-header {
+	display: block;
+	cursor: pointer;
+	/*position: relative;*/
+	/*margin-top: 20px;*/
+	padding: 0 0 0 0;
+	min-height: 0; /* support: IE7 */
+}
+
+.ui-accordion .ui-accordion-icons {
+	padding-left: 22.2em;
+}
+
+.ui-accordion .ui-accordion-noicons {
+	padding-left: .7em;
+}
+
+.ui-accordion .ui-accordion-icons .ui-accordion-icons {
+	padding-left: 2.2em;
+}
+
+.ui-accordion .ui-accordion-header .ui-accordion-header-icon {
+	position: absolute;
+	left: .5em;
+	/*top: 0;
+	margin-top: -1px;*/
+}
+
+.ui-accordion .ui-accordion-content {
+	padding: 0 0;
+	border-top: 0;
+	overflow: auto;
+}
+
+.ui-state-disabled {
+	display: none; /* disabled tabs don't show up */
+}
+
+.horizontal input {
+	width: 4em;
+	font-size: 10pt;
+}
+
+#messages {
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box; /* Firefox, other Gecko */
+	box-sizing: border-box; /* IE 8+ */
+	font-size: 75%;
+}
+
+#notaccordion a {
+	border: 1px solid green;
+	z-index: 0;
+}
