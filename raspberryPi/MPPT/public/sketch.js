@@ -226,3 +226,23 @@ function PWMMode() {
   sendpacket.data = value;
   socket.send(JSON.stringify(sendpacket));
 }
+
+function setRTC() {
+  var currentDate = new Date(Date.now());
+  var year = currentDate.getFullYear();
+  var month = currentDate.getMonth() + 1;
+  var day = currentDate.getDate();
+  var hours = currentDate.getHours();
+  var minutes = currentDate.getMinutes();
+  var seconds = currentDate.getSeconds();
+  var dayofweek = currentDate.getDay();
+
+  sendpacket.type = "SetRTC";
+  sendpacket.data = {
+    year: year,
+    month: month,
+    day: day
+  };
+  socket.send(JSON.stringify(sendpacket));
+  alert(" " + JSON.stringify(sendpacket));
+}

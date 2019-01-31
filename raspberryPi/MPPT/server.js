@@ -12,8 +12,8 @@ var wss = new WebSocketServer({ server: httpServer }); // a websocket server
 const SerialPort = require("serialport");
 var portName = process.argv[2]; // get the port name from the command line
 const Readline = require("@serialport/parser-readline");
-var config = require('./config.json');
-console.log(config.port + ' ' + config.debuglevel);
+var config = require("./config.json");
+console.log(config.port + " " + config.debuglevel);
 //var myPort = new SerialPort(portName);
 //const myPort = new SerialPort('/dev/ttyAMA0')
 //const myPort = new SerialPort('/dev/ttyUSB0')
@@ -28,7 +28,8 @@ var sendpacket = {
   data: "empty"
 };
 
-debugMsg("server started");
+debug = true;
+debugMsg("server started", 0);
 
 myPort.on("open", openPort); // called when the serial port opens
 
@@ -39,20 +40,20 @@ parser.on("data", listen); // called when there's new incoming serial data
 server.use("/", express.static("./public"));
 
 function openPort() {
-  debugMsg("port open");
-  debugMsg("baud rate: " + myPort.baudRate);
+  debugMsg("port open", 0);
+  debugMsg("baud rate: " + myPort.baudRate, 0);
 }
 
 // define the webSocket connection callback function:
 function connectClient(newClient) {
   // when a webSocket message comes in from this client:
   function readMessage(receivedpacket) {
-    debugMsg(receivedpacket);
+    debugMsg(receivedpacket, 3);
     receivedmessage = JSON.parse(receivedpacket);
     if (receivedmessage.type == "storeddata") {
       var path = "./public/data";
-      fs.readdir(path, function (err, items) {
-        debugMsg(items);
+      fs.readdir(path, function(err, items) {
+        debugMsg(items, 1);
         if (wss.clients.size > 0) {
           // if there are any clients
           sendpacket.type = "listdir";
@@ -67,9 +68,9 @@ function connectClient(newClient) {
       rnd = Math.random();
       //name = path + fileName + "?rnd=" + rnd;
       name = path + fileName;
-      debugMsg(name);
+      debugMsg(name, 1);
 
-      fs.readFile(name, "utf8", function (err, contents) {
+      fs.readFile(name, "utf8", function(err, contents) {
         //debugMsg(contents);
         sendpacket.type = "filedata";
         sendpacket.data = contents;
@@ -81,8 +82,12 @@ function connectClient(newClient) {
         PWM: receivedmessage.data
       };
       var arduinoMessageJSON = JSON.stringify(arduinoMessage);
-      debugMsg("serial port write" + arduinoMessageJSON);
+      debugMsg("serial port write" + arduinoMessageJSON, 1);
       myPort.write(arduinoMessageJSON);
+    }
+    if (receivedmessage.type == "SetRTC") {
+      debugMsg("SetRTC" + JSON.stringify(receivedmessage), 1);
+      //rtc.setDateNumbers(year, month, day, hours, minutes, seconds, dayofweek);
     }
   }
 
@@ -90,11 +95,11 @@ function connectClient(newClient) {
   newClient.on("message", readMessage);
   // acknowledge new client:
   //debugMsg("new client");
-  debugMsg("connectClient - number of clients " + wss.clients.size);
+  debugMsg("connectClient - number of clients " + wss.clients.size, 1);
 }
 
 function listen(data) {
-  debugMsg(data);
+  debugMsg(data, 2);
   // toto: at first boot, rtc time gives 2019-02-01. setdate sets correct time
   var UTCdate = rtc.readDate();
   var localdate = new Date(
@@ -110,20 +115,21 @@ function listen(data) {
     var receivedmessage = JSON.parse(data);
     //messageObject = JSON.parse(message);
     if (receivedmessage.type == "IP") {
-      debugMsg('IP requested');
+      debugMsg("IP requested", 1);
       var ipaddress = ip.address();
       console.dir(ipaddress);
       var arduinoMessage = {
         IP: ipaddress
       };
       var arduinoMessageJSON = JSON.stringify(arduinoMessage);
-      debugMsg("serial port write" + arduinoMessageJSON);
+      debugMsg("serial port write" + arduinoMessageJSON, 1);
       myPort.write(arduinoMessageJSON);
     }
+
     if (receivedmessage.type == "data") {
       line = receivedmessage.line;
       var dateline = localdatestring + " " + line;
-      debugMsg(dateline);
+      debugMsg(dateline, 1);
       bufferarray.push(dateline);
       // write file every 50 data
 
@@ -132,15 +138,15 @@ function listen(data) {
         buffer = new Buffer.from(bufferarray.join("\n"));
         bufferarray.length = 0;
 
-        fs.open(path, "w", function (err, fd) {
+        fs.open(path, "w", function(err, fd) {
           if (err) {
             throw "error opening file: " + err;
           }
 
-          fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+          fs.write(fd, buffer, 0, buffer.length, null, function(err) {
             if (err) throw "error writing file: " + err;
-            fs.close(fd, function () {
-              debugMsg("file written " + path);
+            fs.close(fd, function() {
+              debugMsg("file written " + path, 1);
             });
           });
         });
@@ -171,17 +177,19 @@ function broadcast(data) {
 }
 
 // start the servers:
-var server = httpServer.listen(8080, function () {
+var server = httpServer.listen(8080, function() {
   var host = server.address().address;
   host = host == "::" ? "localhost" : host;
   var port = server.address().port;
-  debugMsg("running at http://" + host + ":" + port);
+  debugMsg("running at http://" + host + ":" + port, 1);
 });
 
 wss.on("connection", connectClient); // listen for webSocket messages
 
-function debugMsg(messsage) {
+function debugMsg(message, level) {
   // reduce console ouput if running as service
-  if (false)
-    console.log(message);
+
+  var debugLevel = 1;
+
+  if (level <= debugLevel) console.log(message);
 }
