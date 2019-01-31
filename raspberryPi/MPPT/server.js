@@ -27,6 +27,7 @@ var sendpacket = {
   type: "none",
   data: "empty"
 };
+var logYesNo = true;
 
 debug = true;
 debugMsg("server started", 0);
@@ -96,6 +97,16 @@ function connectClient(newClient) {
       var dayofweek = receivedmessage.data.dayofweek;
       rtc.setDateNumbers(year, month, day, hours, minutes, seconds, dayofweek);
     }
+    if (receivedmessage.type == "enableLogs") {
+      debugMsg("enableLogs" + JSON.stringify(receivedmessage), 1);
+      if (receivedmessage.data == 'true') {
+        logYesNo = true;
+        debugMsg("enableLogs: " + logYesNo, 1);
+      } else {
+        logYesNo = false;
+        debugMsg("enableLogs: " + logYesNo, 1);
+      }
+    }
   }
 
   // set up event listeners:
@@ -137,26 +148,28 @@ function listen(data) {
       line = receivedmessage.line;
       var dateline = localdatestring + " " + line;
       debugMsg(dateline, 1);
-      bufferarray.push(dateline);
-      // write file every 50 data
 
-      if (bufferarray.length > 50) {
-        var path = "./public/data/" + localdatestring + ".txt";
-        buffer = new Buffer.from(bufferarray.join("\n"));
-        bufferarray.length = 0;
+      if (logYesNo == true) {
+        bufferarray.push(dateline);
+        // write file every 50 data
+        if (bufferarray.length > 3) {
+          var path = "./public/data/" + localdatestring + ".txt";
+          buffer = new Buffer.from(bufferarray.join("\n"));
+          bufferarray.length = 0;
 
-        fs.open(path, "w", function (err, fd) {
-          if (err) {
-            throw "error opening file: " + err;
-          }
+          fs.open(path, "w", function (err, fd) {
+            if (err) {
+              throw "error opening file: " + err;
+            }
 
-          fs.write(fd, buffer, 0, buffer.length, null, function (err) {
-            if (err) throw "error writing file: " + err;
-            fs.close(fd, function () {
-              debugMsg("file written " + path, 1);
+            fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+              if (err) throw "error writing file: " + err;
+              fs.close(fd, function () {
+                debugMsg("file written " + path, 1);
+              });
             });
           });
-        });
+        }
       }
 
       if (wss.clients.size > 0) {

@@ -248,7 +248,31 @@ function setRTC() {
     dayofweek: dayofweek
   };
   socket.send(JSON.stringify(sendpacket));
-  const msg=year + ' ' + month + ' ' + day + ' ' + hours + ' ' + minutes + ' ' + seconds;
+  const msg = year + ' ' + month + ' ' + day + ' ' + hours + ' ' + minutes + ' ' + seconds;
 
   alert("Date set to " + msg);
+}
+
+function enableLogs() {
+  enableLogschecked = document.getElementById("enableLogs").checked;
+  sendpacket.type = "enableLogs";
+  if (enableLogschecked == true) {
+    document.getElementById("enableLogscontent").style.display = "block";
+    document.getElementById("setLogPeriod").disabled = false;
+    value = "true";
+  } else {
+    document.getElementById("enableLogscontent").style.display = "none";
+    document.getElementById("setLogPeriod").disabled = true;
+    value = "false";
+  }
+  sendpacket.data = value;
+  socket.send(JSON.stringify(sendpacket));
+}
+
+function setPWMButton() {
+  var value = document.getElementById("LogPeriod").value;
+  sendpacket.type = "LogPeriod";
+  sendpacket.data = value;
+  socket.send(JSON.stringify(sendpacket));
+
 }
