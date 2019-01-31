@@ -241,8 +241,14 @@ function setRTC() {
   sendpacket.data = {
     year: year,
     month: month,
-    day: day
+    day: day,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
+    dayofweek: dayofweek
   };
   socket.send(JSON.stringify(sendpacket));
-  alert(" " + JSON.stringify(sendpacket));
+  const msg=year + ' ' + month + ' ' + day + ' ' + hours + ' ' + minutes + ' ' + seconds;
+
+  alert("Date set to " + msg);
 }

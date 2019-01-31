@@ -52,7 +52,7 @@ function connectClient(newClient) {
     receivedmessage = JSON.parse(receivedpacket);
     if (receivedmessage.type == "storeddata") {
       var path = "./public/data";
-      fs.readdir(path, function(err, items) {
+      fs.readdir(path, function (err, items) {
         debugMsg(items, 1);
         if (wss.clients.size > 0) {
           // if there are any clients
@@ -70,7 +70,7 @@ function connectClient(newClient) {
       name = path + fileName;
       debugMsg(name, 1);
 
-      fs.readFile(name, "utf8", function(err, contents) {
+      fs.readFile(name, "utf8", function (err, contents) {
         //debugMsg(contents);
         sendpacket.type = "filedata";
         sendpacket.data = contents;
@@ -87,7 +87,14 @@ function connectClient(newClient) {
     }
     if (receivedmessage.type == "SetRTC") {
       debugMsg("SetRTC" + JSON.stringify(receivedmessage), 1);
-      //rtc.setDateNumbers(year, month, day, hours, minutes, seconds, dayofweek);
+      var year = receivedmessage.data.year;
+      var month = receivedmessage.data.month;
+      var day = receivedmessage.data.day;
+      var hours = receivedmessage.data.hours;
+      var minutes = receivedmessage.data.minutes;
+      var seconds = receivedmessage.data.seconds;
+      var dayofweek = receivedmessage.data.dayofweek;
+      rtc.setDateNumbers(year, month, day, hours, minutes, seconds, dayofweek);
     }
   }
 
@@ -138,14 +145,14 @@ function listen(data) {
         buffer = new Buffer.from(bufferarray.join("\n"));
         bufferarray.length = 0;
 
-        fs.open(path, "w", function(err, fd) {
+        fs.open(path, "w", function (err, fd) {
           if (err) {
             throw "error opening file: " + err;
           }
 
-          fs.write(fd, buffer, 0, buffer.length, null, function(err) {
+          fs.write(fd, buffer, 0, buffer.length, null, function (err) {
             if (err) throw "error writing file: " + err;
-            fs.close(fd, function() {
+            fs.close(fd, function () {
               debugMsg("file written " + path, 1);
             });
           });
@@ -177,7 +184,7 @@ function broadcast(data) {
 }
 
 // start the servers:
-var server = httpServer.listen(8080, function() {
+var server = httpServer.listen(8080, function () {
   var host = server.address().address;
   host = host == "::" ? "localhost" : host;
   var port = server.address().port;
