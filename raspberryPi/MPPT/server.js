@@ -29,7 +29,7 @@ var sendpacket = {
 };
 var logYesNo = true;
 
-debug = true;
+var debugLevel = 1;
 debugMsg("server started", 0);
 
 myPort.on("open", openPort); // called when the serial port opens
@@ -147,7 +147,7 @@ function listen(data) {
     if (receivedmessage.type == "data") {
       line = receivedmessage.line;
       var dateline = localdatestring + " " + line;
-      debugMsg(dateline, 1);
+      debugMsg(dateline, 2);
 
       if (logYesNo == true) {
         bufferarray.push(dateline);
@@ -208,8 +208,5 @@ wss.on("connection", connectClient); // listen for webSocket messages
 
 function debugMsg(message, level) {
   // reduce console ouput if running as service
-
-  var debugLevel = 1;
-
   if (level <= debugLevel) console.log(message);
 }
