@@ -258,18 +258,18 @@ function enableLogs() {
   sendpacket.type = "enableLogs";
   if (enableLogschecked == true) {
     document.getElementById("enableLogscontent").style.display = "block";
-    document.getElementById("setLogPeriod").disabled = false;
+    //document.getElementById("setLogPeriod").disabled = false;
     value = "true";
   } else {
     document.getElementById("enableLogscontent").style.display = "none";
-    document.getElementById("setLogPeriod").disabled = true;
+    //document.getElementById("setLogPeriod").disabled = true;
     value = "false";
   }
   sendpacket.data = value;
   socket.send(JSON.stringify(sendpacket));
 }
 
-function setPWMButton() {
+function setLogPeriodButton() {
   var value = document.getElementById("LogPeriod").value;
   sendpacket.type = "LogPeriod";
   sendpacket.data = value;

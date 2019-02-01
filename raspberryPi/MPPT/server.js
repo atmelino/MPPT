@@ -1,6 +1,7 @@
-// to start:
-// Arduino UNO: node server.js /dev/ttyAMA0
-// Arduino Pro Mini: node server.js /dev/ttyUSB0
+// to start: sudo node server.js 
+// port is in config.json
+// Arduino UNO: /dev/ttyAMA0
+// Arduino Pro Mini: /dev/ttyUSB0
 
 var express = require("express"); // the express library
 var http = require("http"); // the http library
@@ -10,13 +11,9 @@ var server = express(); // the express server
 var httpServer = http.createServer(server); // an http server
 var wss = new WebSocketServer({ server: httpServer }); // a websocket server
 const SerialPort = require("serialport");
-var portName = process.argv[2]; // get the port name from the command line
 const Readline = require("@serialport/parser-readline");
 var config = require("./config.json");
 console.log(config.port + " " + config.debuglevel);
-//var myPort = new SerialPort(portName);
-//const myPort = new SerialPort('/dev/ttyAMA0')
-//const myPort = new SerialPort('/dev/ttyUSB0')
 const myPort = new SerialPort(config.port);
 const RTC = require("./RTC.js");
 var rtc = new RTC();
@@ -28,15 +25,14 @@ var sendpacket = {
   data: "empty"
 };
 var logYesNo = true;
-
+var oldUTCdate = rtc.readDate();
 var debugLevel = 1;
+var LogPeriod = 60;
+
 debugMsg("server started", 0);
-
 myPort.on("open", openPort); // called when the serial port opens
-
 const parser = myPort.pipe(new Readline({ delimiter: "\r\n" }));
 parser.on("data", listen); // called when there's new incoming serial data
-
 // serve static files from /public:
 server.use("/", express.static("./public"));
 
@@ -107,6 +103,10 @@ function connectClient(newClient) {
         debugMsg("enableLogs: " + logYesNo, 1);
       }
     }
+    if (receivedmessage.type == "LogPeriod") {
+      debugMsg('log period: ' + receivedmessage.data, 1);
+      LogPeriod = receivedmessage.data;
+    }
   }
 
   // set up event listeners:
@@ -118,10 +118,11 @@ function connectClient(newClient) {
 
 function listen(data) {
   debugMsg(data, 2);
-  // toto: at first boot, rtc time gives 2019-02-01. setdate sets correct time
-  var UTCdate = rtc.readDate();
+  var newUTCdate = rtc.readDate();
+  const t1 = oldUTCdate.toISOString();
+  const t2 = newUTCdate.toISOString();
   var localdate = new Date(
-    UTCdate.getTime() - UTCdate.getTimezoneOffset() * 60000
+    newUTCdate.getTime() - newUTCdate.getTimezoneOffset() * 60000
   );
   var localdatestring = localdate
     .toISOString()
@@ -148,43 +149,55 @@ function listen(data) {
       line = receivedmessage.line;
       var dateline = localdatestring + " " + line;
       debugMsg(dateline, 2);
-
-      if (logYesNo == true) {
-        bufferarray.push(dateline);
-        // write file every 50 data
-        if (bufferarray.length > 3) {
-          var path = "./public/data/" + localdatestring + ".txt";
-          buffer = new Buffer.from(bufferarray.join("\n"));
-          bufferarray.length = 0;
-
-          fs.open(path, "w", function (err, fd) {
-            if (err) {
-              throw "error opening file: " + err;
-            }
-
-            fs.write(fd, buffer, 0, buffer.length, null, function (err) {
-              if (err) throw "error writing file: " + err;
-              fs.close(fd, function () {
-                debugMsg("file written " + path, 1);
-              });
-            });
-          });
-        }
-      }
-
       if (wss.clients.size > 0) {
         // if there are any clients
         //debugMsg('clients');
         sendpacket.type = "livedata";
         sendpacket.data = dateline;
         broadcast(JSON.stringify(sendpacket)); // send them the data as a string
-        //broadcast(line);   // send them the data as a string
+      }
+
+      if (logYesNo == true) {
+        const diff = newUTCdate - oldUTCdate;
+        debugMsg(t1 + ' ' + t2 + ' ' + diff, 1);
+        if (diff < 100) {
+          return; // something wrong with the clock
+        }
+        if (diff >= 1000 * LogPeriod) {
+          oldUTCdate = newUTCdate;
+          debugMsg('add a line to buffer', 1);
+          bufferarray.push(dateline);
+          // write file every 60 data
+          if (bufferarray.length > 59) {
+            writeDataFile(localdatestring);
+          }
+        }
       }
     }
   } catch (e) {
     return console.error(e);
   }
 }
+
+function writeDataFile(localdatestring) {
+  var path = "./public/data/" + localdatestring + ".txt";
+  buffer = new Buffer.from(bufferarray.join("\n"));
+  bufferarray.length = 0;
+
+  fs.open(path, "w", function (err, fd) {
+    if (err) {
+      throw "error opening file: " + err;
+    }
+
+    fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+      if (err) throw "error writing file: " + err;
+      fs.close(fd, function () {
+        debugMsg("file written " + path, 1);
+      });
+    });
+  });
+}
+
 
 // broadcast data to connected webSocket clients:
 function broadcast(data) {
