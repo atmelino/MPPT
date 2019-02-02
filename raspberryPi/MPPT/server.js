@@ -25,11 +25,14 @@ var sendpacket = {
   data: "empty"
 };
 var logYesNo = true;
-var oldUTCdate = rtc.readDate();
+var oldBufferDate = rtc.readDate();
+var oldFileDate = oldBufferDate;
 var debugLevel = 1;
 var LogPeriod = 60;
+var LogFilePeriod = 3600;
+var countDots = 0;
 
-debugMsg("server started", 0);
+debugMsgln("server started", 0);
 myPort.on("open", openPort); // called when the serial port opens
 const parser = myPort.pipe(new Readline({ delimiter: "\r\n" }));
 parser.on("data", listen); // called when there's new incoming serial data
@@ -37,20 +40,21 @@ parser.on("data", listen); // called when there's new incoming serial data
 server.use("/", express.static("./public"));
 
 function openPort() {
-  debugMsg("port open", 0);
-  debugMsg("baud rate: " + myPort.baudRate, 0);
+  debugMsgln("port open", 0);
+  debugMsgln("baud rate: " + myPort.baudRate, 0);
 }
 
 // define the webSocket connection callback function:
 function connectClient(newClient) {
+
   // when a webSocket message comes in from this client:
   function readMessage(receivedpacket) {
-    debugMsg(receivedpacket, 3);
+    debugMsgln(receivedpacket, 3);
     receivedmessage = JSON.parse(receivedpacket);
     if (receivedmessage.type == "storeddata") {
       var path = "./public/data";
       fs.readdir(path, function (err, items) {
-        debugMsg(items, 1);
+        debugMsgln(items, 2);
         if (wss.clients.size > 0) {
           // if there are any clients
           sendpacket.type = "listdir";
@@ -65,10 +69,10 @@ function connectClient(newClient) {
       rnd = Math.random();
       //name = path + fileName + "?rnd=" + rnd;
       name = path + fileName;
-      debugMsg(name, 1);
+      debugMsgln('readfile: ' + name, 1);
 
       fs.readFile(name, "utf8", function (err, contents) {
-        //debugMsg(contents);
+        //debugMsgln(contents);
         sendpacket.type = "filedata";
         sendpacket.data = contents;
         broadcast(JSON.stringify(sendpacket)); // send them the data as a string
@@ -79,11 +83,11 @@ function connectClient(newClient) {
         PWM: receivedmessage.data
       };
       var arduinoMessageJSON = JSON.stringify(arduinoMessage);
-      debugMsg("serial port write" + arduinoMessageJSON, 1);
+      debugMsgln("serial port write" + arduinoMessageJSON, 1);
       myPort.write(arduinoMessageJSON);
     }
     if (receivedmessage.type == "SetRTC") {
-      debugMsg("SetRTC" + JSON.stringify(receivedmessage), 1);
+      debugMsgln("SetRTC" + JSON.stringify(receivedmessage), 1);
       var year = receivedmessage.data.year;
       var month = receivedmessage.data.month;
       var day = receivedmessage.data.day;
@@ -94,32 +98,42 @@ function connectClient(newClient) {
       rtc.setDateNumbers(year, month, day, hours, minutes, seconds, dayofweek);
     }
     if (receivedmessage.type == "enableLogs") {
-      debugMsg("enableLogs" + JSON.stringify(receivedmessage), 1);
+      debugMsgln("enableLogs" + JSON.stringify(receivedmessage), 1);
       if (receivedmessage.data == 'true') {
         logYesNo = true;
-        debugMsg("enableLogs: " + logYesNo, 1);
+        debugMsgln("enableLogs: " + logYesNo, 1);
       } else {
         logYesNo = false;
-        debugMsg("enableLogs: " + logYesNo, 1);
+        debugMsgln("enableLogs: " + logYesNo, 1);
       }
     }
     if (receivedmessage.type == "LogPeriod") {
-      debugMsg('log period: ' + receivedmessage.data, 1);
+      debugMsgln('log period: ' + receivedmessage.data, 1);
       LogPeriod = receivedmessage.data;
+    }
+    if (receivedmessage.type == "LogFilePeriod") {
+      debugMsgln('log file period: ' + receivedmessage.data, 1);
+      LogFilePeriod = receivedmessage.data;
+    }
+    if (receivedmessage.type == "query") {
+      debugMsgln('query', 1);
+      sendpacket.type = "query";
+      sendpacket.data = { LogPeriod: LogPeriod, LogFilePeriod: LogFilePeriod };
+      broadcast(JSON.stringify(sendpacket)); // send them the data as a string
     }
   }
 
   // set up event listeners:
   newClient.on("message", readMessage);
   // acknowledge new client:
-  //debugMsg("new client");
-  debugMsg("connectClient - number of clients " + wss.clients.size, 1);
+  //debugMsgln("new client");
+  debugMsgln("connectClient - number of clients " + wss.clients.size, 1);
 }
 
 function listen(data) {
-  debugMsg(data, 2);
+  debugMsgln(data, 2);
   var newUTCdate = rtc.readDate();
-  const t1 = oldUTCdate.toISOString();
+  const t1 = oldBufferDate.toISOString();
   const t2 = newUTCdate.toISOString();
   var localdate = new Date(
     newUTCdate.getTime() - newUTCdate.getTimezoneOffset() * 60000
@@ -134,41 +148,47 @@ function listen(data) {
     var receivedmessage = JSON.parse(data);
     //messageObject = JSON.parse(message);
     if (receivedmessage.type == "IP") {
-      debugMsg("IP requested", 1);
+      debugMsgln("IP requested", 1);
       var ipaddress = ip.address();
       console.dir(ipaddress);
       var arduinoMessage = {
         IP: ipaddress
       };
       var arduinoMessageJSON = JSON.stringify(arduinoMessage);
-      debugMsg("serial port write" + arduinoMessageJSON, 1);
+      debugMsgln("serial port write" + arduinoMessageJSON, 1);
       myPort.write(arduinoMessageJSON);
     }
 
     if (receivedmessage.type == "data") {
       line = receivedmessage.line;
       var dateline = localdatestring + " " + line;
-      debugMsg(dateline, 2);
+      debugMsgln(dateline, 2);
       if (wss.clients.size > 0) {
         // if there are any clients
-        //debugMsg('clients');
+        //debugMsgln('clients');
         sendpacket.type = "livedata";
         sendpacket.data = dateline;
         broadcast(JSON.stringify(sendpacket)); // send them the data as a string
       }
 
       if (logYesNo == true) {
-        const diff = newUTCdate - oldUTCdate;
-        debugMsg(t1 + ' ' + t2 + ' ' + diff, 1);
-        if (diff < 100) {
+        const diffBuffer = newUTCdate - oldBufferDate;
+        const diffFile = newUTCdate - oldFileDate;
+        debugMsg('.', 1);
+        debugMsgln(t1 + ' ' + t2 + ' ' + diffBuffer + ' ' + diffFile, 2);
+        if (diffBuffer < 100) {
           return; // something wrong with the clock
         }
-        if (diff >= 1000 * LogPeriod) {
-          oldUTCdate = newUTCdate;
-          debugMsg('add a line to buffer', 1);
+        // add line to buffer every LogPeriod seconds 
+        if (diffBuffer >= 1000 * LogPeriod) {
+          oldBufferDate = newUTCdate;
+          debugMsg('b', 1);
+          debugMsgln('add a line to buffer', 2);
           bufferarray.push(dateline);
-          // write file every 60 data
-          if (bufferarray.length > 59) {
+          // write file every LogFilePeriod seconds
+          //if (bufferarray.length > 59) {
+          if (diffFile >= 1000 * LogFilePeriod) {
+            oldFileDate = newUTCdate;
             writeDataFile(localdatestring);
           }
         }
@@ -192,7 +212,7 @@ function writeDataFile(localdatestring) {
     fs.write(fd, buffer, 0, buffer.length, null, function (err) {
       if (err) throw "error writing file: " + err;
       fs.close(fd, function () {
-        debugMsg("file written " + path, 1);
+        debugMsgln("file written " + path, 1);
       });
     });
   });
@@ -201,10 +221,10 @@ function writeDataFile(localdatestring) {
 
 // broadcast data to connected webSocket clients:
 function broadcast(data) {
-  //debugMsg("broadcast - number of clients " + wss.clients.size);
+  //debugMsgln("broadcast - number of clients " + wss.clients.size);
 
   wss.clients.forEach(function each(client) {
-    //debugMsg('sending to client');
+    //debugMsgln('sending to client');
     client.send(data);
   });
 }
@@ -214,12 +234,19 @@ var server = httpServer.listen(8080, function () {
   var host = server.address().address;
   host = host == "::" ? "localhost" : host;
   var port = server.address().port;
-  debugMsg("running at http://" + host + ":" + port, 1);
+  debugMsgln("running at http://" + host + ":" + port, 1);
 });
 
 wss.on("connection", connectClient); // listen for webSocket messages
 
-function debugMsg(message, level) {
+function debugMsgln(message, level) {
   // reduce console ouput if running as service
   if (level <= debugLevel) console.log(message);
+}
+
+function debugMsg(message, level) {
+  // reduce console ouput if running as service
+  if (level <= debugLevel) process.stdout.write(message);
+  countDots++;
+  if (countDots > 40) { countDots = 0; console.log(); }
 }
