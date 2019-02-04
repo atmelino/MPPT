@@ -108,3 +108,20 @@ https://learn.adafruit.com/running-programs-automatically-on-your-tiny-computer/
 https://nodesource.com/blog/running-your-node-js-app-with-systemd-part-1/<br>
 
 
+<h4>Support</h4>
+Q: PC simulation getting serialport version error<br>
+A: Try completely removing node and reinstalling.<br>
+sudo apt remove nodejs
+delete .npm folder in home
+delete .nvm folder in home
+delete package json lock file
+delete package.json file
+sudo apt install nodejs
+try running 
+sudo node server.js
+install node modules as requested
+npm install express
+etc
+
+
+
