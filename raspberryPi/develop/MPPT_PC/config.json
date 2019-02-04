@@ -1,0 +1,6 @@
+{
+    "port": "/dev/ttyACM0",
+    "debuglevel": "0",
+    "otherport1": "/dev/ttyAMA0",
+    "otherport2": "/dev/ttyUSB0"
+}

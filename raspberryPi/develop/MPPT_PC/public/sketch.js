@@ -24,21 +24,27 @@ function sendIntro() {
 function readMessage(event) {
   //console.log('readMessage');
   //printlnMessage("messages", event.type);
-  receivemessage = JSON.parse(event.data);
-  if (receivemessage.type == "livedata") {
+  receivedmessage = JSON.parse(event.data);
+  if (receivedmessage.type == "livedata") {
     printlnMessage("messages", event.data);
-    //document.getElementById("liveDatatmp").innerHTML = receivemessage.data;
-    refreshTable("liveTable", receivemessage.data);
+    //document.getElementById("liveDatatmp").innerHTML = receivedmessage.data;
+    refreshTable("liveTable", receivedmessage.data);
   }
-  if (receivemessage.type == "listdir") {
-    setFilesComboBox(receivemessage.data);
+  if (receivedmessage.type == "listdir") {
+    setFilesComboBox(receivedmessage.data);
     filesComboSelect();
   }
-  if (receivemessage.type == "filedata") {
-    str = receivemessage.data.replace(/(?:\r\n|\r|\n)/g, "<br>");
+  if (receivedmessage.type == "filedata") {
+    str = receivedmessage.data.replace(/(?:\r\n|\r|\n)/g, "<br>");
     //document.getElementById("storedDatatmp").innerHTML = str;
-    fillTable("storedTable", receivemessage.data);
-    //fillTable(receivemessage.data);
+    fillTable("storedTable", receivedmessage.data);
+    //fillTable(receivedmessage.data);
+  }
+
+  if (receivedmessage.type == "query") {
+    printlnMessage("messages", JSON.stringify(receivedmessage));
+    document.getElementById("LogPeriod").value = receivedmessage.data.LogPeriod;
+    document.getElementById("LogFilePeriod").value = receivedmessage.data.LogFilePeriod;
   }
 }
 
@@ -173,8 +179,14 @@ function hide(name) {
 }
 
 function settingsClicked() {
+  document.getElementById("LogPeriod").value = 'query..';
+  document.getElementById("LogFilePeriod").value = 'query..';
+  sendpacket.type = "query";
+  sendpacket.data = " ";
+  socket.send(JSON.stringify(sendpacket));
   var settings = document.getElementById("settings");
   settings.style.display = "block";
+  //alert('query');
 }
 
 function showMessages() {
@@ -225,4 +237,60 @@ function PWMMode() {
   }
   sendpacket.data = value;
   socket.send(JSON.stringify(sendpacket));
+}
+
+function setRTC() {
+  var currentDate = new Date(Date.now());
+  var year = currentDate.getFullYear();
+  var month = currentDate.getMonth() + 1;
+  var day = currentDate.getDate();
+  var hours = currentDate.getHours();
+  var minutes = currentDate.getMinutes();
+  var seconds = currentDate.getSeconds();
+  var dayofweek = currentDate.getDay();
+
+  sendpacket.type = "SetRTC";
+  sendpacket.data = {
+    year: year,
+    month: month,
+    day: day,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
+    dayofweek: dayofweek
+  };
+  socket.send(JSON.stringify(sendpacket));
+  const msg = year + ' ' + month + ' ' + day + ' ' + hours + ' ' + minutes + ' ' + seconds;
+
+  alert("Date set to " + msg);
+}
+
+function enableLogs() {
+  enableLogschecked = document.getElementById("enableLogs").checked;
+  sendpacket.type = "enableLogs";
+  if (enableLogschecked == true) {
+    document.getElementById("enableLogscontent").style.display = "block";
+    value = "true";
+  } else {
+    document.getElementById("enableLogscontent").style.display = "none";
+    value = "false";
+  }
+  sendpacket.data = value;
+  socket.send(JSON.stringify(sendpacket));
+}
+
+function setLogPeriodButton() {
+  var value = document.getElementById("LogPeriod").value;
+  sendpacket.type = "LogPeriod";
+  sendpacket.data = value;
+  socket.send(JSON.stringify(sendpacket));
+
+}
+
+function setLogFilePeriodButton() {
+  var value = document.getElementById("LogFilePeriod").value;
+  sendpacket.type = "LogFilePeriod";
+  sendpacket.data = value;
+  socket.send(JSON.stringify(sendpacket));
+
 }
