@@ -110,17 +110,33 @@ https://nodesource.com/blog/running-your-node-js-app-with-systemd-part-1/<br>
 
 <h4>Support</h4>
 Q: PC simulation getting serialport version error<br>
-A: Try completely removing node and reinstalling.<br>
-sudo apt remove nodejs
+Error: Error: The module '<yourpath>/node_modules/serialport/build/Release/serialport.node'<br>
+was compiled against a different Node.js version using<br>
+NODE_MODULE_VERSION 48. This version of Node.js requires<br>
+NODE_MODULE_VERSION 57. Please try re-compiling or re-installing<br>
+
+A: Possible solutions:<br>
+method 1<br>
+run your program with an older version of node by installing Node Version Manager nvm<br>
+<code>git clone https://github.com/creationix/nvm.git ~/.nvm</code><br>
+<code>cd ~/.nvm</code><br>
+<code>git checkout `git describe --abbrev=0 --tags`</code><br>
+<code>cd ..</code><br>
+<code>. ~/.nvm/nvm.sh</code><br>
+
+
+method 2<br>
+Try completely removing node and reinstalling.<br>
+<code>sudo apt remove nodejs</code><br>
 delete .npm folder in home
 delete .nvm folder in home
 delete package json lock file
 delete package.json file
-sudo apt install nodejs
+<code>sudo apt install nodejs</code><br>
 try running 
-sudo node server.js
+<code>sudo node server.js</code><br>
 install node modules as requested
-npm install express
+<code>npm install express</code><br>
 etc
 
 
