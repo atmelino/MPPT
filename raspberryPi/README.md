@@ -116,16 +116,21 @@ NODE_MODULE_VERSION 48. This version of Node.js requires<br>
 NODE_MODULE_VERSION 57. Please try re-compiling or re-installing<br>
 
 A: Possible solutions:<br>
-method 1<br>
+<h5>method 1</h5>
 run your program with an older version of node by installing Node Version Manager nvm<br>
 <code>git clone https://github.com/creationix/nvm.git ~/.nvm</code><br>
 <code>cd ~/.nvm</code><br>
 <code>git checkout `git describe --abbrev=0 --tags`</code><br>
 <code>cd ..</code><br>
 <code>. ~/.nvm/nvm.sh</code><br>
+Add these lines to ~/.bashrc<br>
+<code>export NVM_DIR="$HOME/.nvm"</code><br>
+<code>[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm</code><br>
+Install and use different node version<br>
+<code>nvm install 6</code><br>
+<code>nvm use 6</code><br>
 
-
-method 2<br>
+<h5>method 2</h5>
 Try completely removing node and reinstalling.<br>
 <code>sudo apt remove nodejs</code><br>
 delete .npm folder in home
@@ -133,9 +138,9 @@ delete .nvm folder in home
 delete package json lock file
 delete package.json file
 <code>sudo apt install nodejs</code><br>
-try running 
+try running <br>
 <code>sudo node server.js</code><br>
-install node modules as requested
+install node modules as requested<br>
 <code>npm install express</code><br>
 etc
 
