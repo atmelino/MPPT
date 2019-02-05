@@ -115,10 +115,14 @@ function connectClient(newClient) {
       debugMsgln('log file period: ' + receivedmessage.data, 1);
       LogFilePeriod = receivedmessage.data;
     }
-    if (receivedmessage.type == "query") {
-      debugMsgln('query', 1);
-      sendpacket.type = "query";
-      sendpacket.data = { LogPeriod: LogPeriod, LogFilePeriod: LogFilePeriod };
+    if (receivedmessage.type == "status") {
+      debugMsgln('status', 1);
+      sendpacket.type = "status";
+      sendpacket.data = {
+        LogPeriod: LogPeriod,
+        LogFilePeriod: LogFilePeriod,
+        bufferLength: bufferarray.length
+      };
       broadcast(JSON.stringify(sendpacket)); // send them the data as a string
     }
   }

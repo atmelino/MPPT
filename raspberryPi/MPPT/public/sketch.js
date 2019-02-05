@@ -41,10 +41,11 @@ function readMessage(event) {
     //fillTable(receivedmessage.data);
   }
 
-  if (receivedmessage.type == "query") {
+  if (receivedmessage.type == "status") {
     printlnMessage("messages", JSON.stringify(receivedmessage));
     document.getElementById("LogPeriod").value = receivedmessage.data.LogPeriod;
     document.getElementById("LogFilePeriod").value = receivedmessage.data.LogFilePeriod;
+    document.getElementById("bufferLength").value = receivedmessage.data.bufferLength;
   }
 }
 
@@ -179,14 +180,10 @@ function hide(name) {
 }
 
 function settingsClicked() {
-  document.getElementById("LogPeriod").value = 'query..';
-  document.getElementById("LogFilePeriod").value = 'query..';
-  sendpacket.type = "query";
-  sendpacket.data = " ";
-  socket.send(JSON.stringify(sendpacket));
+  requestStatus();
   var settings = document.getElementById("settings");
   settings.style.display = "block";
-  //alert('query');
+  //alert('status');
 }
 
 function showMessages() {
@@ -284,7 +281,6 @@ function setLogPeriodButton() {
   sendpacket.type = "LogPeriod";
   sendpacket.data = value;
   socket.send(JSON.stringify(sendpacket));
-
 }
 
 function setLogFilePeriodButton() {
@@ -292,5 +288,13 @@ function setLogFilePeriodButton() {
   sendpacket.type = "LogFilePeriod";
   sendpacket.data = value;
   socket.send(JSON.stringify(sendpacket));
+}
 
+function requestStatus() {
+  document.getElementById("LogPeriod").value = 'query..';
+  document.getElementById("LogFilePeriod").value = 'query..';
+  document.getElementById("bufferLength").value = 'query..';
+  sendpacket.type = "status";
+  sendpacket.data = " ";
+  socket.send(JSON.stringify(sendpacket));
 }

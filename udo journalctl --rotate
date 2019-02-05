@@ -1,0 +1,123 @@
+-- Logs begin at Sat 2019-02-02 00:57:30 CST, end at Sat 2019-02-02 01:41:56 CST. --
+Feb 02 00:59:05 raspberrypi systemd[1]: Started server.js MPPT application.
+Feb 02 00:59:08 raspberrypi node[1159]: /dev/ttyAMA0 0
+Feb 02 00:59:09 raspberrypi node[1159]: server started
+Feb 02 00:59:09 raspberrypi node[1159]: (node:1159) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Feb 02 00:59:09 raspberrypi node[1159]: running at http://localhost:8080
+Feb 02 00:59:09 raspberrypi node[1159]: port open
+Feb 02 00:59:09 raspberrypi node[1159]: baud rate: 9600
+Feb 02 01:00:44 raspberrypi node[1159]: .........................b...............
+Feb 02 01:01:49 raspberrypi node[1159]: ..........b................connectClient - number of clients 1
+Feb 02 01:02:18 raspberrypi node[1159]: .........b....
+Feb 02 01:03:23 raspberrypi node[1159]: .....................b......readfile: ./public/data/2000-02-01T00_01_20.txt
+Feb 02 01:03:42 raspberrypi node[1159]: .......readfile: ./public/data/2000-02-01T00_01_20.txt
+Feb 02 01:03:46 raspberrypi node[1159]: ..readfile: ./public/data/2019-02-02T00_52_35.txt
+Feb 02 01:03:48 raspberrypi node[1159]: .readfile: ./public/data/2019-02-02T00_52_59.txt
+Feb 02 01:03:48 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_53_23.txt
+Feb 02 01:03:48 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_53_47.txt
+Feb 02 01:03:48 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_54_11.txt
+Feb 02 01:03:48 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_54_35.txt
+Feb 02 01:03:49 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_58_28.txt
+Feb 02 01:03:51 raspberrypi node[1159]: .readfile: ./public/data/2019-02-02T00_54_35.txt
+Feb 02 01:03:51 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_54_11.txt
+Feb 02 01:03:52 raspberrypi node[1159]: .readfile: ./public/data/2019-02-02T00_53_47.txt
+Feb 02 01:03:52 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_53_23.txt
+Feb 02 01:03:52 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_52_59.txt
+Feb 02 01:03:53 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_52_35.txt
+Feb 02 01:03:53 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_52_11.txt
+Feb 02 01:03:54 raspberrypi node[1159]: .
+Feb 02 01:03:54 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T23_41_34.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T23_41_25.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T02_53_58.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T02_53_49.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T02_53_39.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-22T23_58_58.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-22T03_23_29.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-21T20_03_16.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-21T03_51_51.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-20T03_11_53.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-20T02_27_04.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-19T02_24_03.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-18T01_14_50.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-18T01_12_53.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-17T03_18_25.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2019-01-17T03_17_27.txt
+Feb 02 01:03:55 raspberrypi node[1159]: readfile: ./public/data/2000-02-01T00_01_20.txt
+Feb 02 01:03:56 raspberrypi node[1159]: .readfile: ./public/data/2019-01-17T03_17_27.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-17T03_18_25.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-18T01_12_53.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-18T01_14_50.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-19T02_24_03.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-20T02_27_04.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-20T03_11_53.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-21T03_51_51.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-21T20_03_16.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-22T03_23_29.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-22T23_58_58.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T02_53_39.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T02_53_49.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T02_53_58.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T23_41_25.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-01-31T23_41_34.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_52_11.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_52_35.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_52_59.txt
+Feb 02 01:03:57 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_53_23.txt
+Feb 02 01:03:58 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_53_47.txt
+Feb 02 01:03:58 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_54_11.txt
+Feb 02 01:03:58 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_54_35.txt
+Feb 02 01:03:58 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_58_28.txt
+Feb 02 01:03:59 raspberrypi node[1159]: readfile: ./public/data/2019-02-02T00_54_35.txt
+Feb 02 01:04:00 raspberrypi node[1159]: .readfile: ./public/data/2019-02-02T00_58_28.txt
+Feb 02 01:04:08 raspberrypi node[1159]: ....breadfile: ./public/data/2000-02-01T00_01_20.txt
+Feb 02 01:05:28 raspberrypi node[1159]: .........................b........
+Feb 02 01:05:33 raspberrypi node[1159]: ..readfile: ./public/data/2019-01-17T03_17_27.txt
+Feb 02 01:05:40 raspberrypi node[1159]: ...readfile: ./public/data/2019-02-02T00_58_28.txt
+Feb 02 01:05:43 raspberrypi node[1159]: .readfile: ./public/data/2019-02-02T00_54_35.txt
+Feb 02 01:05:45 raspberrypi node[1159]: .readfile: ./public/data/2019-02-02T00_58_28.txt
+Feb 02 01:07:04 raspberrypi node[1159]: ..........b.......................
+Feb 02 01:08:37 raspberrypi node[1159]: ..b.........................b............
+Feb 02 01:09:23 raspberrypi node[1159]: .............b.....log period: 20
+Feb 02 01:09:31 raspberrypi node[1159]: ....blog file period: 40
+Feb 02 01:09:45 raspberrypi node[1159]: ......readfile: ./public/data/2019-01-17T03_17_27.txt
+Feb 02 01:09:50 raspberrypi node[1159]: ..readfile: ./public/data/2019-02-02T00_58_28.txt
+Feb 02 01:09:52 raspberrypi node[1159]: .bfile written ./public/data/2019-02-02T01_09_53.txt
+Feb 02 01:10:09 raspberrypi node[1159]: .......
+Feb 02 01:10:33 raspberrypi node[1159]: ..b........bfile written ./public/data/2019-02-02T01_10_34.txt
+Feb 02 01:11:16 raspberrypi node[1159]: .........b.........bfile written ./public/data/2019-02-02T01_11_17.txt
+Feb 02 01:11:38 raspberrypi node[1159]: .........
+Feb 02 01:11:59 raspberrypi node[1159]: b.........bfile written ./public/data/2019-02-02T01_12_00.txt
+Feb 02 01:12:43 raspberrypi node[1159]: .........b.........bfile written ./public/data/2019-02-02T01_12_43.txt
+Feb 02 01:13:04 raspberrypi node[1159]: ........b.
+Feb 02 01:13:23 raspberrypi node[1159]: ........bfile written ./public/data/2019-02-02T01_13_24.txt
+Feb 02 01:14:07 raspberrypi node[1159]: .........b.........bfile written ./public/data/2019-02-02T01_14_08.txt
+Feb 02 01:14:33 raspberrypi node[1159]: .........b..
+Feb 02 01:14:50 raspberrypi node[1159]: .......bfile written ./public/data/2019-02-02T01_14_51.txt
+Feb 02 01:15:31 raspberrypi node[1159]: .........b........bfile written ./public/data/2019-02-02T01_15_32.txt
+Feb 02 01:16:02 raspberrypi node[1159]: .........b....
+Feb 02 01:16:14 raspberrypi node[1159]: .....bfile written ./public/data/2019-02-02T01_16_15.txt
+Feb 02 01:16:57 raspberrypi node[1159]: .........b.........bfile written ./public/data/2019-02-02T01_16_58.txt
+Feb 02 01:17:31 raspberrypi node[1159]: .........b.....
+Feb 02 01:17:41 raspberrypi node[1159]: ....bfile written ./public/data/2019-02-02T01_17_41.txt
+Feb 02 01:17:50 raspberrypi node[1159]: ...connectClient - number of clients 1
+Feb 02 01:18:22 raspberrypi node[1159]: .....b.........bfile written ./public/data/2019-02-02T01_18_22.txt
+Feb 02 01:19:00 raspberrypi node[1159]: .........b.......
+Feb 02 01:19:05 raspberrypi node[1159]: ..bfile written ./public/data/2019-02-02T01_19_06.txt
+Feb 02 01:19:48 raspberrypi node[1159]: .........b.........bfile written ./public/data/2019-02-02T01_19_49.txt
+Feb 02 01:20:08 raspberrypi node[1159]: ........connectClient - number of clients 1
+Feb 02 01:20:19 raspberrypi systemd[1]: Stopping server.js MPPT application...
+Feb 02 01:20:19 raspberrypi node[1159]: .b....
+Feb 02 01:20:19 raspberrypi systemd[1]: Stopped server.js MPPT application.
+Feb 02 01:41:21 raspberrypi systemd[1]: Started server.js MPPT application.
+Feb 02 01:41:25 raspberrypi node[1363]: /dev/ttyAMA0 0
+Feb 02 01:41:25 raspberrypi node[1363]: server started
+Feb 02 01:41:25 raspberrypi node[1363]: (node:1363) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Feb 02 01:41:25 raspberrypi node[1363]: running at http://localhost:8080
+Feb 02 01:41:25 raspberrypi node[1363]: port open
+Feb 02 01:41:25 raspberrypi node[1363]: baud rate: 9600
+Feb 02 01:41:28 raspberrypi node[1363]: .connectClient - number of clients 1
+Feb 02 01:41:30 raspberrypi node[1363]: .query
+Feb 02 01:41:38 raspberrypi node[1363]: ....query
+Feb 02 01:41:41 raspberrypi node[1363]: .query
+Feb 02 01:41:52 raspberrypi node[1363]: .....log file period: 1800
+Feb 02 01:41:56 raspberrypi node[1363]: .query
