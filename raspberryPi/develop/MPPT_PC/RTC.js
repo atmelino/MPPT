@@ -112,6 +112,18 @@ class RTCPi {
 
     }
 
+    setDateNumbers(year, month, day, hours, minutes, seconds,dayofweek) {
+       
+        this.i2cWriteByte(SECONDS, this.decToBcd(seconds));
+        this.i2cWriteByte(MINUTES, this.decToBcd(minutes));
+        this.i2cWriteByte(HOURS, this.decToBcd(hours));
+        this.i2cWriteByte(DAY, this.decToBcd(day));
+        this.i2cWriteByte(MONTH, this.decToBcd(month -1));
+        this.i2cWriteByte(YEAR, this.decToBcd(year - century));
+        this.i2cWriteByte(DAYOFWEEK, this.decToBcd(dayofweek));
+
+    }
+
     /**
      * Read the date and time from the RTC
      * @returns  {Date} - Returns the date as a javascript Date object

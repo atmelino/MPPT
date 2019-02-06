@@ -181,6 +181,7 @@ function listen(data) {
         debugMsg('.', 1);
         debugMsgln(t1 + ' ' + t2 + ' ' + diffBuffer + ' ' + diffFile, 2);
         if (diffBuffer < 100) {
+          debugMsg('Real Time Clock Error', 0);
           return; // something wrong with the clock
         }
         // add line to buffer every LogPeriod seconds 
