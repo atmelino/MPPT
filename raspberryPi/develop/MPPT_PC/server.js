@@ -1,4 +1,4 @@
-// to start: sudo node server.js 
+// to start: sudo node server.js
 // port is in config.json
 // Arduino UNO: /dev/ttyAMA0
 // Arduino Pro Mini: /dev/ttyUSB0
@@ -46,14 +46,13 @@ function openPort() {
 
 // define the webSocket connection callback function:
 function connectClient(newClient) {
-
   // when a webSocket message comes in from this client:
   function readMessage(receivedpacket) {
     debugMsgln(receivedpacket, 3);
     receivedmessage = JSON.parse(receivedpacket);
     if (receivedmessage.type == "storeddata") {
       var path = "./public/data";
-      fs.readdir(path, function (err, items) {
+      fs.readdir(path, function(err, items) {
         debugMsgln(items, 2);
         if (wss.clients.size > 0) {
           // if there are any clients
@@ -69,9 +68,9 @@ function connectClient(newClient) {
       rnd = Math.random();
       //name = path + fileName + "?rnd=" + rnd;
       name = path + fileName;
-      debugMsgln('readfile: ' + name, 1);
+      debugMsgln("readfile: " + name, 1);
 
-      fs.readFile(name, "utf8", function (err, contents) {
+      fs.readFile(name, "utf8", function(err, contents) {
         //debugMsgln(contents);
         sendpacket.type = "filedata";
         sendpacket.data = contents;
@@ -99,7 +98,7 @@ function connectClient(newClient) {
     }
     if (receivedmessage.type == "enableLogs") {
       debugMsgln("enableLogs" + JSON.stringify(receivedmessage), 1);
-      if (receivedmessage.data == 'true') {
+      if (receivedmessage.data == "true") {
         logYesNo = true;
         debugMsgln("enableLogs: " + logYesNo, 1);
       } else {
@@ -108,15 +107,15 @@ function connectClient(newClient) {
       }
     }
     if (receivedmessage.type == "LogPeriod") {
-      debugMsgln('log period: ' + receivedmessage.data, 1);
+      debugMsgln("log period: " + receivedmessage.data, 1);
       LogPeriod = receivedmessage.data;
     }
     if (receivedmessage.type == "LogFilePeriod") {
-      debugMsgln('log file period: ' + receivedmessage.data, 1);
+      debugMsgln("log file period: " + receivedmessage.data, 1);
       LogFilePeriod = receivedmessage.data;
     }
     if (receivedmessage.type == "status") {
-      debugMsgln('status', 1);
+      debugMsgln("status", 1);
       sendpacket.type = "status";
       sendpacket.data = {
         LogPeriod: LogPeriod,
@@ -135,8 +134,11 @@ function connectClient(newClient) {
 }
 
 function listen(data) {
+  var newUTCdate;
   debugMsgln(data, 2);
-  var newUTCdate = rtc.readDate();
+  if (config.clock == "RTC") newUTCdate = rtc.readDate();
+  else newUTCdate = new Date();
+
   const t1 = oldBufferDate.toISOString();
   const t2 = newUTCdate.toISOString();
   var localdate = new Date(
@@ -178,17 +180,17 @@ function listen(data) {
       if (logYesNo == true) {
         const diffBuffer = newUTCdate - oldBufferDate;
         const diffFile = newUTCdate - oldFileDate;
-        debugMsg('.', 1);
-        debugMsgln(t1 + ' ' + t2 + ' ' + diffBuffer + ' ' + diffFile, 2);
+        debugMsg(".", 1);
+        debugMsgln(t1 + " " + t2 + " " + diffBuffer + " " + diffFile, 2);
         if (diffBuffer < 100) {
-          debugMsg('Real Time Clock Error', 0);
+          debugMsg("Real Time Clock Error", 0);
           return; // something wrong with the clock
         }
-        // add line to buffer every LogPeriod seconds 
+        // add line to buffer every LogPeriod seconds
         if (diffBuffer >= 1000 * LogPeriod) {
           oldBufferDate = newUTCdate;
-          debugMsg('b', 1);
-          debugMsgln('add a line to buffer', 2);
+          debugMsg("b", 1);
+          debugMsgln("add a line to buffer", 2);
           bufferarray.push(dateline);
           // write file every LogFilePeriod seconds
           //if (bufferarray.length > 59) {
@@ -209,20 +211,19 @@ function writeDataFile(localdatestring) {
   buffer = new Buffer.from(bufferarray.join("\n"));
   bufferarray.length = 0;
 
-  fs.open(path, "w", function (err, fd) {
+  fs.open(path, "w", function(err, fd) {
     if (err) {
       throw "error opening file: " + err;
     }
 
-    fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+    fs.write(fd, buffer, 0, buffer.length, null, function(err) {
       if (err) throw "error writing file: " + err;
-      fs.close(fd, function () {
+      fs.close(fd, function() {
         debugMsgln("file written " + path, 1);
       });
     });
   });
 }
-
 
 // broadcast data to connected webSocket clients:
 function broadcast(data) {
@@ -235,7 +236,7 @@ function broadcast(data) {
 }
 
 // start the servers:
-var server = httpServer.listen(8080, function () {
+var server = httpServer.listen(8080, function() {
   var host = server.address().address;
   host = host == "::" ? "localhost" : host;
   var port = server.address().port;
@@ -253,5 +254,8 @@ function debugMsg(message, level) {
   // reduce console ouput if running as service
   if (level <= debugLevel) process.stdout.write(message);
   countDots++;
-  if (countDots > 40) { countDots = 0; console.log(); }
+  if (countDots > 40) {
+    countDots = 0;
+    console.log();
+  }
 }

@@ -1,6 +1,8 @@
 {
-    "port": "/dev/ttyAMA0",
-    "debuglevel": "0",
-    "otherport1": "/dev/ttyACM0",
-    "otherport2": "/dev/ttyUSB0"
+  "port": "/dev/ttyACM0",
+  "debuglevel": "0",
+  "otherport1": "/dev/ttyAMA0",
+  "otherport2": "/dev/ttyUSB0",
+  "clock": "PC",
+  "otherclock": "RTC"
 }
