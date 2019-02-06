@@ -5,6 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "express": "^4.16.4",
+    "fs-extra": "^7.0.1",
     "ip": "^1.1.5",
     "rpio": "^1.0.12",
     "serialport": "^6.2.2",

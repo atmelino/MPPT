@@ -20,7 +20,7 @@
           <!-- -->
           <label style="white-space: nowrap"><input type="radio" name="LS" id="stored" onclick="liveStored()" />stored</label>
         </div>
-        <div style="width: 12%; display: table-cell; white-space: nowrap;">
+        <div style="width: 12%; display: table-cell; white-space: nowrap; visibility:hidden" id="fileSelect">
           <select id="filesComboBox" onchange="filesComboSelect()">
             <option>default</option>
           </select>
@@ -115,9 +115,9 @@
           <div id="enableLogscontent">
             Log values every <input id="LogPeriod" name="value" value="query.." /> seconds <button onclick="setLogPeriodButton()"
               id="setLogPeriodButton">Set</button><br>
-              Save log file every <input id="LogFilePeriod" name="value" value="query.." /> seconds <button onclick="setLogFilePeriodButton()"
+            Save log file every <input id="LogFilePeriod" name="value" value="query.." /> seconds <button onclick="setLogFilePeriodButton()"
               id="setLogFilePeriodButton">Set</button><br>
-              current buffer length <input id="bufferLength" name="value" value="query.." />  <button onclick="requestStatus()"
+            current buffer length <input id="bufferLength" name="value" value="query.." /> <button onclick="requestStatus()"
               id="requestStatus">Refresh</button><br>
           </div>
         </div><br>

@@ -110,11 +110,13 @@ function liveStored() {
   if (ldchecked == true) {
     show("liveData");
     hide("storedData");
+    invisible("fileSelect");
     //setCookie("livedata", 1, 365);
   } else {
     sendpacket.type = "storeddata";
     socket.send(JSON.stringify(sendpacket));
     show("storedData");
+    visible("fileSelect");
     hide("liveData");
     //setCookie("livedata", 0, 365);
   }
@@ -174,9 +176,19 @@ function show(name) {
   x.style.display = "block";
 }
 
+function visible(name) {
+  var x = document.getElementById(name);
+  x.style.visibility = "visible";
+}
+
 function hide(name) {
   var x = document.getElementById(name);
   x.style.display = "none";
+}
+
+function invisible(name) {
+  var x = document.getElementById(name);
+  x.style.visibility = "hidden";
 }
 
 function settingsClicked() {
