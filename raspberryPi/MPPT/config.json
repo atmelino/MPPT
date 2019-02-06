@@ -3,6 +3,6 @@
   "debuglevel": "0",
   "otherport1": "/dev/ttyAMA0",
   "otherport2": "/dev/ttyUSB0",
-  "clock": "PC",
-  "otherclock": "RTC"
+  "clock": "RTC",
+  "otherclock": "PC"
 }
