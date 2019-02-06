@@ -19,6 +19,7 @@ const RTC = require("./RTC.js");
 var rtc = new RTC();
 var ip = require("ip");
 const fs = require("fs");
+const fse = require("fs-extra");
 var bufferarray = [];
 var sendpacket = {
   type: "none",
@@ -148,7 +149,6 @@ function listen(data) {
     .toISOString()
     .replace(/:/g, "_")
     .slice(0, 19);
-  // fixed : check for error in parse, exit listen if error
   var receivedmessage;
   try {
     var receivedmessage = JSON.parse(data);
@@ -196,7 +196,7 @@ function listen(data) {
           //if (bufferarray.length > 59) {
           if (diffFile >= 1000 * LogFilePeriod) {
             oldFileDate = newUTCdate;
-            writeDataFile(localdatestring);
+            writeDataFile(localdate);
           }
         }
       }
@@ -206,8 +206,18 @@ function listen(data) {
   }
 }
 
-function writeDataFile(localdatestring) {
-  var path = "./public/data/" + localdatestring + ".txt";
+function writeDataFile(localdate) {
+  const year = localdate.getFullYear();
+  const month = localdate.getMonth() + 1;
+  makeDataDir(year, month);
+  var localdatestring = localdate
+    .toISOString()
+    .replace(/:/g, "_")
+    .slice(0, 19);
+  const dir = "./public/data/" + year + "/" + month+"/";
+  //  var path = "./public/data/" + localdatestring + ".txt";
+  var path = dir + localdatestring + ".txt";
+
   buffer = new Buffer.from(bufferarray.join("\n"));
   bufferarray.length = 0;
 
@@ -244,6 +254,13 @@ var server = httpServer.listen(8080, function() {
 });
 
 wss.on("connection", connectClient); // listen for webSocket messages
+
+function makeDataDir(year, month) {
+  //const dir = "./data/2019";
+  const dir = "./public/data/" + year + "/" + month;
+  fse.ensureDirSync(dir);
+  debugMsgln("existence of folder ensured" + dir, 1);
+}
 
 function debugMsgln(message, level) {
   // reduce console ouput if running as service
