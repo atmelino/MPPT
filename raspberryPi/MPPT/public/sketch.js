@@ -1,7 +1,7 @@
 // where the serial server is (your local machine):
 var host = document.location.host;
 var socket; // the websocket
-var sendpacket = {
+var sendmessage = {
   type: "none",
   data: "empty"
 };
@@ -17,18 +17,25 @@ function setup() {
 
 function sendIntro() {
   // convert the message object to a string and send it:
-  sendpacket.type = "Hello";
-  socket.send(JSON.stringify(sendpacket));
+  sendmessage.type = "Hello";
+  socket.send(JSON.stringify(sendmessage));
 }
 
 function readMessage(event) {
   //console.log('readMessage');
   //printlnMessage("messages", event.type);
   receivedmessage = JSON.parse(event.data);
-  if (receivedmessage.type == "livedata") {
+  if (receivedmessage.type != "livedata") {
     printlnMessage("messages", event.data);
+  }
+  if (receivedmessage.type == "livedata") {
+    //printlnMessage("messages", event.data);
     //document.getElementById("liveDatatmp").innerHTML = receivedmessage.data;
     refreshTable("liveTable", receivedmessage.data);
+  }
+  if (receivedmessage.type == "listmonths") {
+    setMonthsComboBox(receivedmessage.data);
+    //filesComboSelect();
   }
   if (receivedmessage.type == "listdir") {
     setFilesComboBox(receivedmessage.data);
@@ -113,12 +120,27 @@ function liveStored() {
     invisible("fileSelect");
     //setCookie("livedata", 1, 365);
   } else {
-    sendpacket.type = "storeddata";
-    socket.send(JSON.stringify(sendpacket));
+
+    const year = getSelectedText("yearsComboBox");
+    sendmessage.type = "listmonths";
+    sendmessage.data = {
+      year: year
+    };
+    socket.send(JSON.stringify(sendmessage));
     show("storedData");
     visible("fileSelect");
     hide("liveData");
     //setCookie("livedata", 0, 365);
+  }
+}
+
+function setMonthsComboBox(items) {
+
+  elementId = document.getElementById("monthsComboBox");
+  elementId.options.length = 0;
+
+  for (var i = 0; i < items.length; i++) {
+    AddItem("monthsComboBox", items[i], items[i]);
   }
 }
 
@@ -145,9 +167,22 @@ function AddItem(Element, Text, Value) {
   opt.value = Value;
 }
 
+function monthsComboSelect() {
+  year = getSelectedText("yearsComboBox");
+  month = getSelectedText("monthsComboBox");
+  sendmessage.type = "listdir";
+  sendmessage.data = {
+    year: year,
+    month: month
+  };
+  socket.send(JSON.stringify(sendmessage));
+}
+
 function filesComboSelect() {
+  year = getSelectedText("yearsComboBox");
+  month = getSelectedText("monthsComboBox");
   fileName = getSelectedText("filesComboBox");
-  refreshData(fileName);
+  refreshData(year, month, fileName);
 }
 
 function getSelectedText(elementId) {
@@ -156,10 +191,14 @@ function getSelectedText(elementId) {
   return elt.options[elt.selectedIndex].text;
 }
 
-function refreshData(fileName) {
-  sendpacket.type = "readfile";
-  sendpacket.data = fileName;
-  socket.send(JSON.stringify(sendpacket));
+function refreshData(year, month, fileName) {
+  sendmessage.type = "readfile";
+  sendmessage.data = {
+    year: year,
+    month: month,
+    fileName: fileName
+  };
+  socket.send(JSON.stringify(sendmessage));
 }
 
 function showHide(name) {
@@ -220,9 +259,9 @@ function attribution() {
 
 function setPWMButton() {
   var value = document.getElementById("PWM").value;
-  sendpacket.type = "PWM";
-  sendpacket.data = value;
-  socket.send(JSON.stringify(sendpacket));
+  sendmessage.type = "PWM";
+  sendmessage.data = value;
+  socket.send(JSON.stringify(sendmessage));
 
   // if (existCookie('simulation') != true)
   //   setCookie('simulation', 0, 100);
@@ -234,7 +273,7 @@ function setPWMButton() {
 
 function PWMMode() {
   manualchecked = document.getElementById("manual").checked;
-  sendpacket.type = "PWMMode";
+  sendmessage.type = "PWMMode";
   if (manualchecked == true) {
     show("PWMmanualdiv");
     hide("MPPTdiv");
@@ -244,8 +283,8 @@ function PWMMode() {
     hide("PWMmanualdiv");
     value = "MPPT";
   }
-  sendpacket.data = value;
-  socket.send(JSON.stringify(sendpacket));
+  sendmessage.data = value;
+  socket.send(JSON.stringify(sendmessage));
 }
 
 function setRTC() {
@@ -258,8 +297,8 @@ function setRTC() {
   var seconds = currentDate.getSeconds();
   var dayofweek = currentDate.getDay();
 
-  sendpacket.type = "SetRTC";
-  sendpacket.data = {
+  sendmessage.type = "SetRTC";
+  sendmessage.data = {
     year: year,
     month: month,
     day: day,
@@ -268,7 +307,7 @@ function setRTC() {
     seconds: seconds,
     dayofweek: dayofweek
   };
-  socket.send(JSON.stringify(sendpacket));
+  socket.send(JSON.stringify(sendmessage));
   const msg = year + ' ' + month + ' ' + day + ' ' + hours + ' ' + minutes + ' ' + seconds;
 
   alert("Date set to " + msg);
@@ -276,7 +315,7 @@ function setRTC() {
 
 function enableLogs() {
   enableLogschecked = document.getElementById("enableLogs").checked;
-  sendpacket.type = "enableLogs";
+  sendmessage.type = "enableLogs";
   if (enableLogschecked == true) {
     document.getElementById("enableLogscontent").style.display = "block";
     value = "true";
@@ -284,29 +323,29 @@ function enableLogs() {
     document.getElementById("enableLogscontent").style.display = "none";
     value = "false";
   }
-  sendpacket.data = value;
-  socket.send(JSON.stringify(sendpacket));
+  sendmessage.data = value;
+  socket.send(JSON.stringify(sendmessage));
 }
 
 function setLogPeriodButton() {
   var value = document.getElementById("LogPeriod").value;
-  sendpacket.type = "LogPeriod";
-  sendpacket.data = value;
-  socket.send(JSON.stringify(sendpacket));
+  sendmessage.type = "LogPeriod";
+  sendmessage.data = value;
+  socket.send(JSON.stringify(sendmessage));
 }
 
 function setLogFilePeriodButton() {
   var value = document.getElementById("LogFilePeriod").value;
-  sendpacket.type = "LogFilePeriod";
-  sendpacket.data = value;
-  socket.send(JSON.stringify(sendpacket));
+  sendmessage.type = "LogFilePeriod";
+  sendmessage.data = value;
+  socket.send(JSON.stringify(sendmessage));
 }
 
 function requestStatus() {
   document.getElementById("LogPeriod").value = 'query..';
   document.getElementById("LogFilePeriod").value = 'query..';
   document.getElementById("bufferLength").value = 'query..';
-  sendpacket.type = "status";
-  sendpacket.data = " ";
-  socket.send(JSON.stringify(sendpacket));
+  sendmessage.type = "status";
+  sendmessage.data = " ";
+  socket.send(JSON.stringify(sendmessage));
 }

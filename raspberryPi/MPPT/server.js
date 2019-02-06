@@ -51,9 +51,25 @@ function connectClient(newClient) {
   function readMessage(receivedpacket) {
     debugMsgln(receivedpacket, 3);
     receivedmessage = JSON.parse(receivedpacket);
-    if (receivedmessage.type == "storeddata") {
-      var path = "./public/data";
-      fs.readdir(path, function(err, items) {
+    if (receivedmessage.type == "listmonths") {
+      const year = receivedmessage.data.year;
+      var path = "./public/data/" + year;
+      debugMsgln(path, 1);
+      fs.readdir(path, function (err, items) {
+        debugMsgln(items, 1);
+        if (wss.clients.size > 0) {
+          // if there are any clients
+          sendpacket.type = "listmonths";
+          sendpacket.data = items;
+          broadcast(JSON.stringify(sendpacket)); // send them the data as a string
+        }
+      });
+    }
+    if (receivedmessage.type == "listdir") {
+      const year = receivedmessage.data.year;
+      const month = receivedmessage.data.month;
+      var path = "./public/data/" + year+"/"+month;
+      fs.readdir(path, function (err, items) {
         debugMsgln(items, 2);
         if (wss.clients.size > 0) {
           // if there are any clients
@@ -64,14 +80,16 @@ function connectClient(newClient) {
       });
     }
     if (receivedmessage.type == "readfile") {
-      var path = "./public/data/";
-      fileName = receivedmessage.data;
+      const year = receivedmessage.data.year;
+      const month = receivedmessage.data.month;
+      const fileName = receivedmessage.data.fileName;
+      var path = "./public/data/" + year+"/"+month+"/";
       rnd = Math.random();
       //name = path + fileName + "?rnd=" + rnd;
       name = path + fileName;
       debugMsgln("readfile: " + name, 1);
 
-      fs.readFile(name, "utf8", function(err, contents) {
+      fs.readFile(name, "utf8", function (err, contents) {
         //debugMsgln(contents);
         sendpacket.type = "filedata";
         sendpacket.data = contents;
@@ -214,21 +232,21 @@ function writeDataFile(localdate) {
     .toISOString()
     .replace(/:/g, "_")
     .slice(0, 19);
-  const dir = "./public/data/" + year + "/" + month+"/";
+  const dir = "./public/data/" + year + "/" + month + "/";
   //  var path = "./public/data/" + localdatestring + ".txt";
   var path = dir + localdatestring + ".txt";
 
   buffer = new Buffer.from(bufferarray.join("\n"));
   bufferarray.length = 0;
 
-  fs.open(path, "w", function(err, fd) {
+  fs.open(path, "w", function (err, fd) {
     if (err) {
       throw "error opening file: " + err;
     }
 
-    fs.write(fd, buffer, 0, buffer.length, null, function(err) {
+    fs.write(fd, buffer, 0, buffer.length, null, function (err) {
       if (err) throw "error writing file: " + err;
-      fs.close(fd, function() {
+      fs.close(fd, function () {
         debugMsgln("file written " + path, 1);
       });
     });
@@ -246,7 +264,7 @@ function broadcast(data) {
 }
 
 // start the servers:
-var server = httpServer.listen(8080, function() {
+var server = httpServer.listen(8080, function () {
   var host = server.address().address;
   host = host == "::" ? "localhost" : host;
   var port = server.address().port;
