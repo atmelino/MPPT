@@ -51,8 +51,10 @@ function readMessage(event) {
   if (receivedmessage.type == "status") {
     printlnMessage("messages", JSON.stringify(receivedmessage));
     document.getElementById("LogPeriod").value = receivedmessage.data.LogPeriod;
-    document.getElementById("LogFilePeriod").value = receivedmessage.data.LogFilePeriod;
-    document.getElementById("bufferLength").value = receivedmessage.data.bufferLength;
+    document.getElementById("LogFilePeriod").value =
+      receivedmessage.data.LogFilePeriod;
+    document.getElementById("bufferLength").value =
+      receivedmessage.data.bufferLength;
   }
 }
 
@@ -120,7 +122,6 @@ function liveStored() {
     invisible("fileSelect");
     //setCookie("livedata", 1, 365);
   } else {
-
     const year = getSelectedText("yearsComboBox");
     sendmessage.type = "listmonths";
     sendmessage.data = {
@@ -135,13 +136,13 @@ function liveStored() {
 }
 
 function setMonthsComboBox(items) {
-
   elementId = document.getElementById("monthsComboBox");
   elementId.options.length = 0;
 
   for (var i = 0; i < items.length; i++) {
     AddItem("monthsComboBox", items[i], items[i]);
   }
+  monthsComboSelect();
 }
 
 function setFilesComboBox(items) {
@@ -308,7 +309,18 @@ function setRTC() {
     dayofweek: dayofweek
   };
   socket.send(JSON.stringify(sendmessage));
-  const msg = year + ' ' + month + ' ' + day + ' ' + hours + ' ' + minutes + ' ' + seconds;
+  const msg =
+    year +
+    " " +
+    month +
+    " " +
+    day +
+    " " +
+    hours +
+    " " +
+    minutes +
+    " " +
+    seconds;
 
   alert("Date set to " + msg);
 }
@@ -342,9 +354,9 @@ function setLogFilePeriodButton() {
 }
 
 function requestStatus() {
-  document.getElementById("LogPeriod").value = 'query..';
-  document.getElementById("LogFilePeriod").value = 'query..';
-  document.getElementById("bufferLength").value = 'query..';
+  document.getElementById("LogPeriod").value = "query..";
+  document.getElementById("LogFilePeriod").value = "query..";
+  document.getElementById("bufferLength").value = "query..";
   sendmessage.type = "status";
   sendmessage.data = " ";
   socket.send(JSON.stringify(sendmessage));

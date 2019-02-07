@@ -32,6 +32,7 @@ var debugLevel = 1;
 var LogPeriod = 60;
 var LogFilePeriod = 3600;
 var countDots = 0;
+var simmonth = 40;
 
 debugMsgln("server started", 0);
 myPort.on("open", openPort); // called when the serial port opens
@@ -55,7 +56,7 @@ function connectClient(newClient) {
       const year = receivedmessage.data.year;
       var path = "./public/data/" + year;
       debugMsgln(path, 1);
-      fs.readdir(path, function (err, items) {
+      fs.readdir(path, function(err, items) {
         debugMsgln(items, 1);
         if (wss.clients.size > 0) {
           // if there are any clients
@@ -68,8 +69,8 @@ function connectClient(newClient) {
     if (receivedmessage.type == "listdir") {
       const year = receivedmessage.data.year;
       const month = receivedmessage.data.month;
-      var path = "./public/data/" + year+"/"+month;
-      fs.readdir(path, function (err, items) {
+      var path = "./public/data/" + year + "/" + month;
+      fs.readdir(path, function(err, items) {
         debugMsgln(items, 2);
         if (wss.clients.size > 0) {
           // if there are any clients
@@ -83,13 +84,14 @@ function connectClient(newClient) {
       const year = receivedmessage.data.year;
       const month = receivedmessage.data.month;
       const fileName = receivedmessage.data.fileName;
-      var path = "./public/data/" + year+"/"+month+"/";
+      var path = "./public/data/" + year + "/" + month + "/";
       rnd = Math.random();
       //name = path + fileName + "?rnd=" + rnd;
       name = path + fileName;
-      debugMsgln("readfile: " + name, 1);
+      debugMsg("r", 1);
+      debugMsgln("readfile: " + name, 2);
 
-      fs.readFile(name, "utf8", function (err, contents) {
+      fs.readFile(name, "utf8", function(err, contents) {
         //debugMsgln(contents);
         sendpacket.type = "filedata";
         sendpacket.data = contents;
@@ -156,8 +158,11 @@ function listen(data) {
   var newUTCdate;
   debugMsgln(data, 2);
   if (config.clock == "RTC") newUTCdate = rtc.readDate();
-  else newUTCdate = new Date();
-
+  if (config.clock == "PC") newUTCdate = new Date();
+  if (config.clock == "Sim") {
+    tmpDate = new Date();
+    newUTCdate = new Date(tmpDate.getTime() + simmonth * 2700000000);
+  }
   const t1 = oldBufferDate.toISOString();
   const t2 = newUTCdate.toISOString();
   var localdate = new Date(
@@ -239,14 +244,14 @@ function writeDataFile(localdate) {
   buffer = new Buffer.from(bufferarray.join("\n"));
   bufferarray.length = 0;
 
-  fs.open(path, "w", function (err, fd) {
+  fs.open(path, "w", function(err, fd) {
     if (err) {
       throw "error opening file: " + err;
     }
 
-    fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+    fs.write(fd, buffer, 0, buffer.length, null, function(err) {
       if (err) throw "error writing file: " + err;
-      fs.close(fd, function () {
+      fs.close(fd, function() {
         debugMsgln("file written " + path, 1);
       });
     });
@@ -264,7 +269,7 @@ function broadcast(data) {
 }
 
 // start the servers:
-var server = httpServer.listen(8080, function () {
+var server = httpServer.listen(8080, function() {
   var host = server.address().address;
   host = host == "::" ? "localhost" : host;
   var port = server.address().port;

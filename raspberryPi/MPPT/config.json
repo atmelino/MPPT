@@ -5,5 +5,7 @@
   "portArduinoProMini": "/dev/ttyUSB0",
   "portArduinoBeetle": "/dev/ttyACM0",
   "clock": "RTC",
-  "otherclock": "PC"
+  "clockPC": "PC",
+  "clockRTC": "RTC",
+  "clockSim": "Sim"
 }
