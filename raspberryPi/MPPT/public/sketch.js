@@ -33,6 +33,10 @@ function readMessage(event) {
     //document.getElementById("liveDatatmp").innerHTML = receivedmessage.data;
     refreshTable("liveTable", receivedmessage.data);
   }
+  if (receivedmessage.type == "listyears") {
+    setYearsComboBox(receivedmessage.data);
+    //filesComboSelect();
+  }
   if (receivedmessage.type == "listmonths") {
     setMonthsComboBox(receivedmessage.data);
     //filesComboSelect();
@@ -122,17 +126,23 @@ function liveStored() {
     invisible("fileSelect");
     //setCookie("livedata", 1, 365);
   } else {
-    const year = getSelectedText("yearsComboBox");
-    sendmessage.type = "listmonths";
-    sendmessage.data = {
-      year: year
-    };
+    sendmessage.type = "listyears";
     socket.send(JSON.stringify(sendmessage));
     show("storedData");
     visible("fileSelect");
     hide("liveData");
     //setCookie("livedata", 0, 365);
   }
+}
+
+function setYearsComboBox(items) {
+  elementId = document.getElementById("yearsComboBox");
+  elementId.options.length = 0;
+
+  for (var i = 0; i < items.length; i++) {
+    AddItem("yearsComboBox", items[i], items[i]);
+  }
+  yearsComboSelect();
 }
 
 function setMonthsComboBox(items) {
@@ -166,6 +176,15 @@ function AddItem(Element, Text, Value) {
   // Assign text and value to Option object
   opt.text = Text;
   opt.value = Value;
+}
+
+function yearsComboSelect() {
+  const year = getSelectedText("yearsComboBox");
+  sendmessage.type = "listmonths";
+  sendmessage.data = {
+    year: year
+  };
+  socket.send(JSON.stringify(sendmessage));
 }
 
 function monthsComboSelect() {
