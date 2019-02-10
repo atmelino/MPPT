@@ -52,6 +52,19 @@ function connectClient(newClient) {
   function readMessage(receivedpacket) {
     debugMsgln(receivedpacket, 3);
     receivedmessage = JSON.parse(receivedpacket);
+
+    if (receivedmessage.type == "listyears") {
+      var path = "./public/data";
+      fs.readdir(path, function(err, items) {
+        debugMsgln(items, 1);
+        if (wss.clients.size > 0) {
+          // if there are any clients
+          sendpacket.type = "listyears";
+          sendpacket.data = items;
+          broadcast(JSON.stringify(sendpacket)); // send them the data as a string
+        }
+      });
+    }
     if (receivedmessage.type == "listmonths") {
       const year = receivedmessage.data.year;
       var path = "./public/data/" + year;
