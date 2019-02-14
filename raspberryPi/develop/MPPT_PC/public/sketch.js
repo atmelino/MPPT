@@ -5,6 +5,7 @@ var sendmessage = {
   type: "none",
   data: "empty"
 };
+var debugLevel = 1;
 
 function setup() {
   // connect to server:
@@ -26,7 +27,7 @@ function readMessage(event) {
   //printlnMessage("messages", event.type);
   receivedmessage = JSON.parse(event.data);
   if (receivedmessage.type != "livedata") {
-    printlnMessage("messages", event.data);
+    debugMsgln(event.data, 2);
   }
   if (receivedmessage.type == "livedata") {
     //printlnMessage("messages", event.data);
@@ -383,3 +384,10 @@ function requestStatus() {
   sendmessage.data = " ";
   socket.send(JSON.stringify(sendmessage));
 }
+
+function debugMsgln(message, level) {
+  if (level <= debugLevel)
+    printlnMessage("messages", message);
+}
+
+
