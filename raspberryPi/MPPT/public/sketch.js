@@ -5,6 +5,7 @@ var sendmessage = {
   type: "none",
   data: "empty"
 };
+var debugLevel = 1;
 
 function setup() {
   // connect to server:
@@ -26,7 +27,7 @@ function readMessage(event) {
   //printlnMessage("messages", event.type);
   receivedmessage = JSON.parse(event.data);
   if (receivedmessage.type != "livedata") {
-    printlnMessage("messages", event.data);
+    debugMsgln(event.data, 2);
   }
   if (receivedmessage.type == "livedata") {
     //printlnMessage("messages", event.data);
@@ -76,6 +77,9 @@ function refreshTable(tableName, data) {
   for (var j = 0; j < 11; j++) {
     cell[j] = row.insertCell(j);
     cell[j].innerHTML = splitString[j];
+    if (j == 9) {
+      document.getElementById("PWMact").value = splitString[j];
+    }
   }
 }
 
@@ -380,3 +384,10 @@ function requestStatus() {
   sendmessage.data = " ";
   socket.send(JSON.stringify(sendmessage));
 }
+
+function debugMsgln(message, level) {
+  if (level <= debugLevel)
+    printlnMessage("messages", message);
+}
+
+

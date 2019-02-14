@@ -1,158 +1,236 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="./p5.min.js"></script>
+    <script src="sketch.js"></script>
+    <link rel="stylesheet" href="MPPT.css" />
+  </head>
 
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="./p5.min.js"></script>
-  <script src="sketch.js"></script>
-  <link rel="stylesheet" href="MPPT.css" />
-</head>
-
-<body>
-  <div id="menuheader">
-    <div style="display: table; background-color: #eeeeff;">
-      <div style="display: table-row">
-        <div style="width: 20%; display: table-cell; white-space: nowrap;">
-          Status: <label id="divStatus"></label>
-        </div>
-        <div style="width: 30%; display: table-cell; white-space: nowrap;">
-          <label style="white-space: nowrap"><input type="radio" name="LS" id="live" onclick="liveStored()" checked="true" />live</label>
-          <!-- -->
-          <label style="white-space: nowrap"><input type="radio" name="LS" id="stored" onclick="liveStored()" />stored</label>
-          <span style=" visibility:hidden" id="fileSelect">
-            <select id="yearsComboBox" onchange="yearsComboSelect()">
-              <option>2019</option>
-            </select>
-            <select id="monthsComboBox" onchange="monthsComboSelect()">
-              <option>1</option>
-            </select>
-            <select id="filesComboBox" onchange="filesComboSelect()">
-              <option>default</option>
-            </select>
-          </span>
-        </div>
-        <div style="width: 12%; display: table-cell; white-space: nowrap;" id="PWMmanualdiv">
-          PWM: <input id="PWM" name="value" value="128" />
-          <button id="setPWM" onclick="setPWMButton()">set PWM</button>
-        </div>
-        <div style="width: 12%; display: table-cell; white-space: nowrap; display:none" id="MPPTdiv">
-          MPPT
-        </div>
-        <div style="width: 12%; display: table-cell; white-space: nowrap;">
-          <img src="settings.png" alt="settings" height="20" width="20" onclick="settingsClicked()" />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="mainarea">
-    <div id="messagesDiv" style="display: none">
-      <textarea id="messages" rows="20" cols="60" style="width: 100%;"></textarea>
-    </div>
-
-    <div id="liveData">
-      <table id="liveTable">
-        <tr>
-          <th>Date</th>
-          <th>nr</th>
-          <th>V</th>
-          <th>mA</th>
-          <th>mW</th>
-          <th>V</th>
-          <th>mA</th>
-          <th>mW</th>
-          <th>eff</th>
-          <th>act</th>
-          <th>tgt</th>
-        </tr>
-      </table>
-
-      <div id="liveDatatmp"></div>
-    </div>
-    <div id="storedData" style="display: none">
-      <table id="storedTable">
-        <tr>
-          <th>Date</th>
-          <th>nr</th>
-          <th>V</th>
-          <th>mA</th>
-          <th>mW</th>
-          <th>V</th>
-          <th>mA</th>
-          <th>mW</th>
-          <th>eff</th>
-          <th>act</th>
-          <th>tgt</th>
-        </tr>
-      </table>
-
-      <div id="storedDatatmp"></div>
-    </div>
-  </div>
-
-  <!-- Settings as Modal content -->
-  <div id="settings" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span class="close" id="closeModal">&times; </span>
-        <h4>Settings</h4>
-      </div>
-      <div class="settings-body">
-        <label><input type="checkbox" onclick="showMessages()" name="showMessages" id="showMessages" value="male"
-            unchecked />
-          show messages
-        </label>
-        <button onclick="clearMessage('messages')">Clear messages</button>
-        <div style="width: 12%; display: table-cell; white-space: nowrap;">
-          <label style="white-space: nowrap"><input type="radio" name="mode" id="manual" onclick="PWMMode()" checked="true" />PWM
-            manual</label>
-          <!-- -->
-          <label style="white-space: nowrap"><input type="radio" name="mode" id="MPPT" onclick="PWMMode()" />MPPT</label>
-        </div>
-        <br />
-        <button onclick="setRTC()">Set Real Time Clock</button> <br /><br />
-        <!-- -->
-        <div class="title_box" id="bill_to">
-          <div id="title"><label><input type="checkbox" onclick="enableLogs()" name="enableLogs" id="enableLogs" value="male"
-                checked />
-              Log Files<br>
-              <!-- -->
-            </label></div>
-          <div id="enableLogscontent">
-            Log values every <input id="LogPeriod" name="value" value="query.." /> seconds <button onclick="setLogPeriodButton()"
-              id="setLogPeriodButton">Set</button><br>
-            Save log file every <input id="LogFilePeriod" name="value" value="query.." /> seconds <button onclick="setLogFilePeriodButton()"
-              id="setLogFilePeriodButton">Set</button><br>
-            current buffer length <input id="bufferLength" name="value" value="query.." /> <button onclick="requestStatus()"
-              id="requestStatus">Refresh</button><br>
+  <body>
+    <div id="menuheader">
+      <div style="display: table; background-color: #eeeeff;">
+        <div style="display: table-row">
+          <div style="width: 20%; display: table-cell; white-space: nowrap;">
+            Status: <label id="divStatus"></label>
           </div>
-        </div><br>
-        <button onclick="printCookies()">show cookies</button>
-        <button onclick="attribution()">attribution</button> <br />
+          <div style="width: 30%; display: table-cell; white-space: nowrap;">
+            <label style="white-space: nowrap"
+              ><input
+                type="radio"
+                name="LS"
+                id="live"
+                onclick="liveStored()"
+                checked="true"
+              />live</label
+            >
+            <!-- -->
+            <label style="white-space: nowrap"
+              ><input
+                type="radio"
+                name="LS"
+                id="stored"
+                onclick="liveStored()"
+              />stored</label
+            >
+            <span style=" visibility:hidden" id="fileSelect">
+              <select id="yearsComboBox" onchange="yearsComboSelect()">
+                <option>2019</option>
+              </select>
+              <select id="monthsComboBox" onchange="monthsComboSelect()">
+                <option>1</option>
+              </select>
+              <select id="filesComboBox" onchange="filesComboSelect()">
+                <option>default</option>
+              </select>
+            </span>
+          </div>
+          <div
+            style="width: 12%; display: table-cell; white-space: nowrap;"
+            id="PWMmanualdiv"
+          >
+            PWM: <input id="PWMact" name="PWMact" value="???" size="5" disabled/><input
+              id="PWM"
+              name="PWM"
+              value="128"
+              size="5"
+            />
+            <button id="setPWM" onclick="setPWMButton()">set PWM</button>
+          </div>
+          <div
+            style="width: 12%; display: table-cell; white-space: nowrap; display:none"
+            id="MPPTdiv"
+          >
+            MPPT
+          </div>
+          <div style="width: 12%; display: table-cell; white-space: nowrap;">
+            <img
+              src="settings.png"
+              alt="settings"
+              height="20"
+              width="20"
+              onclick="settingsClicked()"
+            />
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    var settings = document.getElementById("settings");
+    <div id="mainarea">
+      <div id="messagesDiv" style="display: none">
+        <textarea
+          id="messages"
+          rows="20"
+          cols="60"
+          style="width: 100%;"
+        ></textarea>
+      </div>
 
-    // Get the <span> element that closes the modal
-    //var span = document.getElementsByClassName("close")[0];
-    //var span = document.getElementsByClassName("close");
-    var span = document.getElementById("closeModal");
+      <div id="liveData">
+        <table id="liveTable">
+          <tr>
+            <th>Date</th>
+            <th>nr</th>
+            <th>V</th>
+            <th>mA</th>
+            <th>mW</th>
+            <th>V</th>
+            <th>mA</th>
+            <th>mW</th>
+            <th>eff</th>
+            <th>act</th>
+            <th>tgt</th>
+          </tr>
+        </table>
 
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function () {
-      settings.style.display = "none";
-    };
+        <div id="liveDatatmp"></div>
+      </div>
+      <div id="storedData" style="display: none">
+        <table id="storedTable">
+          <tr>
+            <th>Date</th>
+            <th>nr</th>
+            <th>V</th>
+            <th>mA</th>
+            <th>mW</th>
+            <th>V</th>
+            <th>mA</th>
+            <th>mW</th>
+            <th>eff</th>
+            <th>act</th>
+            <th>tgt</th>
+          </tr>
+        </table>
 
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function (event) {
-      if (event.target == settings) {
+        <div id="storedDatatmp"></div>
+      </div>
+    </div>
+
+    <!-- Settings as Modal content -->
+    <div id="settings" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="close" id="closeModal">&times; </span>
+          <h4>Settings</h4>
+        </div>
+        <div class="settings-body">
+          <label
+            ><input
+              type="checkbox"
+              onclick="showMessages()"
+              name="showMessages"
+              id="showMessages"
+              value="male"
+              unchecked
+            />
+            show messages
+          </label>
+          <button onclick="clearMessage('messages')">Clear messages</button>
+          <div style="width: 12%; display: table-cell; white-space: nowrap;">
+            <label style="white-space: nowrap"
+              ><input
+                type="radio"
+                name="mode"
+                id="manual"
+                onclick="PWMMode()"
+                checked="true"
+              />PWM manual</label
+            >
+            <!-- -->
+            <label style="white-space: nowrap"
+              ><input
+                type="radio"
+                name="mode"
+                id="MPPT"
+                onclick="PWMMode()"
+              />MPPT</label
+            >
+          </div>
+          <br />
+          <button onclick="setRTC()">Set Real Time Clock</button> <br /><br />
+          <!-- -->
+          <div class="title_box" id="bill_to">
+            <div id="title">
+              <label
+                ><input
+                  type="checkbox"
+                  onclick="enableLogs()"
+                  name="enableLogs"
+                  id="enableLogs"
+                  value="male"
+                  checked
+                />
+                Log Files<br />
+                <!-- -->
+              </label>
+            </div>
+            <div id="enableLogscontent">
+              Log values every
+              <input id="LogPeriod" name="value" value="query.." /> seconds
+              <button onclick="setLogPeriodButton()" id="setLogPeriodButton">
+                Set</button
+              ><br />
+              Save log file every
+              <input id="LogFilePeriod" name="value" value="query.." /> seconds
+              <button
+                onclick="setLogFilePeriodButton()"
+                id="setLogFilePeriodButton"
+              >
+                Set</button
+              ><br />
+              current buffer length
+              <input id="bufferLength" name="value" value="query.." />
+              <button onclick="requestStatus()" id="requestStatus">
+                Refresh</button
+              ><br />
+            </div>
+          </div>
+          <br />
+          <button onclick="printCookies()">show cookies</button>
+          <button onclick="attribution()">attribution</button> <br />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var settings = document.getElementById("settings");
+
+      // Get the <span> element that closes the modal
+      //var span = document.getElementsByClassName("close")[0];
+      //var span = document.getElementsByClassName("close");
+      var span = document.getElementById("closeModal");
+
+      // When the user clicks on <span> (x), close the modal
+      span.onclick = function() {
         settings.style.display = "none";
-      }
-    };
-  </script>
-</body>
+      };
 
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+        if (event.target == settings) {
+          settings.style.display = "none";
+        }
+      };
+    </script>
+  </body>
 </html>
