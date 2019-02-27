@@ -8,8 +8,11 @@ function readWord(register) {
     i2c.writeTo(this.addr, 0x06);
     i2c.writeTo(this.addr, 0x02);
     var dbytes = i2c.readFrom(this.addr, 2);
-    print(dbytes[0].toString(16));
-    print(dbytes[1].toString(16));
+    var line = dbytes[0].toString(16) + dbytes[1].toString(16);
+    print(line);
+    //print(dbytes[0].toString(16));
+    //print(dbytes[1].toString(16));
+    //Serial.write(dbytes[0].toString(16));
 
 
     var dword = dbytes[1] | dbytes[0] << 8;
