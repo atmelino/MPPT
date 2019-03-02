@@ -23,7 +23,7 @@ result = {
 function INA3221(i2c, options) {
   print("hello");
   this.i2c = i2c;
-  this.options.address = options.address || 0x40; // default address if A0/A1 are GND
+  //this.options.address = options.address || 0x40; // default address if A0/A1 are GND
 }
 
 options = {
