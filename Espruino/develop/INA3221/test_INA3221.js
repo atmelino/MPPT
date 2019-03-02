@@ -17,7 +17,11 @@ var ina = new INA3221(i2c, {
     address: 0x40,
     shunt: 0.1 // the shunt resistor's value
 });
+
+
 // You can now simply read the data
+print ("result:");
+
 print(ina.readChannel2());
 
 
