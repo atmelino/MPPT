@@ -8,6 +8,18 @@ result=ina3221.readChannel1();
 */
 
 
+result = {
+  BusVoltage1: 0,
+  ShuntVoltage1: 0,
+  current_mA1: 0,
+  BusVoltage2: 0,
+  ShuntVoltage2: 0,
+  current_mA2: 0,
+  BusVoltage3: 0,
+  ShuntVoltage3: 0,
+  current_mA3: 0
+};
+
 function INA3221(i2c, options) {
   print("hello");
   this.i2c = i2c;
@@ -21,17 +33,7 @@ options = {
   shunt3: 0.1
 };
 
-result = {
-  BusVoltage1: 0,
-  ShuntVoltage1: 0,
-  current_mA1: 0,
-  BusVoltage2: 0,
-  ShuntVoltage2: 0,
-  current_mA2: 0,
-  BusVoltage3: 0,
-  ShuntVoltage3: 0,
-  current_mA3: 0
-};
+
 
 // Setup I2C
 //var i2c = new I2C();
