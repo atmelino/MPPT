@@ -62,11 +62,11 @@ INA3221.prototype.readWord = function (register) {
 // };
 
 INA3221.prototype.getShuntVoltage2 = function () {
-  return readWord(0x03) * 0.005;
+  return this.readWord(0x03) * 0.005;
 };
 
 INA3221.prototype.getBusVoltage2 = function () {
-  return readWord(0x04) * 0.001;
+  return this.readWord(0x04) * 0.001;
 };
 
 // function getShuntVoltage3() {

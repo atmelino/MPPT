@@ -6,7 +6,12 @@ i2c.setup({ sda: B4, scl: B3 });
 
 // initialise INA3221
 //var INA3221 = require("INA3221");
-var INA3221 = require("https://raw.githubusercontent.com/atmelino/MPPT/master/Espruino/develop/INA3221/INA3221.js");
+//var INA3221 = require("https://raw.githubusercontent.com/atmelino/MPPT/master/Espruino/develop/INA3221/INA3221.js");
+var INA3221 = require("https://github.com/atmelino/MPPT/blob/master/Espruino/develop/INA3221/INA3221.js");
+
+
+
+
 
 var ina = new INA3221(i2c, {
     address: 0x40,
