@@ -7,22 +7,11 @@ ina3221=require('INA3221.js');
 result=ina3221.readChannel1();
 */
 
-var C = {
-  MY: 0x001, // description
-  PRIVATE: 0x001, // description
-  CONSTANTS: 0x00423 // description
-};
 
-function INA3221(address) {
-  this.options.address = address || 0x40; // default address if A0/A1 are GND
+function INA3221(i2c, options) {
+  this.i2c = i2c;
+  this.options.address = options.address || 0x40; // default address if A0/A1 are GND
 }
-
-/** 'public' constants here */
-INA3221.prototype.C = {
-  MY: 0x013, // description
-  PUBLIC: 0x0541, // description
-  CONSTANTS: 0x023 // description
-};
 
 options = {
   address: 0x40,
@@ -44,14 +33,14 @@ result = {
 };
 
 // Setup I2C
-var i2c = new I2C();
-i2c.setup({ sda: B4, scl: B3 });
-addr = 0x40;
+//var i2c = new I2C();
+//i2c.setup({ sda: B4, scl: B3 });
+//addr = 0x40;
 
-function readWord(register) {
-  i2c.writeTo(options.address, 0x06);
-  i2c.writeTo(options.address, register);
-  var dbytes = i2c.readFrom(options.address, 2);
+INA3221.prototype.readWord = function (register) {
+  this.i2c.writeTo(options.address, 0x06);
+  this.i2c.writeTo(options.address, register);
+  var dbytes = this.i2c.readFrom(options.address, 2);
   var dword = dbytes[1] | (dbytes[0] << 8);
   if (dword > 32767) dword -= 65536;
 
@@ -59,44 +48,44 @@ function readWord(register) {
   //print(line);
 
   return dword;
-}
+};
 
-function getShuntVoltage1() {
-  return readWord(0x01) * 0.005;
-}
+// function getShuntVoltage1() {
+//   return readWord(0x01) * 0.005;
+// };
 
-function getBusVoltage1() {
-  return readWord(0x02) * 0.001;
-}
+// function getBusVoltage1() {
+//   return readWord(0x02) * 0.001;
+// };
 
-function getShuntVoltage2() {
+INA3221.prototype.getShuntVoltage2 = function () {
   return readWord(0x03) * 0.005;
-}
+};
 
-function getBusVoltage2() {
+INA3221.prototype.getBusVoltage2 = function () {
   return readWord(0x04) * 0.001;
-}
+};
 
-function getShuntVoltage3() {
-  return readWord(0x05) * 0.005;
-}
+// function getShuntVoltage3() {
+//   return readWord(0x05) * 0.005;
+// }
 
-function getBusVoltage3() {
-  return readWord(0x06) * 0.001;
-}
+// function getBusVoltage3() {
+//   return readWord(0x06) * 0.001;
+// }
 
-export function readChannel1() {
+INA3221.prototype.readChannel1 = function () {
   result.shuntVoltage1 = getShuntVoltage1();
   result.busVoltage1 = getBusVoltage1();
   result.current_mA1 = result.shuntVoltage1 / options.shunt1;
   return result;
-}
+};
 
-export function readChannel2() {
+INA3221.prototype.readChannel2 = function () {
   result.shuntVoltage2 = getShuntVoltage2();
   result.busVoltage2 = getBusVoltage2();
   result.current_mA2 = result.shuntVoltage2 / options.shunt2;
   return result;
-}
+};
 
 exports = INA3221;
