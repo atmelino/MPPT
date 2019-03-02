@@ -78,15 +78,15 @@ INA3221.prototype.getBusVoltage2 = function () {
 // }
 
 INA3221.prototype.readChannel1 = function () {
-  result.shuntVoltage1 = getShuntVoltage1();
-  result.busVoltage1 = getBusVoltage1();
+  result.shuntVoltage1 = this.getShuntVoltage1();
+  result.busVoltage1 = this.getBusVoltage1();
   result.current_mA1 = result.shuntVoltage1 / options.shunt1;
   return result;
 };
 
 INA3221.prototype.readChannel2 = function () {
-  result.shuntVoltage2 = getShuntVoltage2();
-  result.busVoltage2 = getBusVoltage2();
+  result.shuntVoltage2 = this.getShuntVoltage2();
+  result.busVoltage2 = this.getBusVoltage2();
   result.current_mA2 = result.shuntVoltage2 / options.shunt2;
   return result;
 };
