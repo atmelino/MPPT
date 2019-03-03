@@ -51,11 +51,11 @@ INA3221.prototype.readWord = function (register) {
 };
 
 INA3221.prototype.getShuntVoltage1 = function () {
-  return readWord(0x01) * 0.005;
+  return this.readWord(0x01) * 0.005;
 };
 
 INA3221.prototype.getBusVoltage1 = function () {
-  return readWord(0x02) * 0.001;
+  return this.readWord(0x02) * 0.001;
 };
 
 INA3221.prototype.getShuntVoltage2 = function () {
@@ -84,6 +84,13 @@ INA3221.prototype.readChannel2 = function () {
   result.shuntVoltage2 = this.getShuntVoltage2();
   result.busVoltage2 = this.getBusVoltage2();
   result.current_mA2 = result.shuntVoltage2 / options.shunt2;
+  return result;
+};
+
+INA3221.prototype.readChannel3 = function () {
+  result.shuntVoltage3 = this.getShuntVoltage3();
+  result.busVoltage3 = this.getBusVoltage3();
+  result.current_mA3 = result.shuntVoltage3 / options.shunt3;
   return result;
 };
 
