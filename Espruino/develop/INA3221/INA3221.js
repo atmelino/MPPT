@@ -3,8 +3,12 @@
 Driver for the TI INA3221 chip. This chip allows voltage and current measurement for 
 three separate channels.
 Usage:
-ina3221=require('INA3221.js');
-result=ina3221.readChannel1();
+var INA3221 = require("INA3221.js");
+var ina = new INA3221(i2c, {
+    address: 0x40,
+    shunt: 0.1 // the shunt resistor's value
+});
+result=ina.readChannel1();
 */
 
 
@@ -33,13 +37,6 @@ options = {
   shunt3: 0.1
 };
 
-
-
-// Setup I2C
-//var i2c = new I2C();
-//i2c.setup({ sda: B4, scl: B3 });
-//addr = 0x40;
-
 INA3221.prototype.readWord = function (register) {
   this.i2c.writeTo(options.address, 0x06);
   this.i2c.writeTo(options.address, register);
@@ -53,13 +50,13 @@ INA3221.prototype.readWord = function (register) {
   return dword;
 };
 
-// function getShuntVoltage1() {
-//   return readWord(0x01) * 0.005;
-// };
+INA3221.prototype.getShuntVoltage1 = function () {
+  return readWord(0x01) * 0.005;
+};
 
-// function getBusVoltage1() {
-//   return readWord(0x02) * 0.001;
-// };
+INA3221.prototype.getBusVoltage1 = function () {
+  return readWord(0x02) * 0.001;
+};
 
 INA3221.prototype.getShuntVoltage2 = function () {
   return this.readWord(0x03) * 0.005;
@@ -68,14 +65,13 @@ INA3221.prototype.getShuntVoltage2 = function () {
 INA3221.prototype.getBusVoltage2 = function () {
   return this.readWord(0x04) * 0.001;
 };
+INA3221.prototype.getShuntVoltage3 = function () {
+  return this.readWord(0x05) * 0.005;
+};
 
-// function getShuntVoltage3() {
-//   return readWord(0x05) * 0.005;
-// }
-
-// function getBusVoltage3() {
-//   return readWord(0x06) * 0.001;
-// }
+INA3221.prototype.getBusVoltage3 = function () {
+  return this.readWord(0x06) * 0.001;
+};
 
 INA3221.prototype.readChannel1 = function () {
   result.shuntVoltage1 = this.getShuntVoltage1();
