@@ -25,7 +25,7 @@ result = {
 };
 
 function INA3221(i2c, options) {
-  print("hello");
+  print("INA3221 driver");
   this.i2c = i2c;
   //this.options.address = options.address || 0x40; // default address if A0/A1 are GND
 }
