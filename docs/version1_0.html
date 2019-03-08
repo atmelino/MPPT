@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>MPPT Version 1.0</title>
+</head>
+
+<body>
+<h1>Maximum Power Point Tracking Solar Powered Computer </h1>
+<h3>Explanation of design</h3>
+<p>
+  Relay for battery: allows Arduino to turn power to itself off when no
+  power comes from solar panel, at night, to save power. When the sun comes
+  up, the voltage from the solar channel will turn the Arduino back on.
+</p>
+<p>
+  Button to connect battery: When the Pi is off and the battery is
+  connected, the relay to the battery is still off.The button allows the
+  user to connect the battery temporarily so that the Arduino recognizes the
+  high enough battery voltage and turns the relay on.
+</p>
+
+</body>
+
+</html>
