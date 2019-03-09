@@ -1,0 +1,7 @@
+{
+  "files.exclude": {
+    "__error": "Not found",
+    "version2_0/Espruino/.vscode": true,
+    ".vscode": true
+  }
+}
