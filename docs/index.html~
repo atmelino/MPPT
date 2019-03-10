@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <title>MPPT</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="MPPT.css">
 </head>
 
 <body>
@@ -39,6 +39,7 @@
       On Raspberry Pi: Lighttp server, Html, PHP, Python<br />
     </div>
     <div class="flex-item">
+    <img src="images/version1_0/MPPT01.jpeg" width="400" alt="">
       <img src="images/MPPT01.jpeg" height="400" alt="" />
     </div>
   </div>
@@ -58,7 +59,8 @@
       On Raspberry Pi: Node.js<br />
     </div>
     <div class="flex-item">
-      <img src="images/MPPT_2019_01.jpg" height="400" alt="" />
+    <img src="images/version1_1/photo.jpeg" width="400"  alt="">
+
     </div>
   </div>
 
