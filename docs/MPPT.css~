@@ -1,0 +1,13 @@
+    .container {
+      display: flex;
+    }
+
+    .fixed {
+      width: 300px;
+    }
+
+    .flex-item {
+      flex-grow: 1;
+    }
+    
+    

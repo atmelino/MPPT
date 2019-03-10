@@ -2,29 +2,65 @@
 <html lang="en">
 
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <title>MPPT Version 1.0</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>MPPT Version 1.0</title>
+  <link rel="stylesheet" href="MPPT.css">
 </head>
 
 <body>
-<h1>Maximum Power Point Tracking Solar Powered Computer </h1>
-Links:
-<a href="https://github.com/atmelino/MPPT">github</a>
-<br>
-<a href="https://hackaday.io/project/10671-arduino-mppt-solar-charge-controller">hackaday</a>
-<br>
-<h3>Explanation of design</h3>
-<p>
-  Relay for battery: allows Arduino to turn power to itself off when no
-  power comes from solar panel, at night, to save power. When the sun comes
-  up, the voltage from the solar channel will turn the Arduino back on.
-</p>
-<p>
-  Button to connect battery: When the Pi is off and the battery is
-  connected, the relay to the battery is still off.The button allows the
-  user to connect the battery temporarily so that the Arduino recognizes the
-  high enough battery voltage and turns the relay on.
-</p>
+  <h1>Maximum Power Point Tracking Solar Powered Computer </h1>
+  <h3>Explanation of design</h3>
+  <p>
+    Relay for battery: allows Arduino to turn power to itself off when no
+    power comes from solar panel, at night, to save power. When the sun comes
+    up, the voltage from the solar channel will turn the Arduino back on.
+  </p>
+  <p>
+    Button to connect battery: When the Pi is off and the battery is
+    connected, the relay to the battery is still off.The button allows the
+    user to connect the battery temporarily so that the Arduino recognizes the
+    high enough battery voltage and turns the relay on.
+  </p>
+
+  <div class="container">
+    <div class="fixed">
+      <a href="images/version1_0/MPPT_LCD/schematic.png"><img src="images/version1_0/MPPT_LCD/schematic.png" width="400"
+          alt=""></a>
+    </div>
+    <div class="fixed">
+      <a href="images/version1_0/MPPT_LCD/board.png"> <img src="images/version1_0/MPPT_LCD/board.png" width="400" alt=""></a>
+    </div>
+    <div class="flex-item">
+      <a href="images/version1_0/MPPT_LCD/photo.jpeg"> <img src="images/version1_0/MPPT_LCD/photo.png" width="400" alt=""></a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="fixed">
+      <a href="images/version1_0/MPPT_power/schematic.png"><img src="images/version1_0/MPPT_power/schematic.png" width="400"
+          alt=""></a>
+    </div>
+    <div class="flex-item">
+      <a href="images/version1_0/MPPT_power/board.png"> <img src="images/version1_0/MPPT_power/board.png" width="400" alt=""></a>
+    </div>
+    <div class="flex-item">
+      <a href="images/version1_0/MPPT_power/photo.jpeg"> <img src="images/version1_0/MPPT_power/photo.jpeg" width="400" alt=""></a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="fixed">
+      <a href="images/version1_0/MPPT_ArdProMini/schematic.png"><img src="images/version1_0/MPPT_ArdProMini/schematic.png" width="400"
+          alt=""></a>
+    </div>
+    <div class="fixed">
+      <a href="images/version1_0/MPPT_ArdProMini/board.png"> <img src="images/version1_0/MPPT_ArdProMini/board.png" width="400" alt=""></a>
+    </div>
+    <div class="flex-item">
+      <a href="images/version1_0/MPPT_ArdProMini/photo.jpeg"> <img src="images/version1_0/MPPT_ArdProMini/photo.jpeg" width="400" alt=""></a>
+    </div>
+  </div>
+
+
+
 
 </body>
 
