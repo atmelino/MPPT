@@ -13,6 +13,7 @@ var ina = new INA3221(i2c, {
     shunt: 0.1 // the shunt resistor's value
 });
 var interval;
+var toggle = false;
 
 
 function getChannel1() {
@@ -47,16 +48,18 @@ function getChannel3() {
 
 function start() {
     console.log('MPPT test  Press button on Espruino to stop');
+
     console.log('Turning PWM on');
-
-
     digitalWrite(B1, 1);
     analogWrite(A0, 0.6, { freq: 80000 });
+
 
     interval = setInterval(function () {
         console.log(rtc.readDateTime());
         print(getChannel2());
         print(getChannel3());
+        toggle = !toggle;
+        digitalWrite(B15, toggle);
     }, 1000);
 }
 
