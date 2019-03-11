@@ -35,12 +35,28 @@ function getChannel2() {
     return line2;
 }
 
+function getChannel3() {
+    result3 = ina.readChannel3();
+    var bV3 = result3.busVoltage3.toString();
+    var sV3 = result3.shuntVoltage3.toString();
+    var I3 = result3.current_mA3;
+    var P3 = I3 * bV3;
+    var line3 = "channel 3: bus " + bV3 + " V shunt " + sV3 + " mV current " + I3 + " mA power " + P3 + "mW";
+    return line3;
+}
+
 function start() {
-    console.log('DS1307 test  Press button on Espruino to stop');
+    console.log('MPPT test  Press button on Espruino to stop');
+    console.log('Turning PWM on');
+
+
+    digitalWrite(B1, 1);
+    analogWrite(A0, 0.6, { freq: 80000 });
 
     interval = setInterval(function () {
         console.log(rtc.readDateTime());
         print(getChannel2());
+        print(getChannel3());
     }, 1000);
 }
 

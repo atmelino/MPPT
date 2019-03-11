@@ -4,7 +4,7 @@ function start() {
     toggle = !toggle;
     digitalWrite(LED2, toggle);
     console.log(toggle);
-  }, 5000);
+  }, 1000);
 }
 function onInit() {
   start();
