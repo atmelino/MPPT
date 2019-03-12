@@ -12,7 +12,7 @@
   <h3>Explanation of design</h3>
 <p>
 The battery is connected to the IN pin of the INA3221 so that it can measure the current battery voltage.
-This has to be considered when asking for the charging voltage of the buck converter. It is reduced by the shunt voltage.
+
 </p>
 
   <h3>Links</h3>
