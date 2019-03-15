@@ -1,7 +1,7 @@
 
 // Setup I2C
 var i2c = new I2C();
-i2c.setup({ sda: B4, scl: B3 });
+i2c.setup({ sda: B9, scl: B8 });
 
 var RTC = require("DS1307");
 var rtc = new RTC(i2c, {
@@ -47,23 +47,27 @@ function getChannel3() {
 }
 
 function start() {
-    console.log('MPPT test  Press button on Espruino to stop');
-
     console.log('Turning PWM on');
     digitalWrite(B1, 1);
-    analogWrite(A0, 0.6, { freq: 80000 });
+    analogWrite(A0, 0.7, { freq: 80000 });
 
 
     interval = setInterval(function () {
+        digitalPulse(B13, 1, 50); // pulse  led as indicator
+        digitalPulse(B14, 1, 50); // pulse  led as indicator
+        digitalPulse(B15, 1, 50); // pulse  led as indicator
         console.log(rtc.readDateTime());
         print(getChannel2());
         print(getChannel3());
-        toggle = !toggle;
-        digitalWrite(B15, toggle);
     }, 1000);
 }
 
-start();
+
+function onInit() {
+    console.log('MPPT test  Press button on Espruino to stop');
+
+    start();
+}
 
 setWatch(function (e) {
     console.log("Stop program");
