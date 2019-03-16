@@ -1,0 +1,56 @@
+
+
+2019-03-15
+==========
+Diode between buck converter and 3.3V bus to prevent current going from 3.3V bus into buck converter when running from USB?
+
+2019-03-15
+==========
+
+when connecting Espruino to USB, after a few times, the LED's stop blinking.
+
+After connecting in Web IDE, following error message:
+
+
+01/01/00 00:00:19
+channel 2: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+channel 3: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+01/01/00 00:01:83
+channel 2: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+channel 3: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+01/01/00 00:01:84
+channel 2: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+channel 3: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+01/01/00 00:01:84
+channel 2: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+channel 3: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+01/01/00 00:01:84
+channel 2: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+channel 3: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+01/01/00 00:01:84
+channel 2: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+channel 3: bus -0.001 V shunt -0.005 mV current -0.05 mA power 0.00005mW
+Uncaught InternalError: Timeout on Utility Timer
+ at line 1 col 24
+digitalPulse(B13, 1, 50); // pulse  led as indicator
+                       ^
+in function called from system
+>
+Found ESPRUINOWIFI, 2v00
+Connected to /dev/ttyACM0
+Uncaught InternalError: Timeout on Utility Timer
+ at line 1 col 24
+digitalPulse(B13, 1, 50); // pulse  led as indicator
+                       ^
+in function called from system
+ERROR: Ctrl-C while processing interval - removing it.
+Execution Interrupted during event processing.
+Uncaught InternalError: Timeout on Utility Timer
+ at line 1 col 24
+digitalPulse(B13, 1, 50); // pulse  led as indicator
+                       ^
+in function called from system
+New interpreter error: CALLBACK
+>
+
+
