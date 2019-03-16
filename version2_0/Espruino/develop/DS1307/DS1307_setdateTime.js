@@ -14,7 +14,8 @@ var C = {
 
 // Setup I2C
 var i2c = new I2C();
-i2c.setup({ sda: B4, scl: B3 });
+//i2c.setup({ sda: B4, scl: B3 });
+i2c.setup({ sda: B9, scl: B8 });
 addr = 0x68;
 
 // Convert Decimal value to BCD
@@ -85,9 +86,9 @@ function start() {
 
     var year = 2019;
     var month = 3;
-    var day = 9;
-    var hour = 2;
-    var minute = 32;
+    var day = 16;
+    var hour = 0;
+    var minute = 54;
 
     setDate(day, month, year);
     setTime(hour, minute);
