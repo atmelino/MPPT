@@ -92,6 +92,7 @@ setWatch(evt => {
 
 function onInit() {
   print("connecting...");
+  digitalWrite(LED1, 1);
 
   // Connect to WiFi
   wifi.connect(WIFI_NAME, WIFI_OPTIONS, err => {
@@ -105,11 +106,17 @@ function onInit() {
       }
       print("http://" + info.ip);
       startServer();
+      digitalWrite(LED2, 1);
+
     });
   });
 }
 
 
+
+digitalPulse(B13, 1, 50); // pulse  led as indicator
+digitalPulse(B14, 1, 50); // pulse  led as indicator
+digitalPulse(B15, 1, 50); // pulse  led as indicator
 
 
 

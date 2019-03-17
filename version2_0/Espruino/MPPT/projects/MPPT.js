@@ -49,7 +49,7 @@ function getChannel3() {
 function start() {
     console.log('Turning PWM on');
     digitalWrite(B1, 1);
-    analogWrite(A0, 0.7, { freq: 80000 });
+    analogWrite(A0, 0.8, { freq: 80000 });
 
 
     interval = setInterval(function () {
@@ -57,7 +57,7 @@ function start() {
         digitalPulse(B14, 1, 50); // pulse  led as indicator
         digitalPulse(B15, 1, 50); // pulse  led as indicator
         console.log(rtc.readDateTime());
-        print(getChannel2());
+        print(getChannel1());
         print(getChannel3());
     }, 1000);
 }
