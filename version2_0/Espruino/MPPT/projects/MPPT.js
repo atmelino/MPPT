@@ -15,6 +15,103 @@ var ina = new INA3221(i2c, {
 var interval;
 var toggle = false;
 
+var wifi = require('Wifi');
+
+
+
+
+
+
+var clients = [];
+
+var WIFI_NAME = "NETGEAR53";
+
+var WIFI_OPTIONS = {
+    password: ""
+};
+
+
+// Create and start server
+function startServer() {
+    const s = require('ws').createServer(pageHandler);
+    s.on('websocket', wsHandler);
+    s.listen(80);
+}
+
+// Page request handler
+function pageHandler(req, res) {
+    res.writeHead(200, {
+        'Content-Type': 'text/html'
+    });
+    res.end(`<html>
+<head>
+<script>
+window.onload = () => {
+  var ws = new WebSocket('ws://' + location.host, 'protocolOne');
+  var btn = document.getElementById('btn');
+  var led = document.getElementById('led');
+  ws.onmessage = evt => {
+    btn.innerText = evt.data;
+  };
+  led.onchange = evt => {
+    ws.send(led.value);
+  };
+};
+</script>
+</head>
+<body>
+  <p>Button: <span id="btn">up</span></p>
+  <p>
+    LED on:
+    <select id="led">
+      <option>off</option><option>on</option>
+    </select>
+  </p>
+</body>
+</html>`);
+}
+
+// WebSocket request handler
+function wsHandler(ws) {
+    clients.push(ws);
+    ws.on('message', msg => {
+        digitalWrite(LED2, msg == 'on');
+    });
+    ws.on('close', evt => {
+        var x = clients.indexOf(ws);
+        if (x > -1) {
+            clients.splice(x, 1);
+        }
+    });
+}
+
+// Send msg to all current websocket connections
+function broadcast(msg) {
+    clients.forEach(cl => cl.send(msg));
+}
+
+function startWifi() {
+    // Connect to WiFi
+    digitalPulse(LED1, 1, 200); // pulse  led as indicator
+    digitalPulse(LED1, 0, 200); // pulse  led as indicator
+    digitalPulse(LED1, 1, 200); // pulse  led as indicator
+    wifi.connect(WIFI_NAME, WIFI_OPTIONS, err => {
+        if (err !== null) {
+            throw err;
+        }
+        // Print IP address
+        wifi.getIP((err, info) => {
+            if (err !== null) {
+                throw err;
+            }
+            print("http://" + info.ip);
+            startServer();
+            digitalPulse(LED2, 1, 200); // pulse  led as indicator
+            digitalPulse(LED2, 0, 200); // pulse  led as indicator
+            digitalPulse(LED2, 1, 200); // pulse  led as indicator
+        });
+    });
+}
 
 function getChannel1() {
     result1 = ina.readChannel1();
@@ -47,6 +144,9 @@ function getChannel3() {
 }
 
 function start() {
+    console.log("Start Wifi");
+    startWifi();
+
     console.log('Turning PWM on');
     digitalWrite(B1, 1);
     analogWrite(A0, 0.8, { freq: 80000 });

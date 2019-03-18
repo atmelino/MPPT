@@ -24,22 +24,6 @@ var WIFI_OPTIONS = {
   password: ""
 };
 
-print("connecting...");
-
-// Connect to WiFi
-wifi.connect(WIFI_NAME, WIFI_OPTIONS, err => {
-  if (err !== null) {
-    throw err;
-  }
-  // Print IP address
-  wifi.getIP((err, info) => {
-    if (err !== null) {
-      throw err;
-    }
-    print("http://" + info.ip);
-    startServer();
-  });
-});
 
 // Create and start server
 function startServer() {
@@ -100,7 +84,43 @@ function broadcast(msg) {
   clients.forEach(cl => cl.send(msg));
 }
 
-// Watch for button events (rising and falling)
-setWatch(evt => {
-  broadcast(evt.state ? 'down' : 'up');
-}, BTN, { repeat: true, edge: 'both' });
+
+function startProgram() {
+  // Connect to WiFi
+  wifi.connect(WIFI_NAME, WIFI_OPTIONS, err => {
+    if (err !== null) {
+      throw err;
+    }
+    // Print IP address
+    wifi.getIP((err, info) => {
+      if (err !== null) {
+        throw err;
+      }
+      print("http://" + info.ip);
+      startServer();
+      digitalPulse(LED2, 1, 200); // pulse  led as indicator
+      digitalPulse(LED2, 0, 200); // pulse  led as indicator
+      digitalPulse(LED2, 1, 200); // pulse  led as indicator
+    });
+  });
+}
+
+
+function onInit() {
+  print("connecting...");
+  digitalPulse(LED1, 1, 200); // pulse  led as indicator
+  startProgram();
+  //digitalWrite(LED1, 1);
+}
+
+setWatch(function (e) {
+  //console.log("Stop program");
+  digitalPulse(LED2, 1, 200); // pulse  led as indicator
+}, BTN, { repeat: true, edge: 'rising' });
+
+
+
+
+
+
+
