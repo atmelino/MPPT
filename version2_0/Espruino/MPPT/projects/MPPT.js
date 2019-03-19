@@ -75,6 +75,7 @@ function wsHandler(ws) {
     clients.push(ws);
     ws.on('message', msg => {
         digitalWrite(LED2, msg == 'on');
+        digitalWrite(B0, msg == 'on');
     });
     ws.on('close', evt => {
         var x = clients.indexOf(ws);
