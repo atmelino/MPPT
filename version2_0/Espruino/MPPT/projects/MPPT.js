@@ -14,22 +14,21 @@ var ina = new INA3221(i2c, {
 });
 var interval;
 var toggle = false;
-
 var wifi = require('Wifi');
-
-
-
-
-
-
 var clients = [];
-
 var WIFI_NAME = "NETGEAR53";
-
 var WIFI_OPTIONS = {
     password: ""
 };
 
+
+
+function userMessage(msg) {
+    const consExist = false;
+    if (consExist)
+        console.log(msg);
+
+}
 
 // Create and start server
 function startServer() {
@@ -104,7 +103,7 @@ function startWifi() {
             if (err !== null) {
                 throw err;
             }
-            print("http://" + info.ip);
+            userMessage("http://" + info.ip);
             startServer();
             digitalPulse(LED2, 1, 200); // pulse  led as indicator
             digitalPulse(LED2, 0, 200); // pulse  led as indicator
@@ -144,10 +143,10 @@ function getChannel3() {
 }
 
 function start() {
-    console.log("Start Wifi");
+    userMessage("Start Wifi");
     startWifi();
 
-    console.log('Turning PWM on');
+    userMessage('Turning PWM on');
     digitalWrite(B1, 1);
     analogWrite(A0, 0.8, { freq: 80000 });
 
@@ -156,21 +155,21 @@ function start() {
         digitalPulse(B13, 1, 50); // pulse  led as indicator
         digitalPulse(B14, 1, 50); // pulse  led as indicator
         digitalPulse(B15, 1, 50); // pulse  led as indicator
-        console.log(rtc.readDateTime());
-        print(getChannel1());
-        print(getChannel3());
+        userMessage(rtc.readDateTime());
+        userMessage(getChannel1());
+        userMessage(getChannel3());
     }, 1000);
 }
 
 
 function onInit() {
-    console.log('MPPT test  Press button on Espruino to stop');
+    userMessage('MPPT test  Press button on Espruino to stop');
 
     start();
 }
 
 setWatch(function (e) {
-    console.log("Stop program");
+    userMessage("Stop program");
     clearInterval(interval);
 }, BTN, { repeat: true, edge: 'rising' });
 
