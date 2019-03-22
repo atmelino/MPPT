@@ -14,6 +14,10 @@ var ina = new INA3221(i2c, {
 });
 var interval;
 var toggle = false;
+
+var webpage = require("webpage");
+var mypage=new webpage();
+
 var wifi = require('Wifi');
 var clients = [];
 var WIFI_NAME = "NETGEAR53";
@@ -42,33 +46,9 @@ function pageHandler(req, res) {
     res.writeHead(200, {
         'Content-Type': 'text/html'
     });
-    res.end(`<html>
-<head>
-<script>
-window.onload = () => {
-  var ws = new WebSocket('ws://' + location.host, 'protocolOne');
-  var btn = document.getElementById('btn');
-  var led = document.getElementById('led');
-  ws.onmessage = evt => {
-    btn.innerText = evt.data;
-  };
-  led.onchange = evt => {
-    ws.send(led.value);
-  };
-};
-</script>
-</head>
-<body>
-  <p>Button: <span id="btn">up</span></p>
-  <p>
-    LED on:
-    <select id="led">
-      <option>off</option><option>on</option>
-    </select>
-  </p>
-</body>
-</html>`);
+    res.end(mypage.gethtml());
 }
+
 
 // WebSocket request handler
 function wsHandler(ws) {
@@ -150,6 +130,8 @@ function start() {
     userMessage('Turning PWM on');
     digitalWrite(B1, 1);
     analogWrite(A0, 0.8, { freq: 80000 });
+    // Turn relay on
+    digitalWrite(B0, 1);
 
 
     interval = setInterval(function () {
@@ -159,13 +141,15 @@ function start() {
         userMessage(rtc.readDateTime());
         userMessage(getChannel1());
         userMessage(getChannel3());
+        //broadcast('hello');
+        broadcast(getChannel1());
     }, 1000);
 }
 
 
 function onInit() {
     userMessage('MPPT test  Press button on Espruino to stop');
-
+    //console.log(mypage.gethtml());
     start();
 }
 
