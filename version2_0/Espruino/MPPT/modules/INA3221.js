@@ -11,17 +11,27 @@ var ina = new INA3221(i2c, {
 result=ina.readChannel1();
 */
 
+channelResult = {
+  BusVoltage: 0,
+  ShuntVoltage: 0,
+  current_mA: 0,
+  power_mW: 0
+};
 
-result = {
+allChannelsResult = {
   BusVoltage1: 0,
   ShuntVoltage1: 0,
   current_mA1: 0,
+  power_mW1: 0,
   BusVoltage2: 0,
   ShuntVoltage2: 0,
   current_mA2: 0,
+  power_mW2: 0,
   BusVoltage3: 0,
   ShuntVoltage3: 0,
-  current_mA3: 0
+  current_mA3: 0,
+  power_mW3: 0,
+  hello: 'hi'
 };
 
 function INA3221(i2c, options) {
@@ -74,24 +84,42 @@ INA3221.prototype.getBusVoltage3 = function () {
 };
 
 INA3221.prototype.readChannel1 = function () {
-  result.shuntVoltage1 = this.getShuntVoltage1();
-  result.busVoltage1 = this.getBusVoltage1();
-  result.current_mA1 = result.shuntVoltage1 / options.shunt1;
-  return result;
+  channelResult.shuntVoltage = this.getShuntVoltage1();
+  channelResult.busVoltage = this.getBusVoltage1();
+  channelResult.current_mA = channelResult.shuntVoltage / options.shunt1;
+  return channelResult;
 };
 
 INA3221.prototype.readChannel2 = function () {
-  result.shuntVoltage2 = this.getShuntVoltage2();
-  result.busVoltage2 = this.getBusVoltage2();
-  result.current_mA2 = result.shuntVoltage2 / options.shunt2;
-  return result;
+  channelResult.shuntVoltage = this.getShuntVoltage2();
+  channelResult.busVoltage = this.getBusVoltage2();
+  channelResult.current_mA = channelResult.shuntVoltage / options.shunt2;
+  return channelResult;
 };
 
 INA3221.prototype.readChannel3 = function () {
-  result.shuntVoltage3 = this.getShuntVoltage3();
-  result.busVoltage3 = this.getBusVoltage3();
-  result.current_mA3 = result.shuntVoltage3 / options.shunt3;
-  return result;
+  channelResult.shuntVoltage = this.getShuntVoltage3();
+  channelResult.busVoltage = this.getBusVoltage3();
+  channelResult.current_mA = channelResult.shuntVoltage / options.shunt3;
+  return channelResult;
 };
+
+INA3221.prototype.readAllChannels = function () {
+  allChannelsResult.shuntVoltage1 = this.getShuntVoltage1();
+  allChannelsResult.busVoltage1 = this.getBusVoltage1();
+  allChannelsResult.current_mA1 = allChannelsResult.shuntVoltage1 / options.shunt1;
+  allChannelsResult.power_mW1 = allChannelsResult.shuntVoltage1 *allChannelsResult.current_mA1;
+  allChannelsResult.shuntVoltage2 = this.getShuntVoltage2();
+  allChannelsResult.busVoltage2 = this.getBusVoltage2();
+  allChannelsResult.current_mA2 = allChannelsResult.shuntVoltage2 / options.shunt2;
+  allChannelsResult.power_mW2 = allChannelsResult.shuntVoltage3 *allChannelsResult.current_mA2;
+  allChannelsResult.shuntVoltage3 = this.getShuntVoltage3();
+  allChannelsResult.busVoltage3 = this.getBusVoltage3();
+  allChannelsResult.current_mA3 = allChannelsResult.shuntVoltage3 / options.shunt3;
+  allChannelsResult.power_mW3 = allChannelsResult.shuntVoltage3 *allChannelsResult.current_mA3;
+  return allChannelsResult;
+};
+
+
 
 exports = INA3221;
