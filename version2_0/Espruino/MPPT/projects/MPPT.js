@@ -16,6 +16,7 @@ var interval;
 var toggle = false;
 var result1;
 var result2;
+var counter=0;
 var allChannelsResult;
 
 
@@ -24,7 +25,8 @@ var mypage=new webpage();
 
 var wifi = require('Wifi');
 var clients = [];
-var WIFI_NAME = "NETGEAR53";
+//var WIFI_NAME = "NETGEAR53";
+var WIFI_NAME = "TP-LINK_MR3040_4B611E";
 var WIFI_OPTIONS = {
     password: ""
 };
@@ -149,6 +151,7 @@ function start() {
         //broadcast(getChannel1());
         allChannelsResult=ina.readAllChannels();
         //console.log(JSON.stringify(allChannelsResult));
+        allChannelsResult.number=counter++;
         broadcast(JSON.stringify(allChannelsResult));
 
     }, 1000);
@@ -165,7 +168,5 @@ setWatch(function (e) {
     userMessage("Stop program");
     clearInterval(interval);
 }, BTN, { repeat: true, edge: 'rising' });
-
-
 
 

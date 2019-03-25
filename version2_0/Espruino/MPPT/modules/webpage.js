@@ -1,5 +1,3 @@
-
-
 myhtml = `<html>
 <head>
 <style>
@@ -8,22 +6,47 @@ table, td {
 }
 </style>
 <script>
+
+function printMessage(target, message) {
+  elementId = document.getElementById(target);
+  if (elementId != null) {
+    elementId.innerHTML += message;
+    elementId.scrollTop = elementId.scrollHeight;
+  }
+}
+
+function printlnMessage(target, message) {
+  elementId = document.getElementById(target);
+  if (elementId != null) {
+    printMessage(target, message);
+    //elementId.innerHTML += "";
+  }
+}
+
 window.onload = () => {
   var ws = new WebSocket('ws://' + location.host, 'protocolOne');
   var led = document.getElementById('led');
   var table = document.getElementById("liveTable");
   ws.onmessage = evt => {
     receivedmessage=evt.data;
+    printlnMessage("messages", JSON.stringify(receivedmessage));
     receiveddata = JSON.parse(receivedmessage);
-
-    document.getElementById("content").innerHTML = receivedmessage;
     var x = document.getElementById("liveTable").rows.length;
-    if(x<10){
-      document.getElementById("message").innerHTML = x;
+    if(x>10){
+      document.getElementById("liveTable").deleteRow(1);
+      x-=1;
+    }
+    {
       var row = table.insertRow(x);
-      var y = row.insertCell(0);
-      y.innerHTML = "New cell";
-      row.insertCell(1).innerHTML =receiveddata.current_mA3;
+      row.insertCell(0).innerHTML =receiveddata.current_mA3;
+      row.insertCell(1).innerHTML =receiveddata.number;
+      row.insertCell(2).innerHTML =receiveddata.busVoltage1;
+      row.insertCell(3).innerHTML =receiveddata.current_mA1;
+      row.insertCell(3).innerHTML =receiveddata.power_mW1;
+      row.insertCell(4).innerHTML =receiveddata.busVoltage3;
+      row.insertCell(5).innerHTML =receiveddata.current_mA3;
+      row.insertCell(6).innerHTML =receiveddata.power_mW3;
+
     }
 };
   led.onchange = evt => {
@@ -40,11 +63,15 @@ window.onload = () => {
       <option>off</option><option>on</option>
     </select>
   </p>
-  <div id="message"></div>
-
-  <div id="content"></div>
-
-  <div id="liveData">
+ <div id="messagesDiv">
+  <textarea
+    id="messages"
+    rows="10"
+    cols="60"
+    style="width: 100%;"
+  ></textarea>
+</div>
+<div id="liveData">
   <table id="liveTable">
     <tr>
       <th>Date</th>
@@ -88,12 +115,11 @@ window.onload = () => {
 </body>
 </html>`;
 
-
 function webpage() {
   //print("MPPT web page");
 }
 
-webpage.prototype.gethtml = function () {
+webpage.prototype.gethtml = function() {
   return myhtml;
 };
 
