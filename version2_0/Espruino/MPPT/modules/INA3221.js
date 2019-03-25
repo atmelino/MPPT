@@ -8,7 +8,7 @@ var ina = new INA3221(i2c, {
     address: 0x40,
     shunt: 0.1 // the shunt resistor's value
 });
-result=ina.readChannel1();
+result=ina.getChannel1();
 */
 
 channelResult = {
@@ -86,39 +86,89 @@ INA3221.prototype.readChannel1 = function () {
   channelResult.shuntVoltage = this.getshuntVoltage1();
   channelResult.busVoltage = this.getbusVoltage1();
   channelResult.current_mA = channelResult.shuntVoltage / options.shunt1;
-  return channelResult;
+  channelResult.power_mW = channelResult.busVoltage * channelResult.current_mA;
 };
 
 INA3221.prototype.readChannel2 = function () {
   channelResult.shuntVoltage = this.getshuntVoltage2();
   channelResult.busVoltage = this.getbusVoltage2();
   channelResult.current_mA = channelResult.shuntVoltage / options.shunt2;
-  return channelResult;
+  channelResult.power_mW = channelResult.busVoltage * channelResult.current_mA;
 };
 
 INA3221.prototype.readChannel3 = function () {
   channelResult.shuntVoltage = this.getshuntVoltage3();
   channelResult.busVoltage = this.getbusVoltage3();
   channelResult.current_mA = channelResult.shuntVoltage / options.shunt3;
-  return channelResult;
+  channelResult.power_mW = channelResult.busVoltage * channelResult.current_mA;
 };
 
 INA3221.prototype.readAllChannels = function () {
   allChannelsResult.shuntVoltage1 = this.getshuntVoltage1();
   allChannelsResult.busVoltage1 = this.getbusVoltage1();
   allChannelsResult.current_mA1 = allChannelsResult.shuntVoltage1 / options.shunt1;
-  allChannelsResult.power_mW1 = allChannelsResult.shuntVoltage1 *allChannelsResult.current_mA1;
+  allChannelsResult.power_mW1 = allChannelsResult.busVoltage1 * allChannelsResult.current_mA1;
   allChannelsResult.shuntVoltage2 = this.getshuntVoltage2();
   allChannelsResult.busVoltage2 = this.getbusVoltage2();
   allChannelsResult.current_mA2 = allChannelsResult.shuntVoltage2 / options.shunt2;
-  allChannelsResult.power_mW2 = allChannelsResult.shuntVoltage3 *allChannelsResult.current_mA2;
+  allChannelsResult.power_mW2 = allChannelsResult.busVoltage3 * allChannelsResult.current_mA2;
   allChannelsResult.shuntVoltage3 = this.getshuntVoltage3();
   allChannelsResult.busVoltage3 = this.getbusVoltage3();
   allChannelsResult.current_mA3 = allChannelsResult.shuntVoltage3 / options.shunt3;
-  allChannelsResult.power_mW3 = allChannelsResult.shuntVoltage3 *allChannelsResult.current_mA3;
-  return allChannelsResult;
+  allChannelsResult.power_mW3 = allChannelsResult.busVoltage3 * allChannelsResult.current_mA3;
 };
 
+INA3221.prototype.getChannel1 = function () {
+  //print("getChannel1");
+  this.readChannel1();
+  //console.log(JSON.stringify(channelResult));
+  return channelResult;
+}
+
+INA3221.prototype.getChannel2 = function () {
+  this.readChannel2();
+  return channelResult;
+}
+
+INA3221.prototype.getChannel3 = function () {
+  this.readChannel3();
+  return channelResult;
+}
+
+INA3221.prototype.getAllChannels = function () {
+  this.readAllChannels();
+  return allChannelsResult;
+}
+
+INA3221.prototype.getChannel1String = function () {
+  this.readChannel1();
+  var bV1 = channelResult.busVoltage.toString();
+  var sV1 = channelResult.shuntVoltage.toString();
+  var I1 = channelResult.current_mA;
+  var P1 = channelResult.power_mW;
+  var line1 = "channel 1: bus " + bV1 + " V shunt " + sV1 + " mV current " + I1 + " mA power " + P1 + "mW";
+  return line1;
+}
+
+INA3221.prototype.getChannel2String = function () {
+  this.readChannel2();
+  var bV2 = channelResult.busVoltage.toString();
+  var sV2 = channelResult.shuntVoltage.toString();
+  var I2 = channelResult.current_mA;
+  var P2 = channelResult.power_mW;
+  var line2 = "channel 2: bus " + bV2 + " V shunt " + sV2 + " mV current " + I2 + " mA power " + P2 + "mW";
+  return line2;
+}
+
+INA3221.prototype.getChannel3String = function () {
+  this.readChannel3();
+  var bV3 = channelResult.busVoltage.toString();
+  var sV3 = channelResult.shuntVoltage.toString();
+  var I3 = channelResult.current_mA;
+  var P3 = channelResult.power_mW;
+  var line3 = "channel 3: bus " + bV3 + " V shunt " + sV3 + " mV current " + I3 + " mA power " + P3 + "mW";
+  return line3;
+}
 
 
 exports = INA3221;
