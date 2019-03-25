@@ -42,11 +42,13 @@ window.onload = () => {
       row.insertCell(1).innerHTML =receiveddata.number;
       row.insertCell(2).innerHTML =receiveddata.busVoltage1;
       row.insertCell(3).innerHTML =receiveddata.current_mA1;
-      row.insertCell(3).innerHTML =receiveddata.power_mW1;
-      row.insertCell(4).innerHTML =receiveddata.busVoltage3;
-      row.insertCell(5).innerHTML =receiveddata.current_mA3;
-      row.insertCell(6).innerHTML =receiveddata.power_mW3;
-
+      row.insertCell(4).innerHTML =receiveddata.power_mW1;
+      row.insertCell(5).innerHTML =receiveddata.busVoltage3;
+      row.insertCell(6).innerHTML =receiveddata.current_mA3;
+      row.insertCell(7).innerHTML =receiveddata.power_mW3;
+      row.insertCell(8).innerHTML =' ';
+      row.insertCell(9).innerHTML =receiveddata.PWM_actual;
+      row.insertCell(10).innerHTML =receiveddata.PWM_target;
     }
 };
   led.onchange = evt => {

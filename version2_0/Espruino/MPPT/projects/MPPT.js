@@ -17,6 +17,8 @@ var toggle = false;
 var result1;
 var result2;
 var counter=0;
+var PWM_actual=0.8;
+var PWM_target=0;
 var allChannelsResult;
 
 
@@ -135,8 +137,8 @@ function start() {
 
     userMessage('Turning PWM on');
     digitalWrite(B1, 1);
-    analogWrite(A0, 0.8, { freq: 80000 });
-    // Turn relay on
+    analogWrite(A0, PWM_actual, { freq: 80000 });
+    // Turn relay between battery and MC on
     digitalWrite(B0, 1);
 
 
@@ -152,6 +154,8 @@ function start() {
         allChannelsResult=ina.readAllChannels();
         //console.log(JSON.stringify(allChannelsResult));
         allChannelsResult.number=counter++;
+        allChannelsResult.PWM_actual=PWM_actual;
+        allChannelsResult.PWM_target=PWM_target;
         broadcast(JSON.stringify(allChannelsResult));
 
     }, 1000);
