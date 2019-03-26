@@ -51,19 +51,31 @@ function pageHandler(req, res) {
 // WebSocket request handler
 function wsHandler(ws) {
     clients.push(ws);
-    ws.on('message', msg => {
-        console.log(msg);
-        if (msg == 'PWMminus') {
+    ws.on('message', receivedpacket => {
+        //console.log(WIFI_OPTIONS);
+        console.log(receivedpacket);
+        receivedmessage = JSON.parse(receivedpacket);
+        //console.log(JSON.stringify(receivedmessage));
+        if (receivedmessage.type == 'PWMminus') {
             PWM_actual -= 0.01;
             analogWrite(A0, PWM_actual, { freq: 80000 });
         }
-        if (msg == 'PWMplus') {
+        if (receivedmessage.type == 'PWMplus') {
             PWM_actual += 0.01;
             analogWrite(A0, PWM_actual, { freq: 80000 });
         }
-
-        digitalWrite(LED2, msg == 'on');
-        //digitalWrite(B0, msg == 'on');
+        if (receivedmessage.type == "setRTC") {
+            var year = receivedmessage.data.year;
+            var month = receivedmessage.data.month;
+            var day = receivedmessage.data.day;
+            var hours = receivedmessage.data.hours;
+            var minutes = receivedmessage.data.minutes;
+            var seconds = receivedmessage.data.seconds;
+            var dayofweek = receivedmessage.data.dayofweek;
+            console.log(year);
+            rtc.setDate(day, month, year);
+        }
+        // digitalWrite(LED2, receivedmessage.type == 'on');
     });
     ws.on('close', evt => {
         var x = clients.indexOf(ws);
@@ -121,14 +133,16 @@ function start() {
         if (batteryVoltage >= 7.7 && batteryVoltage < 8.0)
             digitalPulse(B14, 1, 50); // orange LED
         if (batteryVoltage >= 8.0)
-            digitalPulse(B15, 1, 50); // green LED 
+            digitalPulse(B15, 1, 50); // green LED
         userMessage(rtc.readDateTime());
+        currentDate = rtc.readDateTime();
         // console.log('channel 1: '+JSON.stringify(ina.getChannel1()));
         // console.log('channel 2: '+JSON.stringify(ina.getChannel2()));
         // console.log('channel 3: '+JSON.stringify(ina.getChannel3()));
         //console.log('channel 1: ' + JSON.stringify(ina.getChannel1String()));
         //console.log('channel 3: ' + JSON.stringify(ina.getChannel3String()));
         //console.log(JSON.stringify(allChannelsResult));
+        allChannelsResult.date = currentDate;
         allChannelsResult.number = counter++;
         allChannelsResult.PWM_actual = PWM_actual;
         allChannelsResult.PWM_target = PWM_target;

@@ -1,4 +1,3 @@
-myhtml = `
 <html>
 
 <head>
@@ -52,12 +51,7 @@ myhtml = `
             var dayofweek = clientDate.getDay();
             setDate = {
                 year: year,
-                month: month,
-                day: day,
-                hours: hours,
-                minutes: minutes,
-                seconds: seconds,
-                dayofweek: dayofweek
+                month: month
             }
             sendmessage.data = setDate;
             ws.send(JSON.stringify(sendmessage));
@@ -168,14 +162,3 @@ myhtml = `
 </body>
 
 </html>
-`;
-
-function webpage() {
-  //print("MPPT web page");
-}
-
-webpage.prototype.gethtml = function () {
-  return myhtml;
-};
-
-exports = webpage;
