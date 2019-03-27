@@ -72,10 +72,13 @@ function wsHandler(ws) {
             var minutes = receivedmessage.data.minutes;
             var seconds = receivedmessage.data.seconds;
             var dayofweek = receivedmessage.data.dayofweek;
-            console.log(year);
+            //console.log(year);
             rtc.setDate(day, month, year);
+            rtc.setTime(hours, minutes, seconds);
         }
-        // digitalWrite(LED2, receivedmessage.type == 'on');
+        if (receivedmessage.type == "LED") {
+            digitalWrite(LED2, receivedmessage.data == 'on');
+        }
     });
     ws.on('close', evt => {
         var x = clients.indexOf(ws);
@@ -134,6 +137,11 @@ function start() {
             digitalPulse(B14, 1, 50); // orange LED
         if (batteryVoltage >= 8.0)
             digitalPulse(B15, 1, 50); // green LED
+        // Maximum battery voltage
+        if (batteryVoltage > 8.4) {
+            PWM_actual -= 0.01;
+            analogWrite(A0, PWM_actual, { freq: 80000 });
+        }
         userMessage(rtc.readDateTime());
         currentDate = rtc.readDateTime();
         // console.log('channel 1: '+JSON.stringify(ina.getChannel1()));
