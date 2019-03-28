@@ -12,7 +12,7 @@
   <h3>Explanation of design</h3>
 <p>
 The battery is connected to the IN pin of the INA3221 so that it can measure the current battery voltage.
-
+This has to be considered when asking for the charging voltage of the buck converter. It is reduced by the shunt voltage.
 </p>
 
   <h3>Links</h3>
@@ -24,7 +24,21 @@ https://www.microchip.com/wwwproducts/en/PAC1933#additional-features<br>
 IR2104 logic input 3.3 Volt<br>
 https://electronics.stackexchange.com/questions/305134/mosfet-half-bridge-driver-not-working<br>
 
+  <h3>Battery protection current limiter</h3>
 
-</body>
 
-</html>
+<a href="https://electronics.stackexchange.com/questions/262011/mosfet-current-source-current-limiter-request-for-review">https://electronics.stackexchange.com/questions/262011/mosfet-current-source-current-limiter-request-for-review</a>
+<br>
+</body><a href="https://electronics.stackexchange.com/questions/294061/p-channel-mosfet-inrush-current-limiting">https://electronics.stackexchange.com/questions/294061/p-channel-mosfet-inrush-current-limiting</a>
+<br>
+<img src="images/TykPZ.png" width="607" height="401" alt=""><br>
+
+
+</html><a href="https://www.youtube.com/watch?v=gecjaIV7Fdk&t=166s">https://www.youtube.com/watch?v=gecjaIV7Fdk&t=166s</a>
+<br>
+<img src="images/currentlimit01.png" width="509" height="498" alt="">
+<br>
+<a href="https://www.youtube.com/watch?v=C25X2su0sXI">https://www.youtube.com/watch?v=C25X2su0sXI</a>
+<br>
+
+
