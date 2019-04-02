@@ -122,7 +122,7 @@ function start() {
     startWifi();
 
     userMessage('Turning PWM on');
-    digitalWrite(B1, 1);
+    digitalWrite(B1, 1); // PWM on enable IR2104
     analogWrite(A0, PWM_actual, { freq: 80000 });
     // Turn relay between battery and MC on
     digitalWrite(B0, 1);
@@ -142,6 +142,11 @@ function start() {
             PWM_actual -= 0.01;
             analogWrite(A0, PWM_actual, { freq: 80000 });
         }
+        if (solarVoltage < 5.0)
+            digitalWrite(B1, 0); // PWM off disable IR2104
+        else
+            digitalWrite(B1, 1); // PWM on enable IR2104
+
         userMessage(rtc.readDateTime());
         currentDate = rtc.readDateTime();
         // console.log('channel 1: '+JSON.stringify(ina.getChannel1()));
