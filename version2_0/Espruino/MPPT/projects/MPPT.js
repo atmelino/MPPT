@@ -142,11 +142,15 @@ function start() {
             PWM_actual -= 0.01;
             analogWrite(A0, PWM_actual, { freq: 80000 });
         }
-        if (solarVoltage < 5.0)
+        if (solarVoltage < 5.0) {
+            PWM_actual = 0.0;
+            analogWrite(A0, PWM_actual, { freq: 0 });
             digitalWrite(B1, 0); // PWM off disable IR2104
-        else
+        } else {
+            //PWM_actual = 0.79;
+            analogWrite(A0, PWM_actual, { freq: 80000 });
             digitalWrite(B1, 1); // PWM on enable IR2104
-
+        }
         userMessage(rtc.readDateTime());
         currentDate = rtc.readDateTime();
         // console.log('channel 1: '+JSON.stringify(ina.getChannel1()));
