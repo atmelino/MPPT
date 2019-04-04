@@ -82,7 +82,6 @@ function wsHandler(ws) {
             loopPeriod = receivedmessage.data;
             clearInterval(loopTimer);
             loopTimer = setInterval(mainLoop, loopPeriod);
-
         }
         if (receivedmessage.type == "LED") {
             digitalWrite(LED2, receivedmessage.data == 'on');
@@ -143,17 +142,29 @@ function mainLoop() {
     allChannelsResult = ina.getAllChannels();
     solarVoltage = allChannelsResult.busVoltage3;
     batteryVoltage = allChannelsResult.busVoltage1;
+    batteryCurrent = allChannelsResult.current_mA1;
+    // LED indicators
     if (batteryVoltage < 7.7)
         digitalPulse(B13, 1, 50); // red LED
     if (batteryVoltage >= 7.7 && batteryVoltage < 8.0)
         digitalPulse(B14, 1, 50); // orange LED
     if (batteryVoltage >= 8.0)
         digitalPulse(B15, 1, 50); // green LED
-    // Maximum battery voltage
+    // prevent battery overcharge
     if (batteryVoltage > 8.4) {
         PWM_actual -= 0.01;
         analogWrite(A0, PWM_actual, { freq: 80000 });
     }
+    console.log(batteryCurrent);
+    if (Math.abs(batteryCurrent) > 200) {
+        console.log("decrease PWM");
+        PWM_actual -= 0.01;
+    }
+    // prevent battery over discharge
+    if (batteryVoltage < 7.6) {
+        digitalWrite(B0, 0);
+    }
+
     if (solarVoltage < 5.0) {
         PWM_actual = 0.0;
         analogWrite(A0, PWM_actual, { freq: 0 });
