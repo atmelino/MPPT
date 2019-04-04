@@ -120,6 +120,13 @@ myhtml = `
             ws.send(JSON.stringify(sendmessage));
         }
 
+        function setloopPeriod() {
+            var value = document.getElementById("loopPeriod").value;
+            sendmessage.type = 'loopPeriod';
+            sendmessage.data = value;
+            ws.send(JSON.stringify(sendmessage));
+        }
+
         function LEDonOff() {
             sendmessage.type = 'LED';
             if (document.getElementById("LEDonOff").checked) {
@@ -259,20 +266,30 @@ myhtml = `
             show messages
         </label>
         <button onclick="clearMessage('messages')">Clear messages</button>
-        <div style="width: 12%; display: table-cell; white-space: nowrap;">
+        <div>
             <label style="white-space: nowrap"><input type="radio" name="mode" id="manual" onclick="PWMMode()"
                     checked="true" />PWM manual</label>
             <!-- -->
             <label style="white-space: nowrap"><input type="radio" name="mode" id="MPPT"
                     onclick="PWMMode()" />MPPT</label>
         </div>
-        <br />
+        <br>
+        <div>
+            Measure Period
+            <input id="loopPeriod" name="value" value="1000" />ms
+            <button onclick="setloopPeriod()" id="setloopPeriod">
+                Set</button><br>
+            <label><input type="checkbox" onclick="sendDataCheckbox()" name="sendData" id="sendData" value="male"
+                    checked />
+                Server sends data </label>
+        </div>
+        <br>
         <!-- -->
         <div class="title_box" id="logsbox">
             <div id="title">
                 <label><input type="checkbox" onclick="enableLogs()" name="enableLogs" id="enableLogs" value="male"
                         unchecked />
-                    Log Files<br />
+                    Log Files<br>
                     <!-- -->
                 </label>
             </div>
@@ -280,18 +297,18 @@ myhtml = `
                 Log values every
                 <input id="LogPeriod" name="value" value="query.." /> seconds
                 <button onclick="setLogPeriodButton()" id="setLogPeriodButton">
-                    Set</button><br />
+                    Set</button><br>
                 Save log file every
                 <input id="LogFilePeriod" name="value" value="query.." /> seconds
                 <button onclick="setLogFilePeriodButton()" id="setLogFilePeriodButton">
-                    Set</button><br />
+                    Set</button><br>
                 current buffer length
                 <input id="bufferLength" name="value" value="query.." />
                 <button onclick="requestStatus()" id="requestStatus">
-                    Refresh</button><br />
+                    Refresh</button><br>
             </div>
         </div>
-        <br />
+        <br>
         <button class="close_button" onClick="closePopup()">close</button>
     </div>
 </body>

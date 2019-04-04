@@ -11,7 +11,8 @@ var ina = new INA3221(i2c, {
     address: 0x40,
     shunt: 0.1 // the shunt resistor's value
 });
-var interval;
+var loopTimer;
+var loopPeriod = 1000;
 var counter = 0;
 var PWM_actual = 0.79;
 var PWM_target = 0;
@@ -76,6 +77,13 @@ function wsHandler(ws) {
             rtc.setDate(day, month, year);
             rtc.setTime(hours, minutes, seconds);
         }
+        if (receivedmessage.type == "loopPeriod") {
+            // console.log(JSON.stringify(receivedmessage));
+            loopPeriod = receivedmessage.data;
+            clearInterval(loopTimer);
+            loopTimer = setInterval(mainLoop, loopPeriod);
+
+        }
         if (receivedmessage.type == "LED") {
             digitalWrite(LED2, receivedmessage.data == 'on');
         }
@@ -127,47 +135,42 @@ function start() {
     // Turn relay between battery and MC on
     digitalWrite(B0, 1);
 
-    interval = setInterval(function () {
-        allChannelsResult = ina.getAllChannels();
-        solarVoltage = allChannelsResult.busVoltage3;
-        batteryVoltage = allChannelsResult.busVoltage1;
-        if (batteryVoltage < 7.7)
-            digitalPulse(B13, 1, 50); // red LED
-        if (batteryVoltage >= 7.7 && batteryVoltage < 8.0)
-            digitalPulse(B14, 1, 50); // orange LED
-        if (batteryVoltage >= 8.0)
-            digitalPulse(B15, 1, 50); // green LED
-        // Maximum battery voltage
-        if (batteryVoltage > 8.4) {
-            PWM_actual -= 0.01;
-            analogWrite(A0, PWM_actual, { freq: 80000 });
-        }
-        if (solarVoltage < 5.0) {
-            PWM_actual = 0.0;
-            analogWrite(A0, PWM_actual, { freq: 0 });
-            digitalWrite(B1, 0); // PWM off disable IR2104
-        } else {
-            //PWM_actual = 0.79;
-            analogWrite(A0, PWM_actual, { freq: 80000 });
-            digitalWrite(B1, 1); // PWM on enable IR2104
-        }
-        userMessage(rtc.readDateTime());
-        currentDate = rtc.readDateTime();
-        // console.log('channel 1: '+JSON.stringify(ina.getChannel1()));
-        // console.log('channel 2: '+JSON.stringify(ina.getChannel2()));
-        // console.log('channel 3: '+JSON.stringify(ina.getChannel3()));
-        //console.log('channel 1: ' + JSON.stringify(ina.getChannel1String()));
-        //console.log('channel 3: ' + JSON.stringify(ina.getChannel3String()));
-        //console.log(JSON.stringify(allChannelsResult));
-        allChannelsResult.date = currentDate;
-        allChannelsResult.number = counter++;
-        allChannelsResult.PWM_actual = PWM_actual;
-        allChannelsResult.PWM_target = PWM_target;
-        broadcast(JSON.stringify(allChannelsResult));
-
-    }, 1000);
+    loopTimer = setInterval(mainLoop, loopPeriod);
 }
 
+
+function mainLoop() {
+    allChannelsResult = ina.getAllChannels();
+    solarVoltage = allChannelsResult.busVoltage3;
+    batteryVoltage = allChannelsResult.busVoltage1;
+    if (batteryVoltage < 7.7)
+        digitalPulse(B13, 1, 50); // red LED
+    if (batteryVoltage >= 7.7 && batteryVoltage < 8.0)
+        digitalPulse(B14, 1, 50); // orange LED
+    if (batteryVoltage >= 8.0)
+        digitalPulse(B15, 1, 50); // green LED
+    // Maximum battery voltage
+    if (batteryVoltage > 8.4) {
+        PWM_actual -= 0.01;
+        analogWrite(A0, PWM_actual, { freq: 80000 });
+    }
+    if (solarVoltage < 5.0) {
+        PWM_actual = 0.0;
+        analogWrite(A0, PWM_actual, { freq: 0 });
+        digitalWrite(B1, 0); // PWM off disable IR2104
+    } else {
+        //PWM_actual = 0.79;
+        analogWrite(A0, PWM_actual, { freq: 80000 });
+        digitalWrite(B1, 1); // PWM on enable IR2104
+    }
+    userMessage(rtc.readDateTime());
+    currentDate = rtc.readDateTime();
+    allChannelsResult.date = currentDate;
+    allChannelsResult.number = counter++;
+    allChannelsResult.PWM_actual = PWM_actual;
+    allChannelsResult.PWM_target = PWM_target;
+    broadcast(JSON.stringify(allChannelsResult));
+}
 
 function onInit() {
     userMessage('MPPT test  Press button on Espruino to stop');
@@ -177,7 +180,7 @@ function onInit() {
 
 setWatch(function (e) {
     userMessage("Stop program");
-    clearInterval(interval);
+    clearInterval(loopTimer);
 }, BTN, { repeat: true, edge: 'rising' });
 
 
