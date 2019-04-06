@@ -40,7 +40,6 @@
     </div>
     <div class="flex-item">
     <img src="images/version1_0/MPPT01.jpeg" width="400" alt="">
-      <img src="images/MPPT01.jpeg" height="400" alt="" />
     </div>
   </div>
 
@@ -65,8 +64,21 @@
   </div>
 
   <h3>  <a href="version2_0.html">Version 2.0</a></h3>
+  <div class="container">
+    <div class="fixed">
+      single PCB<br />
+      <ul>
+        Espruino Wifi
+      </ul>
 
-Espruino Wifi
+      Software:<br />
+      On Raspberry Pi: Node.js<br />
+    </div>
+    <div class="flex-item">
+    <img src="images/version2_0/photo.jpg" width="400"  alt="">
+
+    </div>
+  </div>
 
 
   <br />

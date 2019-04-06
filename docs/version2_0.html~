@@ -19,11 +19,35 @@ This has to be considered when asking for the charging voltage of the buck conve
 
 3.3 Volts:<br>
 
-https://www.microchip.com/wwwproducts/en/PAC1933#additional-features<br>
+<a href="https://www.microchip.com/wwwproducts/en/PAC1933#additional-features">https://www.microchip.com/wwwproducts/en/PAC1933#additional-features</a><br>
 
 IR2104 logic input 3.3 Volt<br>
-https://electronics.stackexchange.com/questions/305134/mosfet-half-bridge-driver-not-working<br>
+<a href="https://electronics.stackexchange.com/questions/305134/mosfet-half-bridge-driver-not-working">https://electronics.stackexchange.com/questions/305134/mosfet-half-bridge-driver-not-working</a><br>
 
+  <h3>Battery Fuse</h3>
+Options:<br>
+      <ul>
+thermal fuse
+      </ul>     
+       <ul>
+        manual reset fuse
+      </ul>
+      <ul>
+        automatic reset fuse (PPTC))
+      </ul>
+
+<a href="https://forum.electricunicycle.org/topic/6487-almost-started-bms-battery-fire-doesnt-all-bms-have-shortcircuit-protection-on-the-charge-cables/">https://forum.electricunicycle.org/topic/6487-almost-started-bms-battery-fire-doesnt-all-bms-have-shortcircuit-protection-on-the-charge-cables/</a>
+ <br>
+ 
+ 
+ cheapo PPTC has 1.3 Ohms. <br>
+ <a href="https://www.amazon.com/gp/product/B00X775G34">https://www.amazon.com/gp/product/B00X775G34</a><br>
+ 
+ <a href="https://www.littelfuse.com/products/resettable-ptcs.aspx">https://www.littelfuse.com/products/resettable-ptcs.aspx</a>
+ <br>
+ 
+
+ 
   <h3>Battery protection current limiter</h3>
 
 
@@ -40,5 +64,5 @@ https://electronics.stackexchange.com/questions/305134/mosfet-half-bridge-driver
 <br>
 <a href="https://www.youtube.com/watch?v=C25X2su0sXI">https://www.youtube.com/watch?v=C25X2su0sXI</a>
 <br>
-
-
+<img src="images/currentlimit02.png" width="359" height="317" alt="">
+<br>
