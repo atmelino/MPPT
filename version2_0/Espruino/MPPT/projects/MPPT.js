@@ -14,7 +14,7 @@ var ina = new INA3221(i2c, {
 var loopTimer;
 var loopPeriod = 1000;
 var counter = 0;
-var PWM_actual = 0.79;
+var PWM_actual = 0.0;
 var PWM_target = 0;
 var allChannelsResult;
 var webpage = require("webpage");
@@ -129,8 +129,8 @@ function start() {
     startWifi();
 
     userMessage('Turning PWM on');
-    digitalWrite(B1, 1); // PWM on enable IR2104
-    analogWrite(A0, PWM_actual, { freq: 80000 });
+    // digitalWrite(B1, 1); // PWM on enable IR2104
+    // analogWrite(A0, PWM_actual, { freq: 80000 });
     // Turn relay between battery and MC on
     digitalWrite(B0, 1);
 
@@ -143,6 +143,7 @@ function mainLoop() {
     solarVoltage = allChannelsResult.busVoltage3;
     batteryVoltage = allChannelsResult.busVoltage1;
     batteryCurrent = allChannelsResult.current_mA1;
+
     // LED indicators
     if (batteryVoltage < 7.7)
         digitalPulse(B13, 1, 50); // red LED
@@ -150,37 +151,50 @@ function mainLoop() {
         digitalPulse(B14, 1, 50); // orange LED
     if (batteryVoltage >= 8.0)
         digitalPulse(B15, 1, 50); // green LED
-    // prevent battery overcharge
-    if (batteryVoltage > 8.4) {
+
+    // prevent battery overvoltage and overcurrent
+    if (batteryVoltage > 8.4 || Math.abs(batteryCurrent) > 300) {
         PWM_actual -= 0.01;
         analogWrite(A0, PWM_actual, { freq: 80000 });
     }
-    console.log(batteryCurrent);
-    if (Math.abs(batteryCurrent) > 200) {
-        console.log("decrease PWM");
-        PWM_actual -= 0.01;
-    }
-    // prevent battery over discharge
-    if (batteryVoltage < 7.6) {
-        digitalWrite(B0, 0);
-    }
 
-    if (solarVoltage < 5.0) {
+    if (solarVoltage <= 9.0) {
         PWM_actual = 0.0;
         analogWrite(A0, PWM_actual, { freq: 0 });
         digitalWrite(B1, 0); // PWM off disable IR2104
-    } else {
-        //PWM_actual = 0.79;
+    }
+
+    if (solarVoltage > 9.0) {
+        digitalWrite(B0, 1); // connect battery
+        if (batteryVoltage < 8.2) {
+            PWM_actual += 0.02;
+        }
+        if (batteryVoltage >= 8.2 && batteryVoltage < 8.4) {
+            PWM_actual += 0.001;
+        }
         analogWrite(A0, PWM_actual, { freq: 80000 });
         digitalWrite(B1, 1); // PWM on enable IR2104
     }
-    userMessage(rtc.readDateTime());
+
+    // prevent battery over discharge
+    if (batteryVoltage < 7.6 && solarVoltage <= 8.0) {
+        digitalWrite(B0, 0); //turn system off
+    }
+
     currentDate = rtc.readDateTime();
     allChannelsResult.date = currentDate;
     allChannelsResult.number = counter++;
     allChannelsResult.PWM_actual = PWM_actual;
     allChannelsResult.PWM_target = PWM_target;
     broadcast(JSON.stringify(allChannelsResult));
+    //printValues();
+}
+
+function printValues() {
+    var solarvals = allChannelsResult.busVoltage3 + ' V ' + allChannelsResult.current_mA3 + ' mA ' + allChannelsResult.power_mW3 + ' mW ';
+    var batteryvals = allChannelsResult.busVoltage1 + ' V ' + allChannelsResult.current_mA1 + ' mA ' + allChannelsResult.power_mW1 + ' mW ';
+    var line = allChannelsResult.date + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals;
+    console.log(line);
 }
 
 function onInit() {
