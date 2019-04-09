@@ -26,7 +26,12 @@ var WIFI_NAME = "NETGEAR53";
 var WIFI_OPTIONS = {
     password: ""
 };
+var myfs = require("fs");
 
+var sendmessage = {
+    type: "none",
+    data: "empty"
+};
 
 function userMessage(msg) {
     const consExist = false;
@@ -54,7 +59,7 @@ function wsHandler(ws) {
     clients.push(ws);
     ws.on('message', receivedpacket => {
         //console.log(WIFI_OPTIONS);
-        console.log(receivedpacket);
+        //console.log(receivedpacket);
         receivedmessage = JSON.parse(receivedpacket);
         //console.log(JSON.stringify(receivedmessage));
         if (receivedmessage.type == 'PWMminus') {
@@ -82,6 +87,12 @@ function wsHandler(ws) {
             loopPeriod = receivedmessage.data;
             clearInterval(loopTimer);
             loopTimer = setInterval(mainLoop, loopPeriod);
+        }
+        if (receivedmessage.type == "getLog") {
+            var logContent = myfs.readFileSync("log.txt");
+            sendmessage.type = 'getLog';
+            sendmessage.data = logContent;
+            broadcast(JSON.stringify(sendmessage));
         }
         if (receivedmessage.type == "LED") {
             digitalWrite(LED2, receivedmessage.data == 'on');
@@ -127,6 +138,17 @@ function startWifi() {
 function start() {
     userMessage("Start Wifi");
     startWifi();
+
+    // Wire up up MOSI, MISO, SCK and CS pins (along with 3.3v and GND)
+    SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
+    E.connectSDCard(SPI1, B6 /*CS*/);
+    // see what's on the device
+    //console.log(myfs.readdirSync());
+    logFile = E.openFile("log.txt", "a");
+    //console.log(myfs.readFileSync("log.txt")); //
+    currentDate = rtc.readDateTime();
+    logFile.write(currentDate + "," + "program start" + "\r\n");
+    logFile.close();
 
     userMessage('Turning PWM on');
     // digitalWrite(B1, 1); // PWM on enable IR2104
@@ -186,7 +208,10 @@ function mainLoop() {
     allChannelsResult.number = counter++;
     allChannelsResult.PWM_actual = PWM_actual;
     allChannelsResult.PWM_target = PWM_target;
-    broadcast(JSON.stringify(allChannelsResult));
+    sendmessage.type = 'values';
+    sendmessage.data = allChannelsResult;
+    broadcast(JSON.stringify(sendmessage));
+    //broadcast(JSON.stringify(allChannelsResult));
     //printValues();
 }
 
@@ -204,8 +229,13 @@ function onInit() {
 }
 
 setWatch(function (e) {
+    console.log(myfs.readFileSync("log.txt")); //
+    digitalPulse(LED1, 1, 200); // pulse  led as indicator
     userMessage("Stop program");
     clearInterval(loopTimer);
+    E.unmountSD();
+    digitalPulse(LED1, 1, 500); // pulse  led as indicator
+
 }, BTN, { repeat: true, edge: 'rising' });
 
 

@@ -56,7 +56,6 @@ myhtml = `
             elementId = document.getElementById(target);
             if (elementId != null) {
                 printMessage(target, message);
-                //elementId.innerHTML += "";
             }
         }
 
@@ -120,6 +119,11 @@ myhtml = `
             ws.send(JSON.stringify(sendmessage));
         }
 
+        function getLogClicked() {
+            sendmessage.type = 'getLog';
+            ws.send(JSON.stringify(sendmessage));
+        }
+
         function setloopPeriod() {
             var value = document.getElementById("loopPeriod").value;
             sendmessage.type = 'loopPeriod';
@@ -156,30 +160,40 @@ myhtml = `
             ws = new WebSocket('ws://' + location.host, 'protocolOne');
             var table = document.getElementById("liveTable");
             ws.onmessage = evt => {
-                receivedmessage = evt.data;
+                receivedmessage = JSON.parse(evt.data);
+
                 if (showMessagesFlag) {
                     //printlnMessage("messages", JSON.stringify(receivedmessage));
                 }
-                receiveddata = JSON.parse(receivedmessage);
-                var x = document.getElementById("liveTable").rows.length;
-                if (x > 10) {
-                    document.getElementById("liveTable").deleteRow(1);
-                    x -= 1;
+                if (receivedmessage.type == "getLog") {
+                    printlnMessage("messages", JSON.stringify(receivedmessage));
                 }
-                {
-                    var row = table.insertRow(x);
-                    row.insertCell(0).innerHTML = receiveddata.date;
-                    row.insertCell(1).innerHTML = receiveddata.number;
-                    row.insertCell(2).innerHTML = receiveddata.busVoltage3;
-                    row.insertCell(3).innerHTML = receiveddata.current_mA3;
-                    row.insertCell(4).innerHTML = receiveddata.power_mW3;
-                    row.insertCell(5).innerHTML = receiveddata.busVoltage1;
-                    row.insertCell(6).innerHTML = receiveddata.current_mA1;
-                    row.insertCell(7).innerHTML = receiveddata.power_mW1;
-                    row.insertCell(8).innerHTML = ' ';
-                    row.insertCell(9).innerHTML = receiveddata.PWM_actual;
-                    row.insertCell(10).innerHTML = receiveddata.PWM_target;
+
+                if (receivedmessage.type == "values") {
+                    // new measurement data
+                    receiveddata = receivedmessage.data;
+                    var x = document.getElementById("liveTable").rows.length;
+                    if (x > 10) {
+                        document.getElementById("liveTable").deleteRow(1);
+                        x -= 1;
+                    }
+                    {
+                        var row = table.insertRow(x);
+                        row.insertCell(0).innerHTML = receiveddata.date;
+                        row.insertCell(1).innerHTML = receiveddata.number;
+                        row.insertCell(2).innerHTML = receiveddata.busVoltage3;
+                        row.insertCell(3).innerHTML = receiveddata.current_mA3;
+                        row.insertCell(4).innerHTML = receiveddata.power_mW3;
+                        row.insertCell(5).innerHTML = receiveddata.busVoltage1;
+                        row.insertCell(6).innerHTML = receiveddata.current_mA1;
+                        row.insertCell(7).innerHTML = receiveddata.power_mW1;
+                        row.insertCell(8).innerHTML = ' ';
+                        row.insertCell(9).innerHTML = receiveddata.PWM_actual;
+                        row.insertCell(10).innerHTML = receiveddata.PWM_target;
+                    }
+
                 }
+                // show date on header
                 clientDateUTC = new Date(Date.now());
                 clientDate = new Date(clientDateUTC.getTime() - clientDateUTC.getTimezoneOffset() * 60000);
                 //var clientDateString = clientDate.toISOString().replace(/:/g, "_").slice(0, 19);
@@ -187,7 +201,7 @@ myhtml = `
                 var clientDateString = clientDate.toISOString().replace(/T/g, " ").slice(0, 19);
                 document.getElementById("clientDate").innerHTML = clientDateString;
                 if (showMessagesFlag) {
-                    printlnMessage("messages", JSON.stringify(clientDate));
+                    //printlnMessage("messages", JSON.stringify(clientDate));
                 }
             };
         };
@@ -213,6 +227,9 @@ myhtml = `
                     Date
                     <span id="clientDate"></span>
                     <button id="setRTC" onclick="setRTCButton()">set RTC</button>
+                </div>
+                <div style="width: 12%; display: table-cell; white-space: nowrap;">
+                    <button id="getLogButton" onclick="getLogClicked()">get log</button>
                 </div>
                 <div style="width: 12%; display: table-cell; white-space: nowrap;">
                     <button id="settingsButton" onclick="settingsClicked()">Settings</button>
