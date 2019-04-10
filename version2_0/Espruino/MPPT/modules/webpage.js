@@ -124,6 +124,11 @@ myhtml = `
             ws.send(JSON.stringify(sendmessage));
         }
 
+        function getDirClicked() {
+            sendmessage.type = 'getDir';
+            ws.send(JSON.stringify(sendmessage));
+        }
+
         function setloopPeriod() {
             var value = document.getElementById("loopPeriod").value;
             sendmessage.type = 'loopPeriod';
@@ -165,11 +170,23 @@ myhtml = `
                 if (showMessagesFlag) {
                     //printlnMessage("messages", JSON.stringify(receivedmessage));
                 }
+
                 if (receivedmessage.type == "getLog") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));
                     var logDiv = document.getElementById("logDiv");
                     var logContent = receivedmessage.data.replace(/\\r\\n/g, "<br>");
                     logDiv.innerHTML = logContent;
+                }
+
+                if (receivedmessage.type == "getDir") {
+                    printlnMessage("messages", JSON.stringify(receivedmessage));
+                    var logDiv = document.getElementById("logDiv");
+                    var logContent = JSON.stringify(receivedmessage.data);
+                    logDiv.innerHTML = logContent;
+                }
+
+                if (receivedmessage.type == "writeDataFile") {
+                    printlnMessage("messages", JSON.stringify(receivedmessage));
                 }
 
                 if (receivedmessage.type == "values") {
@@ -203,9 +220,9 @@ myhtml = `
                 //var clientDateString = clientDate.toISOString().slice(0, 19);
                 var clientDateString = clientDate.toISOString().replace(/T/g, " ").slice(0, 19);
                 document.getElementById("clientDate").innerHTML = clientDateString;
-                if (showMessagesFlag) {
-                    //printlnMessage("messages", JSON.stringify(clientDate));
-                }
+                //if (showMessagesFlag) {
+                //printlnMessage("messages", JSON.stringify(clientDate));
+                //}
             };
         };
     </script>
@@ -216,12 +233,12 @@ myhtml = `
     <div id="menuheader">
         <div style="display: table; background-color: #eeeeff;">
             <div style="display: table-row">
-                <div style="width: 20%; display: table-cell; white-space: nowrap;">
+                <div style="width: 10%; display: table-cell; white-space: nowrap;">
                     <label><input type="checkbox" onclick="LEDonOff()" id="LEDonOff" value="male" unchecked />
                         LED
                     </label>
                 </div>
-                <div style="width: 20%; display: table-cell; white-space: nowrap;">
+                <div style="width: 15%; display: table-cell; white-space: nowrap;">
                     <button id="PWMminus" onclick="PWMminusButton()">-</button>
                     PWM
                     <button id="PWMplus" onclick="PWMplusButton()">+</button>
@@ -233,6 +250,9 @@ myhtml = `
                 </div>
                 <div style="width: 12%; display: table-cell; white-space: nowrap;">
                     <button id="getLogButton" onclick="getLogClicked()">get log</button>
+                </div>
+                <div style="width: 12%; display: table-cell; white-space: nowrap;">
+                    <button id="getDirButton" onclick="getDirClicked()">get dir</button>
                 </div>
                 <div style="width: 12%; display: table-cell; white-space: nowrap;">
                     <button id="settingsButton" onclick="settingsClicked()">Settings</button>
@@ -282,7 +302,7 @@ myhtml = `
                 </div>
             </div>
             <div id="logDiv" style="width: 50%; display: table-cell; white-space: nowrap;">
-                logs
+
             </div>
         </div>
     </div>

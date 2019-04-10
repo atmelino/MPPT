@@ -74,7 +74,7 @@ DS1307.prototype.readDateTime = function () {
   var month = bcd2dec(data[5]);
   var year = bcd2dec(data[6]);
 
-  var rtcDate = format(month) + "/" + format(date) + "/" + format(year);
+  var rtcDate = format(month) + "-" + format(date) + "-" + format(year);
   var rtcTime = format(hours) + ":" + format(minutes) + ":" + format(seconds);
   var rtcDateTime = rtcDate + " " + rtcTime;
   return rtcDateTime;

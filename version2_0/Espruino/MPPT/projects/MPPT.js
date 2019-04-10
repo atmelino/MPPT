@@ -13,6 +13,7 @@ var ina = new INA3221(i2c, {
 });
 var loopTimer;
 var loopPeriod = 1000;
+var currentDate;
 var counter = 0;
 var PWM_actual = 0.0;
 var PWM_target = 0;
@@ -27,11 +28,11 @@ var WIFI_OPTIONS = {
     password: ""
 };
 var myfs = require("fs");
-
 var sendmessage = {
     type: "none",
     data: "empty"
 };
+var bufferarray = [];
 
 function userMessage(msg) {
     const consExist = false;
@@ -87,16 +88,52 @@ function wsHandler(ws) {
             loopPeriod = receivedmessage.data;
             clearInterval(loopTimer);
             loopTimer = setInterval(mainLoop, loopPeriod);
-        }
-        if (receivedmessage.type == "getLog") {
+            SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
             E.connectSDCard(SPI1, B6 /*CS*/);
             logFile = E.openFile("log.txt", "a");
-            var logContent = myfs.readFileSync("log.txt");
+            logFile.write(currentDate + " loop period" + loopPeriod + "\r\n");
+            logFile.close();
             E.unmountSD();
-            sendmessage.type = 'getLog';
-            sendmessage.data = logContent;
-            broadcast(JSON.stringify(sendmessage));
         }
+
+        if (receivedmessage.type == "getLog") {
+            var logContent;
+            try {
+                SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
+                E.connectSDCard(SPI1, B6 /*CS*/);
+                logFile = E.openFile("log.txt", "a");
+                logContent = myfs.readFileSync("log.txt");
+                logFile.close();
+            }
+            catch (e) {
+                logContent = e.message;
+            }
+            finally {
+                E.unmountSD();
+                sendmessage.type = 'getLog';
+                sendmessage.data = logContent;
+                broadcast(JSON.stringify(sendmessage));
+            }
+        }
+
+        if (receivedmessage.type == "getDir") {
+            var dirContent;
+            try {
+                SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
+                E.connectSDCard(SPI1, B6 /*CS*/);
+                dirContent = myfs.readdirSync();
+            }
+            catch (e) {
+                dirContent = e.message;
+            }
+            finally {
+                E.unmountSD();
+                sendmessage.type = 'getDir';
+                sendmessage.data = dirContent;
+                broadcast(JSON.stringify(sendmessage));
+            }
+        }
+
         if (receivedmessage.type == "LED") {
             digitalWrite(LED2, receivedmessage.data == 'on');
         }
@@ -143,7 +180,6 @@ function start() {
     startWifi();
 
     // Wire up up MOSI, MISO, SCK and CS pins (along with 3.3v and GND)
-    SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
     // logFile = E.openFile("log.txt", "a");
     // currentDate = rtc.readDateTime();
     // logFile.write(currentDate + "," + "program start" + "\r\n");
@@ -204,8 +240,56 @@ function mainLoop() {
     sendmessage.type = 'values';
     sendmessage.data = allChannelsResult;
     broadcast(JSON.stringify(sendmessage));
-    //broadcast(JSON.stringify(allChannelsResult));
     //printValues();
+
+    line = makeLine();
+    //console.log(line);
+    //console.log(bufferarray.length);
+
+    bufferarray.push(makeLine());
+    if (bufferarray.length > 10) {
+        writeDataFile();
+        while (bufferarray.length > 0) {
+            bufferarray.pop();
+        }
+    }
+
+}
+
+function writeDataFile() {
+    //console.log(bufferarray);
+
+    buffer = bufferarray.join("\n");
+    // sendmessage.type = 'writeDataFile';
+    // sendmessage.data = buffer;
+    // broadcast(JSON.stringify(sendmessage));
+
+    var datestring = allChannelsResult.date.replace(/-/g, "_").replace(/:/g, "_");
+    var filename = datestring + ".txt";
+    //var path = dir+localdatestring + ".txt";
+    //console.log("write file " + filename);
+
+    try {
+        SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
+        E.connectSDCard(SPI1, B6 /*CS*/);
+        dataFile = E.openFile(filename, "a");
+        dataFile.write(buffer);
+        dataFile.close();
+    }
+    catch (e) {
+        //logContent = e.message;
+    }
+    finally {
+        E.unmountSD();
+    }
+
+}
+
+function makeLine() {
+    var solarvals = allChannelsResult.busVoltage3 + ' V ' + allChannelsResult.current_mA3 + ' mA ' + allChannelsResult.power_mW3 + ' mW ';
+    var batteryvals = allChannelsResult.busVoltage1 + ' V ' + allChannelsResult.current_mA1 + ' mA ' + allChannelsResult.power_mW1 + ' mW ';
+    var line = allChannelsResult.date + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals;
+    return line;
 }
 
 function printValues() {
