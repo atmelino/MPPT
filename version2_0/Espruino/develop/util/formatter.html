@@ -167,6 +167,9 @@ myhtml = `
                 }
                 if (receivedmessage.type == "getLog") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));
+                    var logDiv = document.getElementById("logDiv");
+                    var logContent = receivedmessage.data.replace(/\\r\\n/g, "<br>");
+                    logDiv.innerHTML = logContent;
                 }
 
                 if (receivedmessage.type == "values") {
@@ -240,40 +243,50 @@ myhtml = `
     <div id="messagesDiv" style="display: none">
         <textarea id="messages" rows="10" cols="60" style="width: 100%;"></textarea>
     </div>
-    <div id="liveData">
-        <table id="liveTable">
-            <tr>
-                <th>Date</th>
-                <th>nr</th>
-                <th>Sol V</th>
-                <th>mA</th>
-                <th>mW</th>
-                <th>Bat V</th>
-                <th>mA</th>
-                <th>mW</th>
-                <th>eff</th>
-                <th>act</th>
-                <th>tgt</th>
-            </tr>
-        </table>
+    <div style="display: table">
+        <div style="display: table-row">
+            <div style="width: 50%; display: table-cell; white-space: nowrap;">
+                <div id="liveData">
+                    <table id="liveTable">
+                        <tr>
+                            <th>Date</th>
+                            <th>nr</th>
+                            <th>Sol V</th>
+                            <th>mA</th>
+                            <th>mW</th>
+                            <th>Bat V</th>
+                            <th>mA</th>
+                            <th>mW</th>
+                            <th>eff</th>
+                            <th>act</th>
+                            <th>tgt</th>
+                        </tr>
+                    </table>
+                </div>
+                <div id="storedData" style="display: none">
+                    <table id="storedTable">
+                        <tr>
+                            <th>Date</th>
+                            <th>nr</th>
+                            <th>V</th>
+                            <th>mA</th>
+                            <th>mW</th>
+                            <th>V</th>
+                            <th>mA</th>
+                            <th>mW</th>
+                            <th>eff</th>
+                            <th>act</th>
+                            <th>tgt</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="logDiv" style="width: 50%; display: table-cell; white-space: nowrap;">
+                logs
+            </div>
+        </div>
     </div>
-    <div id="storedData" style="display: none">
-        <table id="storedTable">
-            <tr>
-                <th>Date</th>
-                <th>nr</th>
-                <th>V</th>
-                <th>mA</th>
-                <th>mW</th>
-                <th>V</th>
-                <th>mA</th>
-                <th>mW</th>
-                <th>eff</th>
-                <th>act</th>
-                <th>tgt</th>
-            </tr>
-        </table>
-    </div>
+
 
 
     <div id="settings" class="popup">

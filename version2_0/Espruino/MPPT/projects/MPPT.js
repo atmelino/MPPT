@@ -89,7 +89,10 @@ function wsHandler(ws) {
             loopTimer = setInterval(mainLoop, loopPeriod);
         }
         if (receivedmessage.type == "getLog") {
+            E.connectSDCard(SPI1, B6 /*CS*/);
+            logFile = E.openFile("log.txt", "a");
             var logContent = myfs.readFileSync("log.txt");
+            E.unmountSD();
             sendmessage.type = 'getLog';
             sendmessage.data = logContent;
             broadcast(JSON.stringify(sendmessage));
@@ -141,20 +144,10 @@ function start() {
 
     // Wire up up MOSI, MISO, SCK and CS pins (along with 3.3v and GND)
     SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
-    E.connectSDCard(SPI1, B6 /*CS*/);
-    // see what's on the device
-    //console.log(myfs.readdirSync());
-    logFile = E.openFile("log.txt", "a");
-    //console.log(myfs.readFileSync("log.txt")); //
-    currentDate = rtc.readDateTime();
-    logFile.write(currentDate + "," + "program start" + "\r\n");
-    logFile.close();
-
-    userMessage('Turning PWM on');
-    // digitalWrite(B1, 1); // PWM on enable IR2104
-    // analogWrite(A0, PWM_actual, { freq: 80000 });
-    // Turn relay between battery and MC on
-    digitalWrite(B0, 1);
+    // logFile = E.openFile("log.txt", "a");
+    // currentDate = rtc.readDateTime();
+    // logFile.write(currentDate + "," + "program start" + "\r\n");
+    // logFile.close();
 
     loopTimer = setInterval(mainLoop, loopPeriod);
 }
@@ -182,8 +175,8 @@ function mainLoop() {
 
     if (solarVoltage <= 9.0) {
         PWM_actual = 0.0;
-        analogWrite(A0, PWM_actual, { freq: 0 });
         digitalWrite(B1, 0); // PWM off disable IR2104
+        analogWrite(A0, PWM_actual, { freq: 0 });
     }
 
     if (solarVoltage > 9.0) {
@@ -194,8 +187,8 @@ function mainLoop() {
         if (batteryVoltage >= 8.2 && batteryVoltage < 8.4) {
             PWM_actual += 0.001;
         }
-        analogWrite(A0, PWM_actual, { freq: 80000 });
         digitalWrite(B1, 1); // PWM on enable IR2104
+        analogWrite(A0, PWM_actual, { freq: 80000 });
     }
 
     // prevent battery over discharge
@@ -229,11 +222,10 @@ function onInit() {
 }
 
 setWatch(function (e) {
-    console.log(myfs.readFileSync("log.txt")); //
+    //console.log(myfs.readFileSync("log.txt")); //
     digitalPulse(LED1, 1, 200); // pulse  led as indicator
     userMessage("Stop program");
     clearInterval(loopTimer);
-    E.unmountSD();
     digitalPulse(LED1, 1, 500); // pulse  led as indicator
 
 }, BTN, { repeat: true, edge: 'rising' });
