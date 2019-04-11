@@ -174,14 +174,14 @@ myhtml = `
                 if (receivedmessage.type == "getLog") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));
                     var logDiv = document.getElementById("logDiv");
-                    var logContent = receivedmessage.data.replace(/\\r\\n/g, "<br>");
+                    var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
                     logDiv.innerHTML = logContent;
                 }
 
                 if (receivedmessage.type == "getDir") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));
                     var logDiv = document.getElementById("logDiv");
-                    var logContent = JSON.stringify(receivedmessage.data);
+                    var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
                     logDiv.innerHTML = logContent;
                 }
 

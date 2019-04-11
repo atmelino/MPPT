@@ -91,7 +91,7 @@ function wsHandler(ws) {
             SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
             E.connectSDCard(SPI1, B6 /*CS*/);
             logFile = E.openFile("log.txt", "a");
-            logFile.write(currentDate + " loop period" + loopPeriod + "\r\n");
+            logFile.write(currentDate + " loop period" + loopPeriod + "\n");
             logFile.close();
             E.unmountSD();
         }
@@ -122,6 +122,8 @@ function wsHandler(ws) {
                 SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
                 E.connectSDCard(SPI1, B6 /*CS*/);
                 dirContent = myfs.readdirSync();
+                dirString=dirContent.join("\n")
+                //console.log(dirString);
             }
             catch (e) {
                 dirContent = e.message;
@@ -129,7 +131,7 @@ function wsHandler(ws) {
             finally {
                 E.unmountSD();
                 sendmessage.type = 'getDir';
-                sendmessage.data = dirContent;
+                sendmessage.data = dirString;
                 broadcast(JSON.stringify(sendmessage));
             }
         }
@@ -247,7 +249,7 @@ function mainLoop() {
     //console.log(bufferarray.length);
 
     bufferarray.push(makeLine());
-    if (bufferarray.length > 10) {
+    if (bufferarray.length > 60) {
         writeDataFile();
         while (bufferarray.length > 0) {
             bufferarray.pop();
@@ -260,6 +262,8 @@ function writeDataFile() {
     //console.log(bufferarray);
 
     buffer = bufferarray.join("\n");
+    //console.log(buffer);
+
     // sendmessage.type = 'writeDataFile';
     // sendmessage.data = buffer;
     // broadcast(JSON.stringify(sendmessage));
