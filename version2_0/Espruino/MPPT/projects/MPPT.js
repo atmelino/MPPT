@@ -178,6 +178,9 @@ function startWifi() {
 
 
 function start() {
+
+    digitalWrite(B0, 1); // connect battery
+
     userMessage("Start Wifi");
     startWifi();
 
