@@ -13,6 +13,7 @@ var ina = new INA3221(i2c, {
 });
 var loopTimer;
 var loopPeriod = 1000;
+var currentDateString;
 var currentDate;
 var counter = 0;
 var PWM_actual = 0.0;
@@ -91,7 +92,7 @@ function wsHandler(ws) {
             SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
             E.connectSDCard(SPI1, B6 /*CS*/);
             logFile = E.openFile("log.txt", "a");
-            logFile.write(currentDate + " loop period" + loopPeriod + "\n");
+            logFile.write(currentDateString + " loop period" + loopPeriod + "\n");
             logFile.close();
             E.unmountSD();
         }
@@ -121,8 +122,8 @@ function wsHandler(ws) {
             try {
                 SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
                 E.connectSDCard(SPI1, B6 /*CS*/);
-                dirContent = myfs.readdirSync();
-                dirString=dirContent.join("\n")
+                dirContent = myfs.readdirSync(receivedmessage.data);
+                dirString = dirContent.join("\n");
                 //console.log(dirString);
             }
             catch (e) {
@@ -238,7 +239,8 @@ function mainLoop() {
     }
 
     currentDate = rtc.readDateTime();
-    allChannelsResult.date = currentDate;
+    currentDateString = rtc.dateTimeToString(currentDate);
+    allChannelsResult.dateString = currentDateString;
     allChannelsResult.number = counter++;
     allChannelsResult.PWM_actual = PWM_actual;
     allChannelsResult.PWM_target = PWM_target;
@@ -252,7 +254,7 @@ function mainLoop() {
     //console.log(bufferarray.length);
 
     bufferarray.push(makeLine());
-    if (bufferarray.length > 60) {
+    if (bufferarray.length > 10) {
         writeDataFile();
         while (bufferarray.length > 0) {
             bufferarray.pop();
@@ -262,33 +264,95 @@ function mainLoop() {
 }
 
 function writeDataFile() {
-    //console.log(bufferarray);
-
     buffer = bufferarray.join("\n");
-    //console.log(buffer);
-
     // sendmessage.type = 'writeDataFile';
     // sendmessage.data = buffer;
     // broadcast(JSON.stringify(sendmessage));
 
-    var datestring = allChannelsResult.date.replace(/-/g, "_").replace(/:/g, "_");
+    var datestring = allChannelsResult.dateString.replace(/-/g, "_").replace(/:/g, "_").replace(/ /g, "_");
     var filename = datestring + ".txt";
     //var path = dir+localdatestring + ".txt";
     //console.log("write file " + filename);
 
     try {
+        var rootDir, yearDir, monthDir, dayDir;
+        var year = "20" + currentDate.year;
+        var month = "" + currentDate.month;
+        var day = "" + currentDate.date;
+        var yearMonth = year + '/' + month;
+        var yearMonthDay = year + '/' + month + '/' + day;
+        // console.log(yearMonth);
+
         SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
         E.connectSDCard(SPI1, B6 /*CS*/);
-        dataFile = E.openFile(filename, "a");
+
+        // year
+        rootDir = myfs.readdirSync();
+        //console.log(rootDir);
+        console.log(year + ' exists in root? ' + rootDir.indexOf(year));
+        if (rootDir.indexOf(year) < 0) {
+            myfs.mkdirSync(year);
+        }
+        rootDir = myfs.readdirSync();
+        console.log('root dir: ' + rootDir);
+
+        // month
+        yearDir = myfs.readdirSync(year);
+        //console.log(yearDir);
+        console.log(month + ' exists in year? ' + yearDir.indexOf(month));
+        if (yearDir.indexOf(month) < 0) {
+            myfs.mkdirSync(yearMonth);
+        }
+        yearDir = myfs.readdirSync(year);
+        console.log('year dir: ' + yearDir);
+
+        // day
+        monthDir = myfs.readdirSync(yearMonth);
+        //console.log(monthDir);
+        console.log(day + ' exists in month? ' + monthDir.indexOf(day));
+        if (monthDir.indexOf(day) < 0) {
+            myfs.mkdirSync(yearMonthDay);
+        }
+        monthDir = myfs.readdirSync(yearMonth);
+        console.log('month dir: ' + monthDir);
+
+        dayDir = myfs.readdirSync(yearMonthDay);
+        console.log('day dir: ' + dayDir);
+
+
+
+        var fullPath = yearMonthDay + '/' + filename;
+        console.log('full path: ' + fullPath);
+        dataFile = E.openFile(fullPath, "a");
         dataFile.write(buffer);
         dataFile.close();
+        console.log('file written');
+
+        dayDir = myfs.readdirSync(yearMonthDay);
+        console.log('day dir: ' + yearMonthDay);
+        console.log('day dir: ' + dayDir);
+
+
+        // SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
+        // E.connectSDCard(SPI1, B6 /*CS*/);
+        // console.log(currentDate.year);
+        // var year ="20"+currentDate.year;
+        // var yearMonth =year+'/'+currentDate.month;
+        // console.log(yearMonth);
+        // myfs.mkdirSync(year);
+        // myfs.mkdirSync(yearMonth);
+
+        E.unmountSD();
+
     }
     catch (e) {
+        E.unmountSD();
+
         //logContent = e.message;
     }
-    finally {
-        E.unmountSD();
-    }
+    // finally {
+    //     E.unmountSD();
+    // }
 
 }
 

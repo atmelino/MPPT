@@ -126,6 +126,7 @@ myhtml = `
 
         function getDirClicked() {
             sendmessage.type = 'getDir';
+            sendmessage.data = '2019';
             ws.send(JSON.stringify(sendmessage));
         }
 
@@ -199,7 +200,7 @@ myhtml = `
                     }
                     {
                         var row = table.insertRow(x);
-                        row.insertCell(0).innerHTML = receiveddata.date;
+                        row.insertCell(0).innerHTML = receiveddata.dateString;
                         row.insertCell(1).innerHTML = receiveddata.number;
                         row.insertCell(2).innerHTML = receiveddata.busVoltage3;
                         row.insertCell(3).innerHTML = receiveddata.current_mA3;
