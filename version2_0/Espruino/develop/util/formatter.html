@@ -91,13 +91,6 @@ myhtml = `
 
         function setRTCButton() {
             sendmessage.type = 'setRTC';
-            // var year = clientDate.getFullYear();
-            // var month = clientDate.getMonth() + 1;
-            // var day = clientDate.getDate();
-            // var hours = clientDate.getHours();
-            // var minutes = clientDate.getMinutes();
-            // var seconds = clientDate.getSeconds();
-            // var dayofweek = clientDate.getDay();
             var year = clientDateUTC.getFullYear();
             var month = clientDateUTC.getMonth() + 1;
             var day = clientDateUTC.getDate();
@@ -126,7 +119,7 @@ myhtml = `
 
         function getDirClicked() {
             sendmessage.type = 'getDir';
-            sendmessage.data = '2019';
+            sendmessage.data = '';
             ws.send(JSON.stringify(sendmessage));
         }
 
@@ -161,10 +154,21 @@ myhtml = `
             document.body.style.background = 'white';
         }
 
+        function tableText(tableCell) {
+            var pathDiv = document.getElementById("pathDiv");
+            var oldPath = pathDiv.innerHTML;
+            var newFolder = tableCell.innerHTML;
+            var newPath = oldPath + '/' + newFolder;
+            pathDiv.innerHTML = newPath;
+            sendmessage.type = 'getDir';
+            sendmessage.data = newPath;
+            ws.send(JSON.stringify(sendmessage));
+            //alert(tableCell.innerHTML);
+            //alert(pathDiv.innerHTML);
+        }
 
         window.onload = () => {
             ws = new WebSocket('ws://' + location.host, 'protocolOne');
-            var table = document.getElementById("liveTable");
             ws.onmessage = evt => {
                 receivedmessage = JSON.parse(evt.data);
 
@@ -181,9 +185,22 @@ myhtml = `
 
                 if (receivedmessage.type == "getDir") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));
-                    var logDiv = document.getElementById("logDiv");
-                    var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
-                    logDiv.innerHTML = logContent;
+                    var dirTable = document.getElementById("dirTable");
+
+                    while (dirTable.rows.length > 1) {
+                        dirTable.deleteRow(1);
+                    }
+                    for (s of receivedmessage.data) {
+                        var row = dirTable.insertRow(x);
+                        row.insertCell(0).innerHTML = s;
+                    }
+
+                    for (var i = 0; i < dirTable.rows.length; i++) {
+                        for (var j = 0; j < dirTable.rows[i].cells.length; j++)
+                            dirTable.rows[i].cells[j].onclick = function () {
+                                tableText(this);
+                            };
+                    }
                 }
 
                 if (receivedmessage.type == "writeDataFile") {
@@ -191,6 +208,7 @@ myhtml = `
                 }
 
                 if (receivedmessage.type == "values") {
+                    var liveTable = document.getElementById("liveTable");
                     // new measurement data
                     receiveddata = receivedmessage.data;
                     var x = document.getElementById("liveTable").rows.length;
@@ -199,7 +217,7 @@ myhtml = `
                         x -= 1;
                     }
                     {
-                        var row = table.insertRow(x);
+                        var row = liveTable.insertRow(x);
                         row.insertCell(0).innerHTML = receiveddata.dateString;
                         row.insertCell(1).innerHTML = receiveddata.number;
                         row.insertCell(2).innerHTML = receiveddata.busVoltage3;
@@ -227,7 +245,6 @@ myhtml = `
             };
         };
     </script>
-
 </head>
 
 <body>
@@ -302,8 +319,15 @@ myhtml = `
                     </table>
                 </div>
             </div>
-            <div id="logDiv" style="width: 50%; display: table-cell; white-space: nowrap;">
-
+            <div id="logDiv" style="width: 25%; display: table-cell; white-space: nowrap;">
+            </div>
+            <div id="dirDiv" style="width:25%; display: table-cell; white-space: nowrap;">
+                <div id="pathDiv">/</div>
+                <table id="dirTable">
+                    <tr>
+                        <th>File</th>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>

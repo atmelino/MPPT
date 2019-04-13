@@ -12,7 +12,8 @@ var ina = new INA3221(i2c, {
     shunt: 0.1 // the shunt resistor's value
 });
 var loopTimer;
-var loopPeriod = 1000;
+//var loopPeriod = 1000;
+var loopPeriod = 2000;
 var currentDateString;
 var currentDate;
 var counter = 0;
@@ -34,6 +35,7 @@ var sendmessage = {
     data: "empty"
 };
 var bufferarray = [];
+//var pause = false;
 
 function userMessage(msg) {
     const consExist = false;
@@ -123,7 +125,7 @@ function wsHandler(ws) {
                 SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
                 E.connectSDCard(SPI1, B6 /*CS*/);
                 dirContent = myfs.readdirSync(receivedmessage.data);
-                dirString = dirContent.join("\n");
+                //dirString = dirContent.join("\n");
                 //console.log(dirString);
             }
             catch (e) {
@@ -132,7 +134,7 @@ function wsHandler(ws) {
             finally {
                 E.unmountSD();
                 sendmessage.type = 'getDir';
-                sendmessage.data = dirString;
+                sendmessage.data = dirContent;
                 broadcast(JSON.stringify(sendmessage));
             }
         }
@@ -190,7 +192,7 @@ function start() {
     // currentDate = rtc.readDateTime();
     // logFile.write(currentDate + "," + "program start" + "\r\n");
     // logFile.close();
-
+    //if (pause === false)
     loopTimer = setInterval(mainLoop, loopPeriod);
 }
 
@@ -264,6 +266,7 @@ function mainLoop() {
 }
 
 function writeDataFile() {
+    //pause = true;
     buffer = bufferarray.join("\n");
     // sendmessage.type = 'writeDataFile';
     // sendmessage.data = buffer;
@@ -289,35 +292,35 @@ function writeDataFile() {
         // year
         rootDir = myfs.readdirSync();
         //console.log(rootDir);
-        console.log(year + ' exists in root? ' + rootDir.indexOf(year));
+        //console.log(year + ' exists in root? ' + rootDir.indexOf(year));
         if (rootDir.indexOf(year) < 0) {
             myfs.mkdirSync(year);
         }
         rootDir = myfs.readdirSync();
-        console.log('root dir: ' + rootDir);
+        //console.log('root dir: ' + rootDir);
 
         // month
         yearDir = myfs.readdirSync(year);
         //console.log(yearDir);
-        console.log(month + ' exists in year? ' + yearDir.indexOf(month));
+        //console.log(month + ' exists in year? ' + yearDir.indexOf(month));
         if (yearDir.indexOf(month) < 0) {
             myfs.mkdirSync(yearMonth);
         }
         yearDir = myfs.readdirSync(year);
-        console.log('year dir: ' + yearDir);
+        //console.log('year dir: ' + yearDir);
 
         // day
         monthDir = myfs.readdirSync(yearMonth);
         //console.log(monthDir);
-        console.log(day + ' exists in month? ' + monthDir.indexOf(day));
+        //console.log(day + ' exists in month? ' + monthDir.indexOf(day));
         if (monthDir.indexOf(day) < 0) {
             myfs.mkdirSync(yearMonthDay);
         }
         monthDir = myfs.readdirSync(yearMonth);
-        console.log('month dir: ' + monthDir);
+        //console.log('month dir: ' + monthDir);
 
         dayDir = myfs.readdirSync(yearMonthDay);
-        console.log('day dir: ' + dayDir);
+        //console.log('day dir: ' + dayDir);
 
 
 
@@ -353,6 +356,7 @@ function writeDataFile() {
     // finally {
     //     E.unmountSD();
     // }
+    //pause = false;
 
 }
 
