@@ -351,15 +351,12 @@ function writeDataFile() {
 function makeLine() {
     var solarvals = allChannelsResult.busVoltage3 + ' V ' + allChannelsResult.current_mA3 + ' mA ' + allChannelsResult.power_mW3 + ' mW ';
     var batteryvals = allChannelsResult.busVoltage1 + ' V ' + allChannelsResult.current_mA1 + ' mA ' + allChannelsResult.power_mW1 + ' mW ';
-    var line = allChannelsResult.date + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals;
+    var line = allChannelsResult.dateString + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals;
     return line;
 }
 
 function printValues() {
-    var solarvals = allChannelsResult.busVoltage3 + ' V ' + allChannelsResult.current_mA3 + ' mA ' + allChannelsResult.power_mW3 + ' mW ';
-    var batteryvals = allChannelsResult.busVoltage1 + ' V ' + allChannelsResult.current_mA1 + ' mA ' + allChannelsResult.power_mW1 + ' mW ';
-    var line = allChannelsResult.date + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals;
-    console.log(line);
+    console.log(makeLine());
 }
 
 function onInit() {
