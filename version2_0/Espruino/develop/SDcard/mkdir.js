@@ -2,12 +2,6 @@
 
 var myfs = require("fs");
 
-function makeYearDir(year) {
-
-
-
-}
-
 try {
     var rootDir, yearDir, monthDir, dayDir;
     var year = "2020";
@@ -21,32 +15,38 @@ try {
     SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
     E.connectSDCard(SPI1, B6 /*CS*/);
 
+    // year
     rootDir = myfs.readdirSync();
     console.log(rootDir);
-    console.log(rootDir.indexOf(year));
+    console.log(year + ' exists in root? ' + rootDir.indexOf(year));
     if (rootDir.indexOf(year) < 0) {
         myfs.mkdirSync(year);
     }
     rootDir = myfs.readdirSync();
-    console.log(rootDir);
+    console.log('root dir: ' + rootDir);
 
+    // month
     yearDir = myfs.readdirSync(year);
     console.log(yearDir);
-    console.log(yearDir.indexOf(month));
+    console.log(month + ' exists in year? ' + yearDir.indexOf(month));
     if (yearDir.indexOf(month) < 0) {
         myfs.mkdirSync(yearMonth);
     }
     yearDir = myfs.readdirSync(year);
-    console.log(yearDir);
+    console.log('year dir: ' + yearDir);
 
+    // day
     monthDir = myfs.readdirSync(yearMonth);
     console.log(monthDir);
-    console.log(monthDir.indexOf(day));
+    console.log(day + ' exists in month? ' + monthDir.indexOf(day));
     if (monthDir.indexOf(day) < 0) {
         myfs.mkdirSync(yearMonthDay);
     }
     monthDir = myfs.readdirSync(yearMonth);
-    console.log(monthDir);
+    console.log('month dir: ' + monthDir);
+
+    dayDir = myfs.readdirSync(yearMonthDay);
+    console.log('day dir: ' + dayDir);
 
 
     // write a file in year
@@ -75,9 +75,9 @@ try {
     dataFile.write('hello');
     dataFile.close();
     dayDir = myfs.readdirSync('2019/4/12');
-    console.log('day dir: ' + dayDir);
-
-
+    //dayDir = myfs.readdirSync(yearMonthDay);
+    console.log('day dir named' + yearMonthDay);
+    console.log('day dir contents: ' + dayDir);
 
 
 

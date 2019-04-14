@@ -157,12 +157,18 @@ myhtml = `
         function tableText(tableCell) {
             var pathDiv = document.getElementById("pathDiv");
             var oldPath = pathDiv.innerHTML;
-            var newFolder = tableCell.innerHTML;
-            var newPath = oldPath + '/' + newFolder;
-            pathDiv.innerHTML = newPath;
-            sendmessage.type = 'getDir';
-            sendmessage.data = newPath;
-            ws.send(JSON.stringify(sendmessage));
+            var newItem = tableCell.innerHTML;
+            var newPath = oldPath + '/' + newItem;
+            if (newPath.includes('txt')) {
+                sendmessage.type = 'getFile';
+                sendmessage.data = newPath;
+                ws.send(JSON.stringify(sendmessage));
+            } else {
+                pathDiv.innerHTML = newPath;
+                sendmessage.type = 'getDir';
+                sendmessage.data = newPath;
+                ws.send(JSON.stringify(sendmessage));
+            }
             //alert(tableCell.innerHTML);
             //alert(pathDiv.innerHTML);
         }
@@ -202,6 +208,18 @@ myhtml = `
                             };
                     }
                 }
+
+                if (receivedmessage.type == "getFile") {
+                    printlnMessage("messages", JSON.stringify(receivedmessage));
+
+                    var logDiv = document.getElementById("logDiv");
+                    var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
+                    logDiv.innerHTML = logContent;
+                }
+
+
+
+
 
                 if (receivedmessage.type == "writeDataFile") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));

@@ -30,6 +30,7 @@ var WIFI_OPTIONS = {
     password: ""
 };
 var myfs = require("fs");
+var myws = require('ws');
 var sendmessage = {
     type: "none",
     data: "empty"
@@ -45,7 +46,7 @@ function userMessage(msg) {
 
 // Create and start server
 function startServer() {
-    const s = require('ws').createServer(pageHandler);
+    const s = myws.createServer(pageHandler);
     s.on('websocket', wsHandler);
     s.listen(80);
 }
@@ -56,6 +57,7 @@ function pageHandler(req, res) {
         'Content-Type': 'text/html'
     });
     res.end(mypage.gethtml());
+    //console.log("server connected");
 }
 
 // WebSocket request handler
@@ -119,6 +121,26 @@ function wsHandler(ws) {
             }
         }
 
+        if (receivedmessage.type == "getFile") {
+            var fileContent;
+            try {
+                SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
+                E.connectSDCard(SPI1, B6 /*CS*/);
+                //dataFile = E.openFile(receivedmessage.data, "a");
+                fileContent = myfs.readFileSync(receivedmessage.data);
+                //dataFile.close();
+            }
+            catch (e) {
+                fileContent = e.message;
+            }
+            finally {
+                E.unmountSD();
+                sendmessage.type = 'getFile';
+                sendmessage.data = fileContent;
+                broadcast(JSON.stringify(sendmessage));
+            }
+        }
+
         if (receivedmessage.type == "getDir") {
             var dirContent;
             try {
@@ -140,7 +162,7 @@ function wsHandler(ws) {
         }
 
         if (receivedmessage.type == "LED") {
-            digitalWrite(LED2, receivedmessage.data == 'on');
+            digitalWrite(LED2, receivedmessage.data == 'on'); // green LED
         }
     });
     ws.on('close', evt => {
@@ -157,10 +179,9 @@ function broadcast(msg) {
 }
 
 function startWifi() {
+    console.log("connect Wifi");
     // Connect to WiFi
-    digitalPulse(LED1, 1, 200); // pulse  led as indicator
-    digitalPulse(LED1, 0, 200); // pulse  led as indicator
-    digitalPulse(LED1, 1, 200); // pulse  led as indicator
+    //digitalPulse(LED1, 1, [1000, 500, 1000]); // red LED
     wifi.connect(WIFI_NAME, WIFI_OPTIONS, err => {
         if (err !== null) {
             throw err;
@@ -172,9 +193,8 @@ function startWifi() {
             }
             userMessage("http://" + info.ip);
             startServer();
-            digitalPulse(LED2, 1, 200); // pulse  led as indicator
-            digitalPulse(LED2, 0, 200); // pulse  led as indicator
-            digitalPulse(LED2, 1, 200); // pulse  led as indicator
+            console.log("Wifi connected");
+            //digitalPulse(LED2, 1, [1000, 500, 1000]); // green LED
         });
     });
 }
@@ -268,14 +288,10 @@ function mainLoop() {
 function writeDataFile() {
     //pause = true;
     buffer = bufferarray.join("\n");
-    // sendmessage.type = 'writeDataFile';
-    // sendmessage.data = buffer;
-    // broadcast(JSON.stringify(sendmessage));
 
     var datestring = allChannelsResult.dateString.replace(/-/g, "_").replace(/:/g, "_").replace(/ /g, "_");
     var filename = datestring + ".txt";
-    //var path = dir+localdatestring + ".txt";
-    //console.log("write file " + filename);
+    digitalPulse(LED1, 1, [500, 300, 500]); // red LED
 
     try {
         var rootDir, yearDir, monthDir, dayDir;
@@ -284,66 +300,37 @@ function writeDataFile() {
         var day = "" + currentDate.date;
         var yearMonth = year + '/' + month;
         var yearMonthDay = year + '/' + month + '/' + day;
-        // console.log(yearMonth);
 
         SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
         E.connectSDCard(SPI1, B6 /*CS*/);
 
-        // year
-        rootDir = myfs.readdirSync();
-        //console.log(rootDir);
-        //console.log(year + ' exists in root? ' + rootDir.indexOf(year));
-        if (rootDir.indexOf(year) < 0) {
-            myfs.mkdirSync(year);
+        // create folder if it doesn't exist
+        if (true) {
+            // year
+            rootDir = myfs.readdirSync();
+            if (rootDir.indexOf(year) < 0) {
+                myfs.mkdirSync(year);
+            }
+
+            // month
+            yearDir = myfs.readdirSync(year);
+            if (yearDir.indexOf(month) < 0) {
+                myfs.mkdirSync(yearMonth);
+            }
+
+            // day
+            monthDir = myfs.readdirSync(yearMonth);
+            if (monthDir.indexOf(day) < 0) {
+                myfs.mkdirSync(yearMonthDay);
+            }
         }
-        rootDir = myfs.readdirSync();
-        //console.log('root dir: ' + rootDir);
-
-        // month
-        yearDir = myfs.readdirSync(year);
-        //console.log(yearDir);
-        //console.log(month + ' exists in year? ' + yearDir.indexOf(month));
-        if (yearDir.indexOf(month) < 0) {
-            myfs.mkdirSync(yearMonth);
-        }
-        yearDir = myfs.readdirSync(year);
-        //console.log('year dir: ' + yearDir);
-
-        // day
-        monthDir = myfs.readdirSync(yearMonth);
-        //console.log(monthDir);
-        //console.log(day + ' exists in month? ' + monthDir.indexOf(day));
-        if (monthDir.indexOf(day) < 0) {
-            myfs.mkdirSync(yearMonthDay);
-        }
-        monthDir = myfs.readdirSync(yearMonth);
-        //console.log('month dir: ' + monthDir);
-
-        dayDir = myfs.readdirSync(yearMonthDay);
-        //console.log('day dir: ' + dayDir);
-
-
 
         var fullPath = yearMonthDay + '/' + filename;
         console.log('full path: ' + fullPath);
         dataFile = E.openFile(fullPath, "a");
         dataFile.write(buffer);
         dataFile.close();
-        console.log('file written');
-
-        dayDir = myfs.readdirSync(yearMonthDay);
-        console.log('day dir: ' + yearMonthDay);
-        console.log('day dir: ' + dayDir);
-
-
-        // SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
-        // E.connectSDCard(SPI1, B6 /*CS*/);
-        // console.log(currentDate.year);
-        // var year ="20"+currentDate.year;
-        // var yearMonth =year+'/'+currentDate.month;
-        // console.log(yearMonth);
-        // myfs.mkdirSync(year);
-        // myfs.mkdirSync(yearMonth);
+        console.log('file ' + fullPath + 'written');
 
         E.unmountSD();
 
@@ -357,6 +344,7 @@ function writeDataFile() {
     //     E.unmountSD();
     // }
     //pause = false;
+    digitalPulse(LED2, 1, [500, 300, 500]); // green LED
 
 }
 
@@ -382,10 +370,10 @@ function onInit() {
 
 setWatch(function (e) {
     //console.log(myfs.readFileSync("log.txt")); //
-    digitalPulse(LED1, 1, 200); // pulse  led as indicator
+    digitalPulse(LED1, 1, 200); // pulse red led as indicator
     userMessage("Stop program");
     clearInterval(loopTimer);
-    digitalPulse(LED1, 1, 500); // pulse  led as indicator
+    digitalPulse(LED1, 1, 500); // pulse red led as indicator
 
 }, BTN, { repeat: true, edge: 'rising' });
 
