@@ -3,8 +3,13 @@ myhtml = `
 
 <head>
     <style>
+        table {
+            border-collapse: collapse;
+        }
+
         table,
-        td {
+        td,
+        th {
             border: 1px solid black;
         }
 
@@ -41,9 +46,13 @@ myhtml = `
         var clientDateUTC;
         var clientDate;
         var sendmessage = {
-            type: "none",
-            data: "empty"
+            type: 'none',
+            data: 'empty'
         };
+        var liveTable = document.getElementById('liveTable');
+        var storedTable = document.getElementById('storedTable');
+
+
         function printMessage(target, message) {
             elementId = document.getElementById(target);
             if (elementId != null) {
@@ -61,21 +70,21 @@ myhtml = `
 
         function show(name) {
             var x = document.getElementById(name);
-            x.style.display = "block";
+            x.style.display = 'block';
         }
 
         function hide(name) {
             var x = document.getElementById(name);
-            x.style.display = "none";
+            x.style.display = 'none';
         }
 
         function showMessages() {
-            if (document.getElementById("showMessages").checked) {
+            if (document.getElementById('showMessages').checked) {
                 showMessagesFlag = true;
-                show("messagesDiv");
+                show('messagesDiv');
             } else {
                 showMessagesFlag = false;
-                hide("messagesDiv");
+                hide('messagesDiv');
             }
         }
 
@@ -107,7 +116,7 @@ myhtml = `
                 seconds: seconds,
                 dayofweek: dayofweek
             }
-            printlnMessage("messages", JSON.stringify(setDate));
+            printlnMessage('messages', JSON.stringify(setDate));
             sendmessage.data = setDate;
             ws.send(JSON.stringify(sendmessage));
         }
@@ -124,7 +133,7 @@ myhtml = `
         }
 
         function setloopPeriod() {
-            var value = document.getElementById("loopPeriod").value;
+            var value = document.getElementById('loopPeriod').value;
             sendmessage.type = 'loopPeriod';
             sendmessage.data = value;
             ws.send(JSON.stringify(sendmessage));
@@ -132,7 +141,7 @@ myhtml = `
 
         function enableDataFiles() {
             sendmessage.type = 'enableDataFiles';
-            if (document.getElementById("enableDataFiles").checked) {
+            if (document.getElementById('enableDataFiles').checked) {
                 sendmessage.data = true;
             } else {
                 sendmessage.data = false;
@@ -140,10 +149,16 @@ myhtml = `
             ws.send(JSON.stringify(sendmessage));
         }
 
-        
+        function setSaveFileLinesButton() {
+            var value = document.getElementById('saveFileLines').value;
+            sendmessage.type = 'saveFileLines';
+            sendmessage.data = value;
+            ws.send(JSON.stringify(sendmessage));
+        }
+
         function LEDonOff() {
             sendmessage.type = 'LED';
-            if (document.getElementById("LEDonOff").checked) {
+            if (document.getElementById('LEDonOff').checked) {
                 sendmessage.data = 'on';
             } else {
                 sendmessage.data = 'off';
@@ -166,7 +181,7 @@ myhtml = `
         }
 
         function tableText(tableCell) {
-            var pathDiv = document.getElementById("pathDiv");
+            var pathDiv = document.getElementById('pathDiv');
             var oldPath = pathDiv.innerHTML;
             var newItem = tableCell.innerHTML;
             var newPath = oldPath + '/' + newItem;
@@ -190,19 +205,19 @@ myhtml = `
                 receivedmessage = JSON.parse(evt.data);
 
                 if (showMessagesFlag) {
-                    //printlnMessage("messages", JSON.stringify(receivedmessage));
+                    //printlnMessage('messages', JSON.stringify(receivedmessage));
                 }
 
-                if (receivedmessage.type == "getLog") {
-                    printlnMessage("messages", JSON.stringify(receivedmessage));
-                    var logDiv = document.getElementById("logDiv");
-                    var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
+                if (receivedmessage.type == 'getLog') {
+                    printlnMessage('messages', JSON.stringify(receivedmessage));
+                    var logDiv = document.getElementById('logDiv');
+                    //var logContent = receivedmessage.data.replace(/\\n/g, '<br>');
                     logDiv.innerHTML = logContent;
                 }
 
-                if (receivedmessage.type == "getDir") {
-                    printlnMessage("messages", JSON.stringify(receivedmessage));
-                    var dirTable = document.getElementById("dirTable");
+                if (receivedmessage.type == 'getDir') {
+                    printlnMessage('messages', JSON.stringify(receivedmessage));
+                    var dirTable = document.getElementById('dirTable');
 
                     while (dirTable.rows.length > 1) {
                         dirTable.deleteRow(1);
@@ -220,25 +235,42 @@ myhtml = `
                     }
                 }
 
-                if (receivedmessage.type == "getFile") {
-                    printlnMessage("messages", JSON.stringify(receivedmessage));
+                if (receivedmessage.type == 'getFile') {
+                    printlnMessage('messages', JSON.stringify(receivedmessage));
 
-                    var logDiv = document.getElementById("logDiv");
-                    var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
-                    logDiv.innerHTML = logContent;
+                    // var lines=receivedmessage.data.split('\n');
+                    // for (s of lines) {
+                    // {
+                        var row = storedTable.insertRow(x);
+                        row.insertCell(0).innerHTML = s;
+                        // row.insertCell(1).innerHTML = receiveddata.number;
+                        // row.insertCell(2).innerHTML = receiveddata.busVoltage3;
+                        // row.insertCell(3).innerHTML = receiveddata.current_mA3;
+                        // row.insertCell(4).innerHTML = receiveddata.power_mW3;
+                        // row.insertCell(5).innerHTML = receiveddata.busVoltage1;
+                        // row.insertCell(6).innerHTML = receiveddata.current_mA1;
+                        // row.insertCell(7).innerHTML = receiveddata.power_mW1;
+                        // row.insertCell(8).innerHTML = receiveddata.PWM_actual;
+                        // row.insertCell(9).innerHTML = receiveddata.PWM_target;
+//                    }
+
+
+                    // var logDiv = document.getElementById('logDiv');
+                    // var logContent = receivedmessage.data.replace(/\\n/g, '<br>');
+                    // logDiv.innerHTML = logContent;
+
                 }
 
-                if (receivedmessage.type == "writeDataFile") {
-                    printlnMessage("messages", JSON.stringify(receivedmessage));
+                if (receivedmessage.type == 'writeDataFile') {
+                    printlnMessage('messages', JSON.stringify(receivedmessage));
                 }
 
-                if (receivedmessage.type == "values") {
-                    var liveTable = document.getElementById("liveTable");
+                if (receivedmessage.type == 'values') {
                     // new measurement data
                     receiveddata = receivedmessage.data;
-                    var x = document.getElementById("liveTable").rows.length;
+                    var x = document.getElementById('liveTable').rows.length;
                     if (x > 10) {
-                        document.getElementById("liveTable").deleteRow(1);
+                        document.getElementById('liveTable').deleteRow(1);
                         x -= 1;
                     }
                     {
@@ -251,21 +283,19 @@ myhtml = `
                         row.insertCell(5).innerHTML = receiveddata.busVoltage1;
                         row.insertCell(6).innerHTML = receiveddata.current_mA1;
                         row.insertCell(7).innerHTML = receiveddata.power_mW1;
-                        row.insertCell(8).innerHTML = ' ';
-                        row.insertCell(9).innerHTML = receiveddata.PWM_actual;
-                        row.insertCell(10).innerHTML = receiveddata.PWM_target;
+                        row.insertCell(8).innerHTML = receiveddata.PWM_actual;
+                        row.insertCell(9).innerHTML = receiveddata.PWM_target;
                     }
-
                 }
                 // show date on header
                 clientDateUTC = new Date(Date.now());
                 clientDate = new Date(clientDateUTC.getTime() - clientDateUTC.getTimezoneOffset() * 60000);
-                //var clientDateString = clientDate.toISOString().replace(/:/g, "_").slice(0, 19);
+                //var clientDateString = clientDate.toISOString().replace(/:/g, '_').slice(0, 19);
                 //var clientDateString = clientDate.toISOString().slice(0, 19);
-                var clientDateString = clientDate.toISOString().replace(/T/g, " ").slice(0, 19);
-                document.getElementById("clientDate").innerHTML = clientDateString;
+                var clientDateString = clientDate.toISOString().replace(/T/g, ' ').slice(0, 19);
+                document.getElementById('clientDate').innerHTML = clientDateString;
                 //if (showMessagesFlag) {
-                //printlnMessage("messages", JSON.stringify(clientDate));
+                //printlnMessage('messages', JSON.stringify(clientDate));
                 //}
             };
         };
@@ -273,44 +303,44 @@ myhtml = `
 </head>
 
 <body>
-    <div id="menuheader">
-        <div style="display: table; background-color: #eeeeff;">
-            <div style="display: table-row">
-                <div style="width: 10%; display: table-cell; white-space: nowrap;">
-                    <label><input type="checkbox" onclick="LEDonOff()" id="LEDonOff" value="male" unchecked />
+    <div id='menuheader'>
+        <div style='display: table; background-color: #eeeeff;'>
+            <div style='display: table-row'>
+                <div style='width: 10%; display: table-cell; white-space: nowrap;'>
+                    <label><input type='checkbox' onclick='LEDonOff()' id='LEDonOff' value='male' unchecked />
                         LED
                     </label>
                 </div>
-                <div style="width: 15%; display: table-cell; white-space: nowrap;">
-                    <button id="PWMminus" onclick="PWMminusButton()">-</button>
+                <div style='width: 15%; display: table-cell; white-space: nowrap;'>
+                    <button id='PWMminus' onclick='PWMminusButton()'>-</button>
                     PWM
-                    <button id="PWMplus" onclick="PWMplusButton()">+</button>
+                    <button id='PWMplus' onclick='PWMplusButton()'>+</button>
                 </div>
-                <div style="width: 20%; display: table-cell; white-space: nowrap;">
+                <div style='width: 20%; display: table-cell; white-space: nowrap;'>
                     Date
-                    <span id="clientDate"></span>
-                    <button id="setRTC" onclick="setRTCButton()">set RTC</button>
+                    <span id='clientDate'></span>
+                    <button id='setRTC' onclick='setRTCButton()'>set RTC</button>
                 </div>
-                <div style="width: 12%; display: table-cell; white-space: nowrap;">
-                    <button id="getLogButton" onclick="getLogClicked()">get log</button>
+                <div style='width: 12%; display: table-cell; white-space: nowrap;'>
+                    <button id='getLogButton' onclick='getLogClicked()'>get log</button>
                 </div>
-                <div style="width: 12%; display: table-cell; white-space: nowrap;">
-                    <button id="getDirButton" onclick="getDirClicked()">get dir</button>
+                <div style='width: 12%; display: table-cell; white-space: nowrap;'>
+                    <button id='getDirButton' onclick='getDirClicked()'>get dir</button>
                 </div>
-                <div style="width: 12%; display: table-cell; white-space: nowrap;">
-                    <button id="settingsButton" onclick="settingsClicked()">Settings</button>
+                <div style='width: 12%; display: table-cell; white-space: nowrap;'>
+                    <button id='settingsButton' onclick='settingsClicked()'>Settings</button>
                 </div>
             </div>
         </div>
     </div>
-    <div id="messagesDiv" style="display: none">
-        <textarea id="messages" rows="10" cols="60" style="width: 100%;"></textarea>
+    <div id='messagesDiv' style='display: none'>
+        <textarea id='messages' rows='10' cols='60' style='width: 100%;'></textarea>
     </div>
-    <div style="display: table">
-        <div style="display: table-row">
-            <div style="width: 50%; display: table-cell; white-space: nowrap;">
-                <div id="liveData">
-                    <table id="liveTable">
+    <div style='display: table'>
+        <div style='display: table-row'>
+            <div style='width: 39%; display: table-cell; white-space: nowrap;'>
+                <div id='liveData'>
+                    <table id='liveTable'>
                         <tr>
                             <th>Date</th>
                             <th>nr</th>
@@ -320,14 +350,18 @@ myhtml = `
                             <th>Bat V</th>
                             <th>mA</th>
                             <th>mW</th>
-                            <th>eff</th>
                             <th>act</th>
                             <th>tgt</th>
                         </tr>
                     </table>
                 </div>
-                <div id="storedData" style="display: none">
-                    <table id="storedTable">
+            </div>
+            <div style='width: 2%; display: table-cell; white-space: nowrap;'>
+
+            </div>
+            <div style='width: 39%; display: table-cell; white-space: nowrap;'>
+                <div id='storedData'>
+                    <table id='storedTable'>
                         <tr>
                             <th>Date</th>
                             <th>nr</th>
@@ -337,18 +371,15 @@ myhtml = `
                             <th>V</th>
                             <th>mA</th>
                             <th>mW</th>
-                            <th>eff</th>
                             <th>act</th>
                             <th>tgt</th>
                         </tr>
                     </table>
                 </div>
             </div>
-            <div id="logDiv" style="width: 25%; display: table-cell; white-space: nowrap;">
-            </div>
-            <div id="dirDiv" style="width:25%; display: table-cell; white-space: nowrap;">
-                <div id="pathDiv">/</div>
-                <table id="dirTable">
+            <div id='dirDiv' style='width:20%; display: table-cell; white-space: nowrap;'>
+                <div id='pathDiv'>/</div>
+                <table id='dirTable'>
                     <tr>
                         <th>File</th>
                     </tr>
@@ -357,59 +388,59 @@ myhtml = `
         </div>
     </div>
 
+    <div id='logDiv' style='width: 25%; display: table-cell; white-space: nowrap;'>
+    </div>
 
-
-    <div id="settings" class="popup">
+    <div id='settings' class='popup'>
         <h4>Settings</h4>
-        <label><input type="checkbox" onclick="showMessages()" name="showMessages" id="showMessages" value="male"
+        <label><input type='checkbox' onclick='showMessages()' name='showMessages' id='showMessages' value='male'
                 unchecked />
             show messages
         </label>
-        <button onclick="clearMessage('messages')">Clear messages</button>
+        <button onclick='clearMessage('messages')'>Clear messages</button>
         <div>
-            <label style="white-space: nowrap"><input type="radio" name="mode" id="manual" onclick="PWMMode()"
-                    checked="true" />PWM manual</label>
+            <label style='white-space: nowrap'><input type='radio' name='mode' id='manual' onclick='PWMMode()'
+                    checked='true' />PWM manual</label>
             <!-- -->
-            <label style="white-space: nowrap"><input type="radio" name="mode" id="MPPT"
-                    onclick="PWMMode()" />MPPT</label>
+            <label style='white-space: nowrap'><input type='radio' name='mode' id='MPPT'
+                    onclick='PWMMode()' />MPPT</label>
         </div>
         <br>
         <div>
             Measure Period
-            <input id="loopPeriod" name="value" value="1000" />ms
-            <button onclick="setloopPeriod()" id="setloopPeriod">
+            <input id='loopPeriod' name='value' value='1000' />ms
+            <button onclick='setloopPeriod()' id='setloopPeriod'>
                 Set</button><br>
-            <label><input type="checkbox" onclick="sendDataCheckbox()" name="sendData" id="sendData" value="male"
+            <label><input type='checkbox' onclick='sendDataCheckbox()' name='sendData' id='sendData' value='male'
                     checked />
                 Server sends data </label>
         </div>
         <br>
         <!-- -->
-        <div class="title_box" id="logsbox">
-            <div id="title">
-                <label><input type="checkbox" onclick="enableDataFiles()" name="enableDataFiles" id="enableDataFiles" value="male"
-                        checked />
+        <div class='title_box' id='logsbox'>
+            <div id='title'>
+                <label><input type='checkbox' onclick='enableDataFiles()' name='enableDataFiles' id='enableDataFiles'
+                        value='male' checked />
                     Data Files<br>
                     <!-- -->
                 </label>
             </div>
-            <div id="enableDataFilescontent">
-                Log values every
-                <input id="LogPeriod" name="value" value="query.." /> seconds
-                <button onclick="setLogPeriodButton()" id="setLogPeriodButton">
+            <div id='enableDataFilescontent'>
+                Keep every
+                <input id='keepLines' name='value' value='query..' /> th measurement line
+                <button onclick='setkeepLinesButton()' id='setkeepLinesButton'>
                     Set</button><br>
-                Save log file every
-                <input id="LogFilePeriod" name="value" value="query.." /> seconds
-                <button onclick="setLogFilePeriodButton()" id="setLogFilePeriodButton">
+                Write file after every
+                <input id='saveFileLines' name='value' value='query..' /> lines
+                <button onclick='setSaveFileLinesButton()' id='setSaveFileLinesButton'>
                     Set</button><br>
-                current buffer length
-                <input id="bufferLength" name="value" value="query.." />
-                <button onclick="requestStatus()" id="requestStatus">
+                <input id='remainingLines' name='value' value='query..' /> lines until next file save
+                <button onclick='requestremainingLines()' id='requestremainingLines'>
                     Refresh</button><br>
             </div>
         </div>
         <br>
-        <button class="close_button" onClick="closePopup()">close</button>
+        <button class='close_button' onClick='closePopup()'>close</button>
     </div>
 </body>
 
@@ -417,7 +448,7 @@ myhtml = `
 `;
 
 function webpage() {
-//print("MPPT web page");
+//print('MPPT web page');
 }
 
 webpage.prototype.gethtml = function () {

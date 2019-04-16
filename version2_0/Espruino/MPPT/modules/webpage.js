@@ -3,8 +3,13 @@ myhtml = `
 
 <head>
     <style>
+        table {
+            border-collapse: collapse;
+        }
+
         table,
-        td {
+        td,
+        th {
             border: 1px solid black;
         }
 
@@ -44,6 +49,10 @@ myhtml = `
             type: "none",
             data: "empty"
         };
+        var liveTable = document.getElementById("liveTable");
+        var storedTable = document.getElementById("storedTable");
+
+
         function printMessage(target, message) {
             elementId = document.getElementById(target);
             if (elementId != null) {
@@ -140,7 +149,13 @@ myhtml = `
             ws.send(JSON.stringify(sendmessage));
         }
 
-        
+        function setSaveFileLinesButton() {
+            var value = document.getElementById("saveFileLines").value;
+            sendmessage.type = 'saveFileLines';
+            sendmessage.data = value;
+            ws.send(JSON.stringify(sendmessage));
+        }
+
         function LEDonOff() {
             sendmessage.type = 'LED';
             if (document.getElementById("LEDonOff").checked) {
@@ -196,7 +211,7 @@ myhtml = `
                 if (receivedmessage.type == "getLog") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));
                     var logDiv = document.getElementById("logDiv");
-                    var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
+                    //var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
                     logDiv.innerHTML = logContent;
                 }
 
@@ -223,9 +238,27 @@ myhtml = `
                 if (receivedmessage.type == "getFile") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));
 
-                    var logDiv = document.getElementById("logDiv");
-                    var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
-                    logDiv.innerHTML = logContent;
+                    // var lines=receivedmessage.data.split('\n');
+                    // for (s of lines) {
+                    // {
+                        var row = storedTable.insertRow(x);
+                        row.insertCell(0).innerHTML = s;
+                        // row.insertCell(1).innerHTML = receiveddata.number;
+                        // row.insertCell(2).innerHTML = receiveddata.busVoltage3;
+                        // row.insertCell(3).innerHTML = receiveddata.current_mA3;
+                        // row.insertCell(4).innerHTML = receiveddata.power_mW3;
+                        // row.insertCell(5).innerHTML = receiveddata.busVoltage1;
+                        // row.insertCell(6).innerHTML = receiveddata.current_mA1;
+                        // row.insertCell(7).innerHTML = receiveddata.power_mW1;
+                        // row.insertCell(8).innerHTML = receiveddata.PWM_actual;
+                        // row.insertCell(9).innerHTML = receiveddata.PWM_target;
+//                    }
+
+
+                    // var logDiv = document.getElementById("logDiv");
+                    // var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
+                    // logDiv.innerHTML = logContent;
+
                 }
 
                 if (receivedmessage.type == "writeDataFile") {
@@ -233,7 +266,6 @@ myhtml = `
                 }
 
                 if (receivedmessage.type == "values") {
-                    var liveTable = document.getElementById("liveTable");
                     // new measurement data
                     receiveddata = receivedmessage.data;
                     var x = document.getElementById("liveTable").rows.length;
@@ -251,11 +283,9 @@ myhtml = `
                         row.insertCell(5).innerHTML = receiveddata.busVoltage1;
                         row.insertCell(6).innerHTML = receiveddata.current_mA1;
                         row.insertCell(7).innerHTML = receiveddata.power_mW1;
-                        row.insertCell(8).innerHTML = ' ';
-                        row.insertCell(9).innerHTML = receiveddata.PWM_actual;
-                        row.insertCell(10).innerHTML = receiveddata.PWM_target;
+                        row.insertCell(8).innerHTML = receiveddata.PWM_actual;
+                        row.insertCell(9).innerHTML = receiveddata.PWM_target;
                     }
-
                 }
                 // show date on header
                 clientDateUTC = new Date(Date.now());
@@ -308,7 +338,7 @@ myhtml = `
     </div>
     <div style="display: table">
         <div style="display: table-row">
-            <div style="width: 50%; display: table-cell; white-space: nowrap;">
+            <div style="width: 39%; display: table-cell; white-space: nowrap;">
                 <div id="liveData">
                     <table id="liveTable">
                         <tr>
@@ -320,13 +350,17 @@ myhtml = `
                             <th>Bat V</th>
                             <th>mA</th>
                             <th>mW</th>
-                            <th>eff</th>
                             <th>act</th>
                             <th>tgt</th>
                         </tr>
                     </table>
                 </div>
-                <div id="storedData" style="display: none">
+            </div>
+            <div style="width: 2%; display: table-cell; white-space: nowrap;">
+
+            </div>
+            <div style="width: 39%; display: table-cell; white-space: nowrap;">
+                <div id="storedData">
                     <table id="storedTable">
                         <tr>
                             <th>Date</th>
@@ -337,16 +371,13 @@ myhtml = `
                             <th>V</th>
                             <th>mA</th>
                             <th>mW</th>
-                            <th>eff</th>
                             <th>act</th>
                             <th>tgt</th>
                         </tr>
                     </table>
                 </div>
             </div>
-            <div id="logDiv" style="width: 25%; display: table-cell; white-space: nowrap;">
-            </div>
-            <div id="dirDiv" style="width:25%; display: table-cell; white-space: nowrap;">
+            <div id="dirDiv" style="width:20%; display: table-cell; white-space: nowrap;">
                 <div id="pathDiv">/</div>
                 <table id="dirTable">
                     <tr>
@@ -357,7 +388,8 @@ myhtml = `
         </div>
     </div>
 
-
+    <div id="logDiv" style="width: 25%; display: table-cell; white-space: nowrap;">
+    </div>
 
     <div id="settings" class="popup">
         <h4>Settings</h4>
@@ -387,24 +419,23 @@ myhtml = `
         <!-- -->
         <div class="title_box" id="logsbox">
             <div id="title">
-                <label><input type="checkbox" onclick="enableDataFiles()" name="enableDataFiles" id="enableDataFiles" value="male"
-                        checked />
+                <label><input type="checkbox" onclick="enableDataFiles()" name="enableDataFiles" id="enableDataFiles"
+                        value="male" checked />
                     Data Files<br>
                     <!-- -->
                 </label>
             </div>
             <div id="enableDataFilescontent">
-                Log values every
-                <input id="LogPeriod" name="value" value="query.." /> seconds
-                <button onclick="setLogPeriodButton()" id="setLogPeriodButton">
+                Keep every
+                <input id="keepLines" name="value" value="query.." /> th measurement line
+                <button onclick="setkeepLinesButton()" id="setkeepLinesButton">
                     Set</button><br>
-                Save log file every
-                <input id="LogFilePeriod" name="value" value="query.." /> seconds
-                <button onclick="setLogFilePeriodButton()" id="setLogFilePeriodButton">
+                Write file after every
+                <input id="saveFileLines" name="value" value="query.." /> lines
+                <button onclick="setSaveFileLinesButton()" id="setSaveFileLinesButton">
                     Set</button><br>
-                current buffer length
-                <input id="bufferLength" name="value" value="query.." />
-                <button onclick="requestStatus()" id="requestStatus">
+                <input id="remainingLines" name="value" value="query.." /> lines until next file save
+                <button onclick="requestremainingLines()" id="requestremainingLines">
                     Refresh</button><br>
             </div>
         </div>

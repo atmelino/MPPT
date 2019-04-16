@@ -12,16 +12,18 @@ var ina = new INA3221(i2c, {
     shunt: 0.1 // the shunt resistor's value
 });
 var loopTimer;
-//var loopPeriod = 1000;
-var loopPeriod = 2000;
+var loopPeriod = 1000;
 var currentDateString;
 var currentDate;
 var counter = 0;
 var PWM_actual = 0.0;
 var PWM_target = 0;
 var allChannelsResult;
-var webpage = require("webpage");
-var mypage = new webpage();
+//var webpage = require("webpage");
+//var shortwebpage = "bla";
+//var mypage = new webpage();
+var f = require("Storage");
+
 var wifi = require('Wifi');
 var clients = [];
 var WIFI_NAME = "NETGEAR53";
@@ -36,6 +38,7 @@ var sendmessage = {
     data: "empty"
 };
 var bufferarray = [];
+var saveFileLines = 60;
 //var pause = false;
 
 function userMessage(msg) {
@@ -56,7 +59,8 @@ function pageHandler(req, res) {
     res.writeHead(200, {
         'Content-Type': 'text/html'
     });
-    res.end(mypage.gethtml());
+    //res.end(mypage.gethtml());
+    res.end("<html>"+f.read("head")+f.read("body")+"</html>");
     //console.log("server connected");
 }
 
@@ -164,6 +168,13 @@ function wsHandler(ws) {
         if (receivedmessage.type == "enableDataFiles") {
             console.log(receivedmessage.data);
         }
+
+        if (receivedmessage.type == "saveFileLines") {
+            console.log(receivedmessage.data);
+            saveFileLines = receivedmessage.data;
+        }
+
+
 
         if (receivedmessage.type == "LED") {
             digitalWrite(LED2, receivedmessage.data == 'on'); // green LED
@@ -280,7 +291,7 @@ function mainLoop() {
     //console.log(bufferarray.length);
 
     bufferarray.push(makeLine());
-    if (bufferarray.length > 10) {
+    if (bufferarray.length > saveFileLines) {
         writeDataFile();
         while (bufferarray.length > 0) {
             bufferarray.pop();
@@ -289,13 +300,25 @@ function mainLoop() {
 
 }
 
+
+function makeLine() {
+    var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3 + ' ';
+    var batteryvals = allChannelsResult.busVoltage1 + ' ' + allChannelsResult.current_mA1 + ' ' + allChannelsResult.power_mW1 + ' ';
+    var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals;
+    return line;
+}
+
+function printValues() {
+    console.log(makeLine());
+}
+
 function writeDataFile() {
     //pause = true;
     buffer = bufferarray.join("\n");
 
     var datestring = allChannelsResult.dateString.replace(/-/g, "_").replace(/:/g, "_").replace(/ /g, "_");
     var filename = datestring + ".txt";
-    digitalPulse(LED1, 1, [500, 300, 500]); // red LED
+    //digitalPulse(LED1, 1, [500, 300, 500]); // red LED
 
     try {
         var rootDir, yearDir, monthDir, dayDir;
@@ -348,19 +371,8 @@ function writeDataFile() {
     //     E.unmountSD();
     // }
     //pause = false;
-    digitalPulse(LED2, 1, [500, 300, 500]); // green LED
+    //digitalPulse(LED2, 1, [500, 300, 500]); // green LED
 
-}
-
-function makeLine() {
-    var solarvals = allChannelsResult.busVoltage3 + ' V ' + allChannelsResult.current_mA3 + ' mA ' + allChannelsResult.power_mW3 + ' mW ';
-    var batteryvals = allChannelsResult.busVoltage1 + ' V ' + allChannelsResult.current_mA1 + ' mA ' + allChannelsResult.power_mW1 + ' mW ';
-    var line = allChannelsResult.dateString + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals;
-    return line;
-}
-
-function printValues() {
-    console.log(makeLine());
 }
 
 function onInit() {
