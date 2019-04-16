@@ -130,6 +130,17 @@ myhtml = `
             ws.send(JSON.stringify(sendmessage));
         }
 
+        function enableDataFiles() {
+            sendmessage.type = 'enableDataFiles';
+            if (document.getElementById("enableDataFiles").checked) {
+                sendmessage.data = true;
+            } else {
+                sendmessage.data = false;
+            }
+            ws.send(JSON.stringify(sendmessage));
+        }
+
+        
         function LEDonOff() {
             sendmessage.type = 'LED';
             if (document.getElementById("LEDonOff").checked) {
@@ -216,10 +227,6 @@ myhtml = `
                     var logContent = receivedmessage.data.replace(/\\n/g, "<br>");
                     logDiv.innerHTML = logContent;
                 }
-
-
-
-
 
                 if (receivedmessage.type == "writeDataFile") {
                     printlnMessage("messages", JSON.stringify(receivedmessage));
@@ -380,13 +387,13 @@ myhtml = `
         <!-- -->
         <div class="title_box" id="logsbox">
             <div id="title">
-                <label><input type="checkbox" onclick="enableLogs()" name="enableLogs" id="enableLogs" value="male"
-                        unchecked />
-                    Log Files<br>
+                <label><input type="checkbox" onclick="enableDataFiles()" name="enableDataFiles" id="enableDataFiles" value="male"
+                        checked />
+                    Data Files<br>
                     <!-- -->
                 </label>
             </div>
-            <div id="enableLogscontent">
+            <div id="enableDataFilescontent">
                 Log values every
                 <input id="LogPeriod" name="value" value="query.." /> seconds
                 <button onclick="setLogPeriodButton()" id="setLogPeriodButton">

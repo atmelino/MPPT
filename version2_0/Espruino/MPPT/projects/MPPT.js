@@ -161,6 +161,10 @@ function wsHandler(ws) {
             }
         }
 
+        if (receivedmessage.type == "enableDataFiles") {
+            console.log(receivedmessage.data);
+        }
+
         if (receivedmessage.type == "LED") {
             digitalWrite(LED2, receivedmessage.data == 'on'); // green LED
         }
