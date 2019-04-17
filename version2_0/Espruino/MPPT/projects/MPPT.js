@@ -23,7 +23,6 @@ var allChannelsResult;
 //var shortwebpage = "bla";
 //var mypage = new webpage();
 var f = require("Storage");
-
 var wifi = require('Wifi');
 var clients = [];
 var WIFI_NAME = "NETGEAR53";
@@ -60,7 +59,8 @@ function pageHandler(req, res) {
         'Content-Type': 'text/html'
     });
     //res.end(mypage.gethtml());
-    res.end("<html>"+f.read("head")+f.read("body")+"</html>");
+    //res.end("<html>"+f.read("head")+f.read("body")+"</html>");
+    res.end("Attempting to load web site from SD card");
     //console.log("server connected");
 }
 
@@ -174,12 +174,11 @@ function wsHandler(ws) {
             saveFileLines = receivedmessage.data;
         }
 
-
-
         if (receivedmessage.type == "LED") {
             digitalWrite(LED2, receivedmessage.data == 'on'); // green LED
         }
     });
+
     ws.on('close', evt => {
         var x = clients.indexOf(ws);
         if (x > -1) {
@@ -222,7 +221,6 @@ function start() {
     userMessage("Start Wifi");
     startWifi();
 
-    // Wire up up MOSI, MISO, SCK and CS pins (along with 3.3v and GND)
     // logFile = E.openFile("log.txt", "a");
     // currentDate = rtc.readDateTime();
     // logFile.write(currentDate + "," + "program start" + "\r\n");
@@ -297,9 +295,7 @@ function mainLoop() {
             bufferarray.pop();
         }
     }
-
 }
-
 
 function makeLine() {
     var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3 + ' ';
