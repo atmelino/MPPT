@@ -49,8 +49,6 @@ myhtml = `
             type: 'none',
             data: 'empty'
         };
-        var liveTable = document.getElementById('liveTable');
-        var storedTable = document.getElementById('storedTable');
 
 
         function printMessage(target, message) {
@@ -211,7 +209,7 @@ myhtml = `
                 if (receivedmessage.type == 'getLog') {
                     printlnMessage('messages', JSON.stringify(receivedmessage));
                     var logDiv = document.getElementById('logDiv');
-                    //var logContent = receivedmessage.data.replace(/\\n/g, '<br>');
+                    var logContent = receivedmessage.data.replace(/\\n/g, '<br>');
                     logDiv.innerHTML = logContent;
                 }
 
@@ -237,22 +235,23 @@ myhtml = `
 
                 if (receivedmessage.type == 'getFile') {
                     printlnMessage('messages', JSON.stringify(receivedmessage));
+                    var storedTable = document.getElementById('storedTable');
 
-                    // var lines=receivedmessage.data.split('\n');
+                    // var lines=receivedmessage.data.split('');
                     // for (s of lines) {
                     // {
-                        var row = storedTable.insertRow(x);
-                        row.insertCell(0).innerHTML = s;
-                        // row.insertCell(1).innerHTML = receiveddata.number;
-                        // row.insertCell(2).innerHTML = receiveddata.busVoltage3;
-                        // row.insertCell(3).innerHTML = receiveddata.current_mA3;
-                        // row.insertCell(4).innerHTML = receiveddata.power_mW3;
-                        // row.insertCell(5).innerHTML = receiveddata.busVoltage1;
-                        // row.insertCell(6).innerHTML = receiveddata.current_mA1;
-                        // row.insertCell(7).innerHTML = receiveddata.power_mW1;
-                        // row.insertCell(8).innerHTML = receiveddata.PWM_actual;
-                        // row.insertCell(9).innerHTML = receiveddata.PWM_target;
-//                    }
+                    var row = storedTable.insertRow(x);
+                    row.insertCell(0).innerHTML = s;
+                    // row.insertCell(1).innerHTML = receiveddata.number;
+                    // row.insertCell(2).innerHTML = receiveddata.busVoltage3;
+                    // row.insertCell(3).innerHTML = receiveddata.current_mA3;
+                    // row.insertCell(4).innerHTML = receiveddata.power_mW3;
+                    // row.insertCell(5).innerHTML = receiveddata.busVoltage1;
+                    // row.insertCell(6).innerHTML = receiveddata.current_mA1;
+                    // row.insertCell(7).innerHTML = receiveddata.power_mW1;
+                    // row.insertCell(8).innerHTML = receiveddata.PWM_actual;
+                    // row.insertCell(9).innerHTML = receiveddata.PWM_target;
+                    //                    }
 
 
                     // var logDiv = document.getElementById('logDiv');
@@ -266,6 +265,8 @@ myhtml = `
                 }
 
                 if (receivedmessage.type == 'values') {
+                    var liveTable = document.getElementById('liveTable');
+
                     // new measurement data
                     receiveddata = receivedmessage.data;
                     var x = document.getElementById('liveTable').rows.length;
@@ -397,7 +398,7 @@ myhtml = `
                 unchecked />
             show messages
         </label>
-        <button onclick='clearMessage('messages')'>Clear messages</button>
+        <button onclick='clearMessage(' messages')'>Clear messages</button>
         <div>
             <label style='white-space: nowrap'><input type='radio' name='mode' id='manual' onclick='PWMMode()'
                     checked='true' />PWM manual</label>
@@ -448,11 +449,11 @@ myhtml = `
 `;
 
 function webpage() {
-    //print('MPPT web page');
+//print('MPPT web page');
 }
 
 webpage.prototype.gethtml = function () {
-    return myhtml;
+return myhtml;
 };
 
 exports = webpage;

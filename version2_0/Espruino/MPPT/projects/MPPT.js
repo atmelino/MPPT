@@ -19,10 +19,6 @@ var counter = 0;
 var PWM_actual = 0.0;
 var PWM_target = 0;
 var allChannelsResult;
-//var webpage = require("webpage");
-//var shortwebpage = "bla";
-//var mypage = new webpage();
-var f = require("Storage");
 var wifi = require('Wifi');
 var clients = [];
 var WIFI_NAME = "NETGEAR53";
@@ -58,10 +54,13 @@ function pageHandler(req, res) {
     res.writeHead(200, {
         'Content-Type': 'text/html'
     });
-    //res.end(mypage.gethtml());
-    //res.end("<html>"+f.read("head")+f.read("body")+"</html>");
-    res.end("Attempting to load web site from SD card");
+    //res.end("Attempting to load web site from SD card");
     //console.log("server connected");
+    SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
+    E.connectSDCard(SPI1, B6 /*CS*/);
+    var fileContent=myfs.readFileSync('html/index.html');
+    res.end(fileContent);
+    E.unmountSD();
 }
 
 // WebSocket request handler
@@ -130,9 +129,7 @@ function wsHandler(ws) {
             try {
                 SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
                 E.connectSDCard(SPI1, B6 /*CS*/);
-                //dataFile = E.openFile(receivedmessage.data, "a");
                 fileContent = myfs.readFileSync(receivedmessage.data);
-                //dataFile.close();
             }
             catch (e) {
                 fileContent = e.message;
@@ -353,7 +350,7 @@ function writeDataFile() {
         dataFile = E.openFile(fullPath, "a");
         dataFile.write(buffer);
         dataFile.close();
-        console.log('file ' + fullPath + 'written');
+        console.log('file ' + fullPath + ' written');
 
         E.unmountSD();
 
@@ -373,7 +370,6 @@ function writeDataFile() {
 
 function onInit() {
     userMessage('MPPT test  Press button on Espruino to stop');
-    //console.log(mypage.gethtml());
     start();
 }
 
