@@ -236,30 +236,19 @@ myhtml = `
                 if (receivedmessage.type == 'getFile') {
                     printlnMessage('messages', JSON.stringify(receivedmessage));
                     var storedTable = document.getElementById('storedTable');
-
-                    // var lines=receivedmessage.data.split('');
-                    // for (s of lines) {
-                    // {
-                    var row = storedTable.insertRow(x);
-                    row.insertCell(0).innerHTML = s;
-                    // row.insertCell(1).innerHTML = receiveddata.number;
-                    // row.insertCell(2).innerHTML = receiveddata.busVoltage3;
-                    // row.insertCell(3).innerHTML = receiveddata.current_mA3;
-                    // row.insertCell(4).innerHTML = receiveddata.power_mW3;
-                    // row.insertCell(5).innerHTML = receiveddata.busVoltage1;
-                    // row.insertCell(6).innerHTML = receiveddata.current_mA1;
-                    // row.insertCell(7).innerHTML = receiveddata.power_mW1;
-                    // row.insertCell(8).innerHTML = receiveddata.PWM_actual;
-                    // row.insertCell(9).innerHTML = receiveddata.PWM_target;
-                    //                    }
-
-
-                    // var logDiv = document.getElementById('logDiv');
-                    // var logContent = receivedmessage.data.replace(/\\n/g, '<br>');
-                    // logDiv.innerHTML = logContent;
-
+                    while (document.getElementById('storedTable').rows.length > 1) {
+                        document.getElementById('storedTable').deleteRow(1);
+                    }
+                    var lines = receivedmessage.data.split('\\n');
+                    for (s of lines) {
+                        var row = storedTable.insertRow(x);
+                        var line = s.split(' ');
+                        var arrayLength = line.length;
+                        for (var i = 0; i < arrayLength; i++) {
+                            row.insertCell(i).innerHTML = line[i];
+                        }
+                    }
                 }
-
                 if (receivedmessage.type == 'writeDataFile') {
                     printlnMessage('messages', JSON.stringify(receivedmessage));
                 }

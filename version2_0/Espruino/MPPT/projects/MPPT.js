@@ -58,7 +58,7 @@ function pageHandler(req, res) {
     //console.log("server connected");
     SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
     E.connectSDCard(SPI1, B6 /*CS*/);
-    var fileContent=myfs.readFileSync('html/index.html');
+    var fileContent = myfs.readFileSync('html/index.html');
     res.end(fileContent);
     E.unmountSD();
 }
@@ -281,11 +281,11 @@ function mainLoop() {
     broadcast(JSON.stringify(sendmessage));
     //printValues();
 
-    line = makeLine();
+    var line = makeLine();
     //console.log(line);
     //console.log(bufferarray.length);
 
-    bufferarray.push(makeLine());
+    bufferarray.push(line);
     if (bufferarray.length > saveFileLines) {
         writeDataFile();
         while (bufferarray.length > 0) {
@@ -295,9 +295,10 @@ function mainLoop() {
 }
 
 function makeLine() {
-    var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3 + ' ';
-    var batteryvals = allChannelsResult.busVoltage1 + ' ' + allChannelsResult.current_mA1 + ' ' + allChannelsResult.power_mW1 + ' ';
-    var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals;
+    var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3;
+    var batteryvals = allChannelsResult.busVoltage1 + ' ' + allChannelsResult.current_mA1 + ' ' + allChannelsResult.power_mW1;
+    var PWMvals = PWM_actual + ' ' + PWM_target;
+    var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals + ' ' + PWMvals;
     return line;
 }
 
