@@ -33,8 +33,33 @@ var sendmessage = {
     data: "empty"
 };
 var bufferarray = [];
-var saveFileLines = 60;
+var saveFileLines = 20;
 //var pause = false;
+Serial1.setup(9600, { tx: B6, rx: B7 });
+
+
+var cmd = "";
+Serial1.on('data', function (data) {
+
+    //    print(data);
+    cmd += data;
+
+    if (cmd.includes('\n')) {
+        print(cmd);
+        cmd = '';
+    }
+
+    // if (data === '\n') {
+    //     print(cmd);
+    //     cmd = '';
+    // }
+});
+
+
+
+
+
+
 
 function userMessage(msg) {
     const consExist = false;
@@ -56,11 +81,13 @@ function pageHandler(req, res) {
     });
     //res.end("Attempting to load web site from SD card");
     //console.log("server connected");
-    SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
-    E.connectSDCard(SPI1, B6 /*CS*/);
-    var fileContent = myfs.readFileSync('html/index.html');
+
+    //console.log('requesting web page from Arduino');
+
+
+    //var fileContent = myfs.readFileSync('html/index.html');
+    var fileContent = ('html/index.htm');
     res.end(fileContent);
-    E.unmountSD();
 }
 
 // WebSocket request handler
@@ -107,8 +134,6 @@ function wsHandler(ws) {
         if (receivedmessage.type == "getLog") {
             var logContent;
             try {
-                SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
-                E.connectSDCard(SPI1, B6 /*CS*/);
                 logFile = E.openFile("log.txt", "a");
                 logContent = myfs.readFileSync("log.txt");
                 logFile.close();
@@ -127,8 +152,6 @@ function wsHandler(ws) {
         if (receivedmessage.type == "getFile") {
             var fileContent;
             try {
-                SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
-                E.connectSDCard(SPI1, B6 /*CS*/);
                 fileContent = myfs.readFileSync(receivedmessage.data);
             }
             catch (e) {
@@ -145,8 +168,6 @@ function wsHandler(ws) {
         if (receivedmessage.type == "getDir") {
             var dirContent;
             try {
-                SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
-                E.connectSDCard(SPI1, B6 /*CS*/);
                 dirContent = myfs.readdirSync(receivedmessage.data);
                 //dirString = dirContent.join("\n");
                 //console.log(dirString);
@@ -214,6 +235,7 @@ function startWifi() {
 function start() {
 
     digitalWrite(B0, 1); // connect battery
+
 
     userMessage("Start Wifi");
     startWifi();
@@ -287,7 +309,15 @@ function mainLoop() {
 
     bufferarray.push(line);
     if (bufferarray.length > saveFileLines) {
-        writeDataFile();
+        //writeDataFile();
+
+        // test: request file from Arduino
+        console.log(" test: request file from Arduino");
+        Serial1.print("i:\n");
+
+        Serial1.print("r:\n");
+
+
         while (bufferarray.length > 0) {
             bufferarray.pop();
         }
@@ -322,8 +352,6 @@ function writeDataFile() {
         var yearMonth = year + '/' + month;
         var yearMonthDay = year + '/' + month + '/' + day;
 
-        SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
-        E.connectSDCard(SPI1, B6 /*CS*/);
 
         // create folder if it doesn't exist
         if (true) {
@@ -353,17 +381,10 @@ function writeDataFile() {
         dataFile.close();
         console.log('file ' + fullPath + ' written');
 
-        E.unmountSD();
 
     }
     catch (e) {
-        E.unmountSD();
-
-        //logContent = e.message;
     }
-    // finally {
-    //     E.unmountSD();
-    // }
     //pause = false;
     //digitalPulse(LED2, 1, [500, 300, 500]); // green LED
 

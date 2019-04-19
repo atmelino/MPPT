@@ -4,9 +4,11 @@
 
 Serial1.setup(9600, { tx: B6, rx: B7 });
 
-
+console.log('starting serial');
 
 Serial1.print("i:\n");
+Serial1.print("l:\n");
+Serial1.print("r:\n");
 
 
 var cmd = "";
