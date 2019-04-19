@@ -39,6 +39,7 @@ void setup() {
 void loop() {
 
   String str;
+  File curDir;
 
   //read message from Espruino
   while (mySerial.available() > 0) {
@@ -51,37 +52,66 @@ void loop() {
 
     switch (task) {
       case 'i':    //
-        if (!card.init(SPI_HALF_SPEED, chipSelect)) {
+
+        if (!SD.begin(4)) {
           Serial.println("init card fail");
           mySerial.println("init card fail");
         } else {
           Serial.println("init card ok");
           mySerial.write("init card ok\n");
         }
-        // Now we will try to open the 'volume'/'partition' - it should be FAT16 or FAT32
-        if (!volume.init(card)) {
-          Serial.println("init volume fail");
-          mySerial.println("init volume fail");
-        } else {
-          Serial.println("init volume ok");
-          mySerial.write("init volume ok\n");
-        }
+
         break;
       case 'l':    //
-        Serial.println("\nFiles found on the card (name, date and size in bytes): ");
-        root.openRoot(volume);
-
-        // list all files in the card with date and size
-        root.ls(LS_R | LS_DATE | LS_SIZE);
+        curDir = SD.open("/2019/4/17");
+        printDirectory(curDir);
         break;
+
+      case 'r':    //
+        //  23_04_00.txt
+        break;
+
+
     }
 
     delay(10);
+  }
 
+}
 
+void printDirectory(File dir) {
+  while (true) {
+
+    File entry =  dir.openNextFile();
+    if (! entry) {
+      // no more files
+      break;
+    }
+    mySerial.println(entry.name());
+    entry.close();
   }
 }
 
+void printDirectorydeep(File dir) {
+  while (true) {
+
+    File entry =  dir.openNextFile();
+    if (! entry) {
+      // no more files
+      break;
+    }
+    mySerial.print(entry.name());
+    if (entry.isDirectory()) {
+      mySerial.println("/");
+      printDirectory(entry);
+    } else {
+      // files have sizes, directories do not
+      mySerial.println();
+      //mySerial.println(entry.size(), DEC);
+    }
+    entry.close();
+  }
+}
 
 
 
@@ -135,3 +165,25 @@ void loop() {
 //digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
 //void(* resetFunc) (void) = 0;//declare reset function at address 0
 //resetFunc();  //call reset
+
+//        if (!card.init(SPI_HALF_SPEED, chipSelect)) {
+//          Serial.println("init card fail");
+//          mySerial.println("init card fail");
+//        } else {
+//          Serial.println("init card ok");
+//          mySerial.write("init card ok\n");
+//        }
+//        // Now we will try to open the 'volume'/'partition' - it should be FAT16 or FAT32
+//        if (!volume.init(card)) {
+//          Serial.println("init volume fail");
+//          mySerial.println("init volume fail");
+//        } else {
+//          Serial.println("init volume ok");
+//          mySerial.write("init volume ok\n");
+//        }
+
+//        Serial.println("\nFiles found on the card (name, date and size in bytes): ");
+//        root.openRoot(volume);
+//
+//        // list all files in the card with date and size
+//        root.ls(LS_R | LS_DATE | LS_SIZE);
