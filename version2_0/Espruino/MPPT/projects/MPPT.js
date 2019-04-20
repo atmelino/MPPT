@@ -43,11 +43,21 @@ Serial1.on('data', function (data) {
 
     //    print(data);
     cmd += data;
-
-    if (cmd.includes('\n')) {
-        print(cmd);
-        cmd = '';
+    var idx = cmd.indexOf("\n");
+    while (idx>=0) {
+      var line = cmd.substr(0,idx);
+      cmd = cmd.substr(idx+1);
+      var s = line;
+      //var s = "'"+line+"' = "+eval(line);
+      print(s);
+      //Serial1.println(s);
+      idx = cmd.indexOf("\n");
     }
+
+    // if (cmd.includes('\n')) {
+    //     print(cmd);
+    //     cmd = '';
+    // }
 
     // if (data === '\n') {
     //     print(cmd);
@@ -55,7 +65,19 @@ Serial1.on('data', function (data) {
     // }
 });
 
-
+// Serial1.on('data', function (data) {
+//   Serial1.print(data);
+//   cmd+=data;
+//   var idx = cmd.indexOf("\r");
+//   while (idx>=0) {
+//     var line = cmd.substr(0,idx);
+//     cmd = cmd.substr(idx+1);
+//     var s = "'"+line+"' = "+eval(line);
+//     print(s);
+//     Serial1.println(s);
+//     idx = cmd.indexOf("\r");
+//   }
+// });
 
 
 
@@ -328,7 +350,7 @@ function makeLine() {
     var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3;
     var batteryvals = allChannelsResult.busVoltage1 + ' ' + allChannelsResult.current_mA1 + ' ' + allChannelsResult.power_mW1;
     var PWMvals = PWM_actual + ' ' + PWM_target;
-    var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals + ' ' + PWMvals;
+    var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals + ' ' + PWMvals+'\n';
     return line;
 }
 
@@ -338,7 +360,7 @@ function printValues() {
 
 function writeDataFile() {
     //pause = true;
-    buffer = bufferarray.join("\n");
+    buffer = bufferarray.join();
 
     var datestring = allChannelsResult.dateString.replace(/-/g, "_").replace(/:/g, "_").replace(/ /g, "_");
     var filename = datestring + ".txt";
