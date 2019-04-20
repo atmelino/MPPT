@@ -33,52 +33,9 @@ var sendmessage = {
     data: "empty"
 };
 var bufferarray = [];
-var saveFileLines = 20;
+var saveFileLines = 3;
 //var pause = false;
-Serial1.setup(9600, { tx: B6, rx: B7 });
-
-
-var cmd = "";
-Serial1.on('data', function (data) {
-
-    //    print(data);
-    cmd += data;
-    var idx = cmd.indexOf("\n");
-    while (idx>=0) {
-      var line = cmd.substr(0,idx);
-      cmd = cmd.substr(idx+1);
-      var s = line;
-      //var s = "'"+line+"' = "+eval(line);
-      print(s);
-      //Serial1.println(s);
-      idx = cmd.indexOf("\n");
-    }
-
-    // if (cmd.includes('\n')) {
-    //     print(cmd);
-    //     cmd = '';
-    // }
-
-    // if (data === '\n') {
-    //     print(cmd);
-    //     cmd = '';
-    // }
-});
-
-// Serial1.on('data', function (data) {
-//   Serial1.print(data);
-//   cmd+=data;
-//   var idx = cmd.indexOf("\r");
-//   while (idx>=0) {
-//     var line = cmd.substr(0,idx);
-//     cmd = cmd.substr(idx+1);
-//     var s = "'"+line+"' = "+eval(line);
-//     print(s);
-//     Serial1.println(s);
-//     idx = cmd.indexOf("\r");
-//   }
-// });
-
+Serial1.setup(28800, { tx: B6, rx: B7 });
 
 
 
@@ -336,15 +293,34 @@ function mainLoop() {
         // test: request file from Arduino
         console.log(" test: request file from Arduino");
         Serial1.print("i:\n");
-
-        Serial1.print("r:\n");
-
+        //Serial1.print("l:\n");
+        //Serial1.print("r:/2019/4/17:23_06_02.TXT\n");
+        //Serial1.print("r:/2019/4/17:23_04_00.TXT\n");
+        Serial1.print("r:/2019/4/17:11_11_11.TXT\n");
 
         while (bufferarray.length > 0) {
             bufferarray.pop();
         }
     }
 }
+
+var cmd = "";
+Serial1.on('data', function (data) {
+
+    //    print(data);
+    cmd += data;
+    var idx = cmd.indexOf("\n");
+    while (idx>=0) {
+      var line = cmd.substr(0,idx);
+      cmd = cmd.substr(idx+1);
+      var s = line;
+      //var s = "'"+line+"' = "+eval(line);
+      print(s);
+      //Serial1.println(s);
+      idx = cmd.indexOf("\n");
+    }
+
+});
 
 function makeLine() {
     var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3;

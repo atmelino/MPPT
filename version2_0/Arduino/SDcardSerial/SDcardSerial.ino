@@ -32,7 +32,7 @@ void setup() {
   Serial.println("program started");
 
   // set the data rate for the SoftwareSerial port
-  mySerial.begin(9600);
+  mySerial.begin(28800);
 
 }
 
@@ -40,6 +40,10 @@ void loop() {
 
   String str;
   String fullpath;
+  String filename;
+  String curDirname;
+  String dataString;
+  int dirIndex;
   File curDir;
   File myFile;
 
@@ -52,6 +56,17 @@ void loop() {
     //mySerial.println(str);
     char task = str[0];
 
+    // read parameters
+    dirIndex = str.indexOf(':', 2 );
+    //curDirname = "/2019/4/17";
+    //filename = str.substring(2, 14);
+    curDirname = str.substring(2, dirIndex);
+    filename = str.substring(dirIndex + 1, dirIndex + 14);
+    fullpath = curDirname + "/" + filename;
+    //Serial.println(filename);
+    Serial.println(fullpath);
+    dataString = "bla";
+    
     switch (task) {
       case 'i':    //
         if (!SD.begin(4)) {
@@ -69,15 +84,12 @@ void loop() {
         break;
       case 'r':    //
         // open the file for reading:
-        fullpath = "/2019/4/17/23_04_00.txt";
         myFile = SD.open(fullpath);
         if (myFile) {
-
           // read from the file until there's nothing else in it:
           while (myFile.available()) {
             mySerial.write(myFile.read());
           }
-          // close the file:
           myFile.close();
         } else {
           // if the file didn't open, print an error:
@@ -85,6 +97,22 @@ void loop() {
           mySerial.println(fullpath);
         }
         break;
+      case 'w':    //
+        // open the file for write/append
+        myFile = SD.open(fullpath, FILE_WRITE);
+        // File dataFile = SD.open("datalog.txt", FILE_WRITE);
+        // if the file is available, write to it:
+        if (myFile) {
+          myFile.println(dataString);
+          myFile.close();
+          //Serial.println(dataString);
+        }
+        // if the file isn't open, pop up an error:
+        else {
+          Serial.println("error opening file");
+        }
+        break;
+
     }
 
     delay(10);
@@ -105,23 +133,4 @@ void printDirectory(File dir) {
   }
 }
 
-void printDirectorydeep(File dir) {
-  while (true) {
-
-    File entry =  dir.openNextFile();
-    if (! entry) {
-      // no more files
-      break;
-    }
-    mySerial.print(entry.name());
-    if (entry.isDirectory()) {
-      mySerial.println("/");
-      printDirectory(entry);
-    } else {
-      // files have sizes, directories do not
-      mySerial.println();
-      //mySerial.println(entry.size(), DEC);
-    }
-    entry.close();
-  }
-}
+//fullpath = "/2019/4/17/23_04_00.txt";
