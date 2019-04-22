@@ -35,8 +35,14 @@ var sendmessage = {
 var bufferarray = [];
 var saveFileLines = 3;
 //var pause = false;
-Serial1.setup(28800, { tx: B6, rx: B7 });
+var myfl = require("W25Q");
+var myflash = new myfl(SPI1, B6 /*CS*/);
 
+SPI1.setup({
+    mosi: B5,
+    miso: B4,
+    sck: B3
+});
 
 
 
@@ -58,14 +64,12 @@ function pageHandler(req, res) {
     res.writeHead(200, {
         'Content-Type': 'text/html'
     });
-    //res.end("Attempting to load web site from SD card");
     //console.log("server connected");
 
-    //console.log('requesting web page from Arduino');
+    //console.log(readPageString(190));
 
+    var fileContent = readPageString(190);
 
-    //var fileContent = myfs.readFileSync('html/index.html');
-    var fileContent = ('html/index.htm');
     res.end(fileContent);
 }
 
@@ -290,13 +294,7 @@ function mainLoop() {
     if (bufferarray.length > saveFileLines) {
         //writeDataFile();
 
-        // test: request file from Arduino
-        console.log(" test: request file from Arduino");
-        Serial1.print("i:\n");
-        //Serial1.print("l:\n");
-        //Serial1.print("r:/2019/4/17:23_06_02.TXT\n");
-        //Serial1.print("r:/2019/4/17:23_04_00.TXT\n");
-        Serial1.print("r:/2019/4/17:11_11_11.TXT\n");
+        //showPage(190);
 
         while (bufferarray.length > 0) {
             bufferarray.pop();
@@ -304,29 +302,61 @@ function mainLoop() {
     }
 }
 
-var cmd = "";
-Serial1.on('data', function (data) {
 
-    //    print(data);
-    cmd += data;
-    var idx = cmd.indexOf("\n");
-    while (idx>=0) {
-      var line = cmd.substr(0,idx);
-      cmd = cmd.substr(idx+1);
-      var s = line;
-      //var s = "'"+line+"' = "+eval(line);
-      print(s);
-      //Serial1.println(s);
-      idx = cmd.indexOf("\n");
+function showPage(number) {
+    console.log("page " + number + ":");
+    console.log(hexdump(readPage(number), 16));
+}
+
+function readPage(page) {
+    var x = new Uint8Array(256);
+    for (i = 0; i < 256; i++) {
+        myflash.seek(page, i);
+        x[i] = myflash.read();
+        //myflash.waitReady();
     }
+    return x;
+}
 
-});
+function readPageString(page) {
+    var x = "";
+    for (i = 0; i < 256; i++) {
+        myflash.seek(page, i);
+        //        x += myflash.read();
+        x += String.fromCharCode(myflash.read());
+
+    }
+    return x;
+}
+
+function hexdump(buffer, blockSize) {
+    var lines = [];
+    blockSize = blockSize || 16;
+    var myblock = new Uint8Array(blockSize);
+    var hex = "0123456789ABCDEF";
+    for (var b = 0; b < buffer.length; b += blockSize) {
+        var addr = ("0000" + b.toString(16)).slice(-4);
+        var codes = "";
+        for (i = 0; i < myblock.length; i++) {
+            myblock[i] = buffer[i + b];
+            codes += ("0" + myblock[i].toString(16)).slice(-2) + " ";
+        }
+        var chars = "";
+        for (i = 0; i < myblock.length; i++) {
+            if (myblock[i] < 32 || myblock[i] > 127)
+                myblock[i] = 46;
+            chars += String.fromCharCode(myblock[i]);
+        }
+        lines.push(addr + " " + codes + "  " + chars);
+    }
+    return lines.join("\n");
+}
 
 function makeLine() {
     var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3;
     var batteryvals = allChannelsResult.busVoltage1 + ' ' + allChannelsResult.current_mA1 + ' ' + allChannelsResult.power_mW1;
     var PWMvals = PWM_actual + ' ' + PWM_target;
-    var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals + ' ' + PWMvals+'\n';
+    var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals + ' ' + PWMvals + '\n';
     return line;
 }
 
@@ -403,3 +433,21 @@ setWatch(function (e) {
 }, BTN, { repeat: true, edge: 'rising' });
 
 
+
+// var cmd = "";
+// Serial1.on('data', function (data) {
+
+//     //    print(data);
+//     cmd += data;
+//     var idx = cmd.indexOf("\n");
+//     while (idx >= 0) {
+//         var line = cmd.substr(0, idx);
+//         cmd = cmd.substr(idx + 1);
+//         var s = line;
+//         //var s = "'"+line+"' = "+eval(line);
+//         print(s);
+//         //Serial1.println(s);
+//         idx = cmd.indexOf("\n");
+//     }
+
+// });

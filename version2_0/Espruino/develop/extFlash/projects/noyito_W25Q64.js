@@ -12,15 +12,6 @@ console.log("manufacturer ID: " + myJedec.manufacturerId.toString(16));
 console.log("      device ID: " + myJedec.deviceId.toString(16));
 console.log("capacity: " + myflash.getCapacity());
 
-function sleep(milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds) {
-            break;
-        }
-    }
-}
-
 
 function readPage(page) {
     var x = new Uint8Array(256);
@@ -59,7 +50,6 @@ function hexdump(buffer, blockSize) {
 function showPage(number) {
     console.log("page " + number + ":");
     console.log(hexdump(readPage(number), 16));
-    // sleep(10000);
 }
 
 function start() {
@@ -70,14 +60,14 @@ function start() {
         showPage(page);
     }
 
-    if (false) {
+    if (true) {
         console.log("erase 16 pages at 202");
         myflash.erase16Pages(202);
     }
 
-    //for (page = 200; page < 220; page++) {
-    //    showPage(page);
-    //}
+    for (page = 190; page < 220; page++) {
+        showPage(page);
+    }
 
 }
 
