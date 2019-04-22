@@ -13,7 +13,6 @@ function readPage(page) {
     var x = new Uint8Array(256);
     for (i = 0; i < 256; i++) {
         myflash.seek(page, i);
-        //x+=myflash.read();
         x[i] = myflash.read();
     }
     return x;
@@ -38,44 +37,50 @@ function hexdump(buffer, blockSize) {
             myblock[i] = buffer[i + b];
             codes += ("0" + myblock[i].toString(16)).slice(-2) + " ";
         }
-        console.log("codes: " + codes);
 
-        var chars = "                ";
+        var chars = "";
         for (i = 0; i < myblock.length; i++) {
-            if (myblock[i] < '\x1F')
-                myblock[i] = '.';
+            if (myblock[i] < 32 || myblock[i] > 127)
+                myblock[i] = 46;
+            chars += String.fromCharCode(myblock[i]);
         }
 
-        //var chars = block.replace(/[\x00-\x1F\x20]/g, '.');
-
-        //chars += " ".repeat(blockSize - block.length);
-
-        //lines.push(addr + " " + codes + "  " + chars);
-        lines.push(addr + " " + codes + "  " + myblock);
+        lines.push(addr + " " + codes + "  " + chars);
     }
-
-
-
-
 
     return lines.join("\n");
 }
 
-console.log(hexdump("bla1bla2bla3bla4bla5bla6bla7bla8", 16));
+console.log();
+//console.log(hexdump("bla1bla2bla3bla4bla5bla6bla7bla", 16));
 
 
 console.log("manufacturer ID: " + myJedec.manufacturerId.toString(16));
 console.log("      device ID: " + myJedec.deviceId.toString(16));
 console.log("capacity: " + myflash.getCapacity());
 
-//console.log("data before read: " + mydata);
 console.log("data before erase");
-//console.log(readPage(0));
-//console.log(readPage(1));
 
-//console.log(hexdump(String(readPage(0), 16)));
-console.log(hexdump(readPage(0), 16));
-console.log(readPage(0));
+//console.log("page 0:");
+//console.log(hexdump(readPage(0), 16));
+// console.log("page 200:");
+// console.log(hexdump(readPage(200), 16));
+// console.log("page 100000:");
+// console.log(hexdump(readPage(100000), 16));
+
+
+
+console.log("page 1:");
+console.log(hexdump(readPage(1), 16));
+
+console.log("page 199:");
+console.log(hexdump(readPage(199), 16));
+console.log("page 200:");
+console.log(hexdump(readPage(200), 16));
+console.log("page 201:");
+console.log(hexdump(readPage(201), 16));
+
+
 
 
 
