@@ -66,11 +66,14 @@ function pageHandler(req, res) {
     });
     //console.log("server connected");
 
-    //console.log(readPageString(190));
+    var page1 = myflash.readPageString(112);
+    //console.log(page1);
+    res.write(page1);
+    var page2 = myflash.readPageString(113);
+    //console.log(page2);
+    res.write(page2);
 
-    var fileContent = myflash.readPageString(190);
-
-    res.end(fileContent);
+    res.end();
 }
 
 // WebSocket request handler
