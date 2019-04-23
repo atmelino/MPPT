@@ -1,5 +1,6 @@
-var myfs = require("fs");
-var webpage = require("webpageShort");
+//var webpage = require("webpageShort");
+//var webpage = require("index.html");
+var webpage = require("indexShort.html");
 var mypage = new webpage();
 var myfl = require("W25Q");
 var myflash = new myfl(SPI1, B6 /*CS*/);
@@ -9,25 +10,6 @@ SPI1.setup({
     miso: B4,
     sck: B3
 });
-
-
-var myhtml = mypage.gethtml();
-console.log(mypage.gethtml());
-
-
-
-
-
-function readPage(page) {
-    var x = new Uint8Array(256);
-    for (i = 0; i < 256; i++) {
-        myflash.seek(page, i);
-        x[i] = myflash.read();
-        //myflash.waitReady();
-    }
-    return x;
-}
-
 
 function hexdump(buffer, blockSize) {
     var lines = [];
@@ -54,26 +36,44 @@ function hexdump(buffer, blockSize) {
 
 function showPage(number) {
     console.log("page " + number + ":");
-    console.log(hexdump(readPage(number), 16));
+    console.log(hexdump(myflash.readPage(number), 16));
 }
 
+
+var myhtml = mypage.gethtml();
+console.log(myhtml.length);
+console.log(myhtml);
+var myhtml2 = myhtml.replace(/\s\s+/g, ' ');
+console.log(myhtml2.length);
+console.log(myhtml2);
+
+var page1=myhtml2.substring(0, 256);
+var page2=myhtml2.substring(256, 512);
+console.log(page1.length);
+console.log(page1);
+console.log(page2.length);
+console.log(page2);
+
+
+
 function start() {
-
+    var firstpage = 112;
     console.log();
-
-    showPage(190);
+    showPage(firstpage);
+    showPage(firstpage + 1);
 
     if (true) {
-        console.log("erase 16 pages at 190");
-        myflash.erase16Pages(190);
+        console.log("erase 16 pages at "+firstpage);
+        myflash.erase16Pages(firstpage);
     }
-
-    showPage(190);
-
+    showPage(firstpage);
+    showPage(firstpage+1);
 
     console.log("write html");
-    myflash.writePage(190, myhtml);
+    myflash.writePage(firstpage, page1);
+    myflash.writePage(firstpage+1, page2);
+    showPage(firstpage);
+    showPage(firstpage+1);
 
-    showPage(190);
 
 }

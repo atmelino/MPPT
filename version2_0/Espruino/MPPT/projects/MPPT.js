@@ -68,7 +68,7 @@ function pageHandler(req, res) {
 
     //console.log(readPageString(190));
 
-    var fileContent = readPageString(190);
+    var fileContent = myflash.readPageString(190);
 
     res.end(fileContent);
 }
@@ -305,28 +305,7 @@ function mainLoop() {
 
 function showPage(number) {
     console.log("page " + number + ":");
-    console.log(hexdump(readPage(number), 16));
-}
-
-function readPage(page) {
-    var x = new Uint8Array(256);
-    for (i = 0; i < 256; i++) {
-        myflash.seek(page, i);
-        x[i] = myflash.read();
-        //myflash.waitReady();
-    }
-    return x;
-}
-
-function readPageString(page) {
-    var x = "";
-    for (i = 0; i < 256; i++) {
-        myflash.seek(page, i);
-        //        x += myflash.read();
-        x += String.fromCharCode(myflash.read());
-
-    }
-    return x;
+    console.log(hexdump(myflash.readPage(number), 16));
 }
 
 function hexdump(buffer, blockSize) {

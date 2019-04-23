@@ -12,18 +12,6 @@ console.log("manufacturer ID: " + myJedec.manufacturerId.toString(16));
 console.log("      device ID: " + myJedec.deviceId.toString(16));
 console.log("capacity: " + myflash.getCapacity());
 
-
-function readPage(page) {
-    var x = new Uint8Array(256);
-    for (i = 0; i < 256; i++) {
-        myflash.seek(page, i);
-        x[i] = myflash.read();
-        //myflash.waitReady();
-    }
-    return x;
-}
-
-
 function hexdump(buffer, blockSize) {
     var lines = [];
     blockSize = blockSize || 16;
@@ -49,72 +37,32 @@ function hexdump(buffer, blockSize) {
 
 function showPage(number) {
     console.log("page " + number + ":");
-    console.log(hexdump(readPage(number), 16));
+    console.log(hexdump(myflash.readPage(number), 16));
 }
 
 function start() {
 
     console.log();
 
-    for (page = 190; page < 220; page++) {
+    //console.log("data before erase");
+    for (page = 190; page < 210; page++) {
         showPage(page);
     }
 
-    if (true) {
-        console.log("erase 16 pages at 202");
-        myflash.erase16Pages(202);
-    }
+    // if (true) {
+    //     console.log("erase 16 pages at 202");
+    //     myflash.erase16Pages(202);
+    // }
 
-    for (page = 190; page < 220; page++) {
-        showPage(page);
-    }
+    // console.log("data after erase");
+    // for (page = 190; page < 210; page++) {
+    //     showPage(page);
+    // }
 
 }
 
 
-
-
-
-// showPage(199);
-// showPage(200);
-// showPage(201);
-
-
-
-//console.log("page 0:");
-//console.log(hexdump(readPage(0), 16));
-// console.log("page 200:");
-// console.log(hexdump(readPage(200), 16));
-// console.log("page 100000:");
-// console.log(hexdump(readPage(100000), 16));
-
-
-
-// console.log("page 1:");
-// console.log(hexdump(readPage(1), 16));
-// console.log("page 199:");
-// console.log(hexdump(readPage(199), 16));
-// console.log("page 200:");
-// console.log(hexdump(readPage(200), 16));
-// console.log("page 201:");
-// console.log(hexdump(readPage(201), 16));
-
-
-
-
-
-//console.log("data before erase");
-// if (true) {
-//     console.log("erase 16 pages at 0");
-//     myflash.erase16Pages(0);
-// }
-
-// console.log("data after erase");
-// console.log(readPage());
-
 // var myarray = [10, 20, 30];
 // myflash.writePage(0, myarray);
 
-// console.log("data after write");
-// console.log(readPage());
 
