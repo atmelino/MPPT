@@ -61,19 +61,31 @@ function startServer() {
 
 // Page request handler
 function pageHandler(req, res) {
+    clearInterval(loopTimer);
+
     res.writeHead(200, {
         'Content-Type': 'text/html'
     });
     //console.log("server connected");
 
-    var page1 = myflash.readPageString(112);
-    //console.log(page1);
-    res.write(page1);
-    var page2 = myflash.readPageString(113);
-    //console.log(page2);
-    res.write(page2);
+    // var page1 = myflash.readPageString(112);
+    // //console.log(page1);
+    // res.write(page1);
+    // var page2 = myflash.readPageString(113);
+    // //console.log(page2);
+    // res.write(page2);
+
+    var startHTMLpage = 112;
+    numberOfPages = 42;
+    for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+        var page = myflash.readPageString(p);
+        console.log(p);
+        res.write(page);
+    }
 
     res.end();
+    loopTimer = setInterval(mainLoop, loopPeriod);
+
 }
 
 // WebSocket request handler

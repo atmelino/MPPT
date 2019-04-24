@@ -113,7 +113,7 @@ myhtml = `
                 minutes: minutes,
                 seconds: seconds,
                 dayofweek: dayofweek
-            }
+            };
             printlnMessage('messages', JSON.stringify(setDate));
             sendmessage.data = setDate;
             ws.send(JSON.stringify(sendmessage));

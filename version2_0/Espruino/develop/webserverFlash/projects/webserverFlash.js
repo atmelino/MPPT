@@ -36,7 +36,7 @@ function onPageRequest(req, res) {
     // res.write(page2);
 
     var startHTMLpage = 112;
-    numberOfPages = 43;
+    numberOfPages = 42;
     for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
         var page = myflash.readPageString(p);
         console.log(page);
@@ -45,8 +45,6 @@ function onPageRequest(req, res) {
 
 
     res.end();
-    if (a.query && "led" in a.query)
-        digitalWrite(LED1, a.query["led"]);
 }
 
 

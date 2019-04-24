@@ -93,19 +93,5 @@ function start() {
 
     showPages(111, 50);
 
-
-
-
-    //     //showPages(112, pagesneeded);
-
-    // showPages(0, 5);
-    // var p = 5;
-    // console.log("erase 16 pages at " + p);
-    //myflash.erase16Pages(p);
-    //showPages(0, 20);
-    // for (var p = 0; p < 16; p++) {
-    //     myflash.writePage(p, "bla");
-    // }
-    // showPages(0, 20);
 }
 
