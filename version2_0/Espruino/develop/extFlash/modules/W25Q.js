@@ -116,7 +116,6 @@ W25Q.prototype.setAddress = function (pageNumber, offset) {
   ]);
 };
 
-
 W25Q.prototype.readPage = function (page) {
   var x = new Uint8Array(256);
   for (i = 0; i < 256; i++) {

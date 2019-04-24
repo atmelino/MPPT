@@ -2,6 +2,8 @@ var http = require("http");
 var wifi = require('Wifi');
 var myfl = require("W25Q");
 var myflash = new myfl(SPI1, B6 /*CS*/);
+var myut=require("utils");
+var myutils=new myut();
 
 SPI1.setup({
     mosi: B5,
@@ -17,34 +19,9 @@ var WIFI_OPTIONS = {
 var myhtml1 = '<html> <body>  <div style="display: table;">  <div style="display: table-row">   Date  <span id="clientDate"></span>';
 var myhtml2 = '  </div>  <div style="display: table-cell; ">  <button>Settings</button>  </div>  </div> </body> </html>';
 
-function hexdump(buffer, blockSize) {
-    var lines = [];
-    blockSize = blockSize || 16;
-    var myblock = new Uint8Array(blockSize);
-    var hex = "0123456789ABCDEF";
-    for (var b = 0; b < buffer.length; b += blockSize) {
-        var addr = ("0000" + b.toString(16)).slice(-4);
-        var codes = "";
-        for (i = 0; i < myblock.length; i++) {
-            myblock[i] = buffer[i + b];
-            codes += ("0" + myblock[i].toString(16)).slice(-2) + " ";
-        }
-        var chars = "";
-        for (i = 0; i < myblock.length; i++) {
-            if (myblock[i] < 32 || myblock[i] > 127)
-                myblock[i] = 46;
-            chars += String.fromCharCode(myblock[i]);
-        }
-        lines.push(addr + " " + codes + "  " + chars);
-    }
-    return lines.join("\n");
-}
-
-
-
 function showPage(number) {
     console.log("page " + number + ":");
-    console.log(hexdump(myflash.readPage(number), 16));
+    console.log(myutils.hexdump(myflash.readPage(number), 16));
 }
 
 function onPageRequest(req, res) {
