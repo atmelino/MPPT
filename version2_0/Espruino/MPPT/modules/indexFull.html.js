@@ -1,3 +1,4 @@
+myhtml = `
 <html>
 
 <head>
@@ -195,6 +196,9 @@
         }
 
         window.onload = () => {
+
+            printlnMessage('messages', "window.onload");
+
             ws = new WebSocket('ws://' + location.host, 'protocolOne');
             ws.onmessage = evt => {
                 receivedmessage = JSON.parse(evt.data);
@@ -206,7 +210,7 @@
                 if (receivedmessage.type == 'getLog') {
                     printlnMessage('messages', JSON.stringify(receivedmessage));
                     var logDiv = document.getElementById('logDiv');
-                    var logContent = receivedmessage.data.replace(/\n/g, '<br>');
+                    var logContent = receivedmessage.data.replace(/\\n/g, '<br>');
                     logDiv.innerHTML = logContent;
                 }
 
@@ -236,7 +240,7 @@
                     while (document.getElementById('storedTable').rows.length > 1) {
                         document.getElementById('storedTable').deleteRow(1);
                     }
-                    var lines = receivedmessage.data.split('\n');
+                    var lines = receivedmessage.data.split('\\n');
                     for (s of lines) {
                         var row = storedTable.insertRow(x);
                         var line = s.split(' ');
@@ -428,4 +432,14 @@
 </body>
 
 </html>
-яяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяяя
+`;
+
+function webpage() {
+//print('MPPT web page');
+}
+
+webpage.prototype.gethtml = function () {
+return myhtml;
+};
+
+exports = webpage;

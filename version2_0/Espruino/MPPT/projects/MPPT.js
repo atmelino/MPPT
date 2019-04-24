@@ -1,4 +1,3 @@
-
 // Setup I2C
 var i2c = new I2C();
 i2c.setup({ sda: B9, scl: B8 });
@@ -34,16 +33,13 @@ var sendmessage = {
 };
 var bufferarray = [];
 var saveFileLines = 3;
-//var pause = false;
-var myfl = require("W25Q");
-var myflash = new myfl(SPI1, B6 /*CS*/);
-
-SPI1.setup({
-    mosi: B5,
-    miso: B4,
-    sck: B3
-});
-
+// var myfl = require("W25Q");
+// var myflash = new myfl(SPI1, B6 /*CS*/);
+// SPI1.setup({
+//     mosi: B5,
+//     miso: B4,
+//     sck: B3
+// });
 
 
 function userMessage(msg) {
@@ -68,24 +64,26 @@ function pageHandler(req, res) {
     });
     //console.log("server connected");
 
-    // var page1 = myflash.readPageString(112);
-    // //console.log(page1);
-    // res.write(page1);
-    // var page2 = myflash.readPageString(113);
-    // //console.log(page2);
-    // res.write(page2);
+    // var startHTMLpage = 112;
+    // numberOfPages = 5;
+    // for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+    //     var page = myflash.readPageString(p);
+    //     console.log(p);
+    //     res.write(page);
+    // }
 
-    var startHTMLpage = 112;
-    numberOfPages = 42;
-    for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
-        var page = myflash.readPageString(p);
-        console.log(p);
-        res.write(page);
-    }
+    res.write(readHTML());
 
     res.end();
-    loopTimer = setInterval(mainLoop, loopPeriod);
 
+    loopTimer = setInterval(mainLoop, loopPeriod);
+}
+
+function readHTML() {
+    var webpage = require("index.html");
+    var mypage = new webpage();
+    var myhtml = mypage.gethtml().replace(/ +/g, ' ');
+    return myhtml;
 }
 
 // WebSocket request handler
@@ -196,6 +194,8 @@ function wsHandler(ws) {
     });
 
     ws.on('close', evt => {
+        console.log("socket close " + JSON.stringify(evt));
+
         var x = clients.indexOf(ws);
         if (x > -1) {
             clients.splice(x, 1);
@@ -234,7 +234,6 @@ function start() {
 
     digitalWrite(B0, 1); // connect battery
 
-
     userMessage("Start Wifi");
     startWifi();
 
@@ -242,7 +241,6 @@ function start() {
     // currentDate = rtc.readDateTime();
     // logFile.write(currentDate + "," + "program start" + "\r\n");
     // logFile.close();
-    //if (pause === false)
     loopTimer = setInterval(mainLoop, loopPeriod);
 }
 
@@ -298,6 +296,9 @@ function mainLoop() {
     allChannelsResult.PWM_target = PWM_target;
     sendmessage.type = 'values';
     sendmessage.data = allChannelsResult;
+
+
+    console.log("broadcast clients " + JSON.stringify(clients));
     broadcast(JSON.stringify(sendmessage));
     //printValues();
 
@@ -359,7 +360,6 @@ function printValues() {
 }
 
 function writeDataFile() {
-    //pause = true;
     buffer = bufferarray.join();
 
     var datestring = allChannelsResult.dateString.replace(/-/g, "_").replace(/:/g, "_").replace(/ /g, "_");
@@ -403,11 +403,9 @@ function writeDataFile() {
         dataFile.close();
         console.log('file ' + fullPath + ' written');
 
-
     }
     catch (e) {
     }
-    //pause = false;
     //digitalPulse(LED2, 1, [500, 300, 500]); // green LED
 
 }
@@ -425,23 +423,3 @@ setWatch(function (e) {
     digitalPulse(LED1, 1, 500); // pulse red led as indicator
 
 }, BTN, { repeat: true, edge: 'rising' });
-
-
-
-// var cmd = "";
-// Serial1.on('data', function (data) {
-
-//     //    print(data);
-//     cmd += data;
-//     var idx = cmd.indexOf("\n");
-//     while (idx >= 0) {
-//         var line = cmd.substr(0, idx);
-//         cmd = cmd.substr(idx + 1);
-//         var s = line;
-//         //var s = "'"+line+"' = "+eval(line);
-//         print(s);
-//         //Serial1.println(s);
-//         idx = cmd.indexOf("\n");
-//     }
-
-// });

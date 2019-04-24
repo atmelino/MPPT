@@ -44,7 +44,7 @@ function showPages(start, number) {
 function readHTML() {
     var webpage = require("index.html");
     var mypage = new webpage();
-    var myhtml = mypage.gethtml().replace(/\s\s+/g, ' ');
+    var myhtml = mypage.gethtml().replace(/ +/g, ' ');
     return myhtml;
 }
 
@@ -67,7 +67,7 @@ function writeHTML(myHTML, startPage, numberOfPages, actuallyDoErase, actuallyDo
         var endindex = startindex + 256;
         var pageContent = myHTML.substring(startindex, endindex);
         console.log("write to page " + pageToWriteTo);
-        console.log(pageContent);
+        //console.log(pageContent);
         if (actuallyDoWrite) {
             console.log("write html");
             myflash.writePage(pageToWriteTo, pageContent);
@@ -88,10 +88,11 @@ function start() {
 
 
     var startHTMLpage = 112;
+    //writeHTML(myHTML, startHTMLpage, numberOfPages, false, false);
     writeHTML(myHTML, startHTMLpage, numberOfPages, true, true);
 
 
-    showPages(111, 50);
+    //showPages(111, 50);
 
 }
 

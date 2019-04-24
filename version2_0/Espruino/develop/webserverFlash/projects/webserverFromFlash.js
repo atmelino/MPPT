@@ -36,7 +36,7 @@ function onPageRequest(req, res) {
     // res.write(page2);
 
     var startHTMLpage = 112;
-    numberOfPages = 42;
+    numberOfPages = 44;
     for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
         var page = myflash.readPageString(p);
         console.log(page);
