@@ -2,8 +2,8 @@ var http = require("http");
 var wifi = require('Wifi');
 var myfl = require("W25Q");
 var myflash = new myfl(SPI1, B6 /*CS*/);
-var myut=require("utils");
-var myutils=new myut();
+var myut = require("utils");
+var myutils = new myut();
 
 SPI1.setup({
     mosi: B5,
@@ -28,12 +28,21 @@ function onPageRequest(req, res) {
     var a = url.parse(req.url, true);
     res.writeHead(200, { 'Content-Type': 'text/html' });
 
-    var page1 = myflash.readPageString(112);
-    console.log(page1);
-    res.write(page1);
-    var page2 = myflash.readPageString(113);
-    console.log(page2);
-    res.write(page2);
+    // var page1 = myflash.readPageString(112);
+    // console.log(page1);
+    // res.write(page1);
+    // var page2 = myflash.readPageString(113);
+    // console.log(page2);
+    // res.write(page2);
+
+    var startHTMLpage = 112;
+    numberOfPages = 43;
+    for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+        var page = myflash.readPageString(p);
+        console.log(page);
+        res.write(page);
+    }
+
 
     res.end();
     if (a.query && "led" in a.query)
@@ -67,5 +76,5 @@ function startWifi() {
 
 startWifi();
 
-showPage(190);
+//showPage(190);
 

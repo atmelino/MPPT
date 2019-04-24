@@ -168,7 +168,7 @@ myhtml = `
             var el = document.getElementById('settings');
             el.style.display = 'block';
 
-            // Updates: set window background color black
+            /* Updates: set window background color black*/
             document.body.style.background = '#353333';
         }
 
@@ -193,8 +193,6 @@ myhtml = `
                 sendmessage.data = newPath;
                 ws.send(JSON.stringify(sendmessage));
             }
-            //alert(tableCell.innerHTML);
-            //alert(pathDiv.innerHTML);
         }
 
         window.onload = () => {
@@ -203,7 +201,7 @@ myhtml = `
                 receivedmessage = JSON.parse(evt.data);
 
                 if (showMessagesFlag) {
-                    //printlnMessage('messages', JSON.stringify(receivedmessage));
+                    /*printlnMessage('messages', JSON.stringify(receivedmessage));*/
                 }
 
                 if (receivedmessage.type == 'getLog') {
@@ -256,7 +254,7 @@ myhtml = `
                 if (receivedmessage.type == 'values') {
                     var liveTable = document.getElementById('liveTable');
 
-                    // new measurement data
+                    /* new measurement data*/
                     receiveddata = receivedmessage.data;
                     var x = document.getElementById('liveTable').rows.length;
                     if (x > 10) {
@@ -277,16 +275,12 @@ myhtml = `
                         row.insertCell(9).innerHTML = receiveddata.PWM_target;
                     }
                 }
-                // show date on header
+                /* show date on header*/
                 clientDateUTC = new Date(Date.now());
                 clientDate = new Date(clientDateUTC.getTime() - clientDateUTC.getTimezoneOffset() * 60000);
-                //var clientDateString = clientDate.toISOString().replace(/:/g, '_').slice(0, 19);
-                //var clientDateString = clientDate.toISOString().slice(0, 19);
                 var clientDateString = clientDate.toISOString().replace(/T/g, ' ').slice(0, 19);
                 document.getElementById('clientDate').innerHTML = clientDateString;
-                //if (showMessagesFlag) {
-                //printlnMessage('messages', JSON.stringify(clientDate));
-                //}
+                /*if (showMessagesFlag) { printlnMessage('messages', JSON.stringify(clientDate)); }*/
             };
         };
     </script>
