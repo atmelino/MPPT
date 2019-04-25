@@ -51,39 +51,33 @@ function userMessage(msg) {
         console.log(msg);
 }
 
+// // Create and start server
+// function startServer() {
+//     http.createServer(onPageRequest).listen(80);
+// }
 
-
-// Create and start server
-function startServer() {
-    http.createServer(onPageRequest).listen(80);
-}
-
-function onPageRequest(req, res) {
-
-    console.log(JSON.stringify(req));
-    //console.log(JSON.stringify(res));
-
-    if (req.url == "/") {
-        clearInterval(loopTimer);
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-
-        var startHTMLpage = 112;
-        numberOfPages = 5;
-        var pageString = "";
-        for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
-            var page = myflash.readPageString(p);
-            console.log(p);
-            //console.log(myutils.hexdumpString(page, 16));
-            pageString += page;
-            //res.write(page);
-        }
-        //console.log(myutils.hexdumpString(pageString, 16));
-        res.write(pageString);
-
-        res.end();
-        loopTimer = setInterval(mainLoop, loopPeriod);
-    }
-}
+// function onPageRequest(req, res) {
+//     console.log(JSON.stringify(req));
+//     //console.log(JSON.stringify(res));
+//     if (req.url == "/") {
+//         clearInterval(loopTimer);
+//         res.writeHead(200, { 'Content-Type': 'text/html' });
+//         var startHTMLpage = 112;
+//         numberOfPages = 5;
+//         var pageString = "";
+//         for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+//             var page = myflash.readPageString(p);
+//             console.log(p);
+//             //console.log(myutils.hexdumpString(page, 16));
+//             pageString += page;
+//             //res.write(page);
+//             //console.log(myutils.hexdumpString(pageString, 16));
+//             res.write(pageString);
+//             res.end();
+//         }
+//         loopTimer = setInterval(mainLoop, loopPeriod);
+//     }
+// }
 
 
 // Create and start server
@@ -96,36 +90,49 @@ function startServer() {
 // Page request handler
 function pageHandler(req, res) {
     console.log(JSON.stringify(req));
+    clearInterval(loopTimer);
 
     if (req.url == "/") {
-        clearInterval(loopTimer);
         res.writeHead(200, {
             'Content-Type': 'text/html'
         });
         //console.log("server connected");
 
-        //var source = "Espruino";
-        var source = "W25Q";
-        if (source == "Espruino") {
-            console.log("load web page");
-            res.write(readHTML());
-        } else {
-            var startHTMLpage = 112;
-            numberOfPages = 5;
+        var startHTMLpage = 112;
+        numberOfPages = 6;
+        const pageBypage = true;
+        if (pageBypage) {
+            for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+                var page = myflash.readPageString(p);
+                res.write(page);
+                console.log(p);
+            }
+            res.end();
+        }
+        else {
             var pageString = "";
             for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
                 var page = myflash.readPageString(p);
                 console.log(p);
                 //console.log(myutils.hexdumpString(page, 16));
                 pageString += page;
-                //res.write(page);
             }
             //console.log(myutils.hexdumpString(pageString, 16));
             res.write(pageString);
+            res.end();
         }
-        res.end();
-        loopTimer = setInterval(mainLoop, loopPeriod);
     }
+    if (req.url == "/functions.js") {
+        console.log("/functions.js requested");
+        // res.writeHead(200, {
+        //     'Content-Type': 'text/javascript'
+        // });
+        res.writeHead(200);
+        res.write("function domore() {alert('more');}");
+        res.end();
+    }
+
+    loopTimer = setInterval(mainLoop, loopPeriod);
 }
 
 function readHTML() {
