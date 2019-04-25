@@ -52,8 +52,14 @@ W25Q.prototype.writePage = function (pageNumber, arrayBuffer) {
   // overwrites a page (256 bytes)
   // that memory MUST be erased first
   this.startWrite(pageNumber, 0);
-  for (var i = 0; i < arrayBuffer.length; i++) this.write(arrayBuffer[i]);
-  this.finish();
+  // for (var i = 0; i < arrayBuffer.length; i++) 
+  // this.write(arrayBuffer[i]);
+  for (var i = 0; i < 256; i++) {
+    if (i < arrayBuffer.length)
+      this.write(arrayBuffer[i]);
+    else
+      this.write(' ');
+  } this.finish();
 };
 
 W25Q.prototype.startWrite = function (pageNumber, offset) {

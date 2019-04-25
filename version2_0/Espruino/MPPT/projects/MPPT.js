@@ -20,13 +20,16 @@ var PWM_target = 0;
 var allChannelsResult;
 var wifi = require('Wifi');
 var clients = [];
-//var WIFI_NAME = "NETGEAR53";
-var WIFI_NAME = "TP-LINK_MR3040_4B611E";
+var WIFI_NAME = "NETGEAR53";
+//var WIFI_NAME = "TP-LINK_MR3040_4B611E";
 var WIFI_OPTIONS = {
     password: ""
 };
+var myut = require("utils");
+var myutils = new myut();
 var myfs = require("fs");
 var myws = require('ws');
+var http = require("http");
 var sendmessage = {
     type: "none",
     data: "empty"
@@ -48,6 +51,41 @@ function userMessage(msg) {
         console.log(msg);
 }
 
+
+
+// Create and start server
+function startServer() {
+    http.createServer(onPageRequest).listen(80);
+}
+
+function onPageRequest(req, res) {
+
+    console.log(JSON.stringify(req));
+    //console.log(JSON.stringify(res));
+
+    if (req.url == "/") {
+        clearInterval(loopTimer);
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+
+        var startHTMLpage = 112;
+        numberOfPages = 5;
+        var pageString = "";
+        for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+            var page = myflash.readPageString(p);
+            console.log(p);
+            //console.log(myutils.hexdumpString(page, 16));
+            pageString += page;
+            //res.write(page);
+        }
+        //console.log(myutils.hexdumpString(pageString, 16));
+        res.write(pageString);
+
+        res.end();
+        loopTimer = setInterval(mainLoop, loopPeriod);
+    }
+}
+
+
 // Create and start server
 function startServer() {
     const s = myws.createServer(pageHandler);
@@ -57,29 +95,37 @@ function startServer() {
 
 // Page request handler
 function pageHandler(req, res) {
-    clearInterval(loopTimer);
+    console.log(JSON.stringify(req));
 
-    res.writeHead(200, {
-        'Content-Type': 'text/html'
-    });
-    //console.log("server connected");
+    if (req.url == "/") {
+        clearInterval(loopTimer);
+        res.writeHead(200, {
+            'Content-Type': 'text/html'
+        });
+        //console.log("server connected");
 
-    var startHTMLpage = 112;
-    numberOfPages = 5;
-    var pageString;
-    for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
-        var page = myflash.readPageString(p);
-        console.log(p);
-        pageString+=page;
-        //res.write(page);
+        //var source = "Espruino";
+        var source = "W25Q";
+        if (source == "Espruino") {
+            console.log("load web page");
+            res.write(readHTML());
+        } else {
+            var startHTMLpage = 112;
+            numberOfPages = 5;
+            var pageString = "";
+            for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+                var page = myflash.readPageString(p);
+                console.log(p);
+                //console.log(myutils.hexdumpString(page, 16));
+                pageString += page;
+                //res.write(page);
+            }
+            //console.log(myutils.hexdumpString(pageString, 16));
+            res.write(pageString);
+        }
+        res.end();
+        loopTimer = setInterval(mainLoop, loopPeriod);
     }
-
-    res.write(pageString);
-    //res.write(readHTML());
-
-    res.end();
-
-    loopTimer = setInterval(mainLoop, loopPeriod);
 }
 
 function readHTML() {
@@ -301,7 +347,7 @@ function mainLoop() {
     sendmessage.data = allChannelsResult;
 
 
-    console.log("broadcast clients " + JSON.stringify(clients));
+    //console.log("broadcast clients " + JSON.stringify(clients));
     broadcast(JSON.stringify(sendmessage));
     //printValues();
 
@@ -322,33 +368,14 @@ function mainLoop() {
 }
 
 
-function showPage(number) {
-    console.log("page " + number + ":");
-    console.log(hexdump(myflash.readPage(number), 16));
+function showPages(start, number) {
+    for (var index = start; index < start + number; index++) {
+        console.log(index);
+        console.log("page " + index + ":");
+        console.log(myutils.hexdump(myflash.readPage(index), 16));
+    }
 }
 
-function hexdump(buffer, blockSize) {
-    var lines = [];
-    blockSize = blockSize || 16;
-    var myblock = new Uint8Array(blockSize);
-    var hex = "0123456789ABCDEF";
-    for (var b = 0; b < buffer.length; b += blockSize) {
-        var addr = ("0000" + b.toString(16)).slice(-4);
-        var codes = "";
-        for (i = 0; i < myblock.length; i++) {
-            myblock[i] = buffer[i + b];
-            codes += ("0" + myblock[i].toString(16)).slice(-2) + " ";
-        }
-        var chars = "";
-        for (i = 0; i < myblock.length; i++) {
-            if (myblock[i] < 32 || myblock[i] > 127)
-                myblock[i] = 46;
-            chars += String.fromCharCode(myblock[i]);
-        }
-        lines.push(addr + " " + codes + "  " + chars);
-    }
-    return lines.join("\n");
-}
 
 function makeLine() {
     var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3;
@@ -426,3 +453,7 @@ setWatch(function (e) {
     digitalPulse(LED1, 1, 500); // pulse red led as indicator
 
 }, BTN, { repeat: true, edge: 'rising' });
+
+setTimeout(function () {
+    save();
+}, (1000));

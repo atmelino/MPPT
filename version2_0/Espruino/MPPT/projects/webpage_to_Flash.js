@@ -93,6 +93,10 @@ function start() {
 
 
     //showPages(111, 50);
+    //showPages(111, 6);
 
 }
 
+setTimeout(function () {
+    start();
+}, (1000));
