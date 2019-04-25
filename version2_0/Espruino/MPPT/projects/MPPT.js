@@ -20,8 +20,8 @@ var PWM_target = 0;
 var allChannelsResult;
 var wifi = require('Wifi');
 var clients = [];
-var WIFI_NAME = "NETGEAR53";
-//var WIFI_NAME = "TP-LINK_MR3040_4B611E";
+//var WIFI_NAME = "NETGEAR53";
+var WIFI_NAME = "TP-LINK_MR3040_4B611E";
 var WIFI_OPTIONS = {
     password: ""
 };
@@ -33,13 +33,13 @@ var sendmessage = {
 };
 var bufferarray = [];
 var saveFileLines = 3;
-// var myfl = require("W25Q");
-// var myflash = new myfl(SPI1, B6 /*CS*/);
-// SPI1.setup({
-//     mosi: B5,
-//     miso: B4,
-//     sck: B3
-// });
+var myfl = require("W25Q");
+var myflash = new myfl(SPI1, B6 /*CS*/);
+SPI1.setup({
+    mosi: B5,
+    miso: B4,
+    sck: B3
+});
 
 
 function userMessage(msg) {
@@ -64,15 +64,18 @@ function pageHandler(req, res) {
     });
     //console.log("server connected");
 
-    // var startHTMLpage = 112;
-    // numberOfPages = 5;
-    // for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
-    //     var page = myflash.readPageString(p);
-    //     console.log(p);
-    //     res.write(page);
-    // }
+    var startHTMLpage = 112;
+    numberOfPages = 5;
+    var pageString;
+    for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+        var page = myflash.readPageString(p);
+        console.log(p);
+        pageString+=page;
+        //res.write(page);
+    }
 
-    res.write(readHTML());
+    res.write(pageString);
+    //res.write(readHTML());
 
     res.end();
 
