@@ -41,6 +41,12 @@ wifi.connect(WIFI_NAME, WIFI_OPTIONS, err => {
   });
 });
 
+// // Create and start server
+// function startServer() {
+//     http.createServer(onPageRequest).listen(80);
+//     //http.createServer(pageHandler).listen(80);
+// }
+
 // Create and start server
 function startServer() {
   const s = require('ws').createServer(pageHandler);

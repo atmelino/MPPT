@@ -42,7 +42,8 @@ function showPages(start, number) {
 }
 
 function readHTML() {
-    var webpage = require("index.html");
+    //var webpage = require("index.html");
+    var webpage = require("indexFull.html");
     var mypage = new webpage();
     var myhtml = mypage.gethtml().replace(/ +/g, ' ');
     return myhtml;

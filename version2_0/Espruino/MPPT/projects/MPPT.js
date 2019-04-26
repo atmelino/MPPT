@@ -29,7 +29,6 @@ var myut = require("utils");
 var myutils = new myut();
 var myfs = require("fs");
 var myws = require('ws');
-var http = require("http");
 var sendmessage = {
     type: "none",
     data: "empty"
@@ -51,46 +50,16 @@ function userMessage(msg) {
         console.log(msg);
 }
 
-// // Create and start server
-// function startServer() {
-//     http.createServer(onPageRequest).listen(80);
-//     //http.createServer(pageHandler).listen(80);
-// }
-
-// function onPageRequest(req, res) {
-//     console.log(JSON.stringify(req));
-//     //console.log(JSON.stringify(res));
-//     if (req.url == "/") {
-//         clearInterval(loopTimer);
-//         res.writeHead(200, { 'Content-Type': 'text/html' });
-//         var startHTMLpage = 112;
-//         numberOfPages = 5;
-//         var pageString = "";
-//         for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
-//             var page = myflash.readPageString(p);
-//             console.log(p);
-//             //console.log(myutils.hexdumpString(page, 16));
-//             pageString += page;
-//             //res.write(page);
-//             //console.log(myutils.hexdumpString(pageString, 16));
-//             res.write(pageString);
-//             res.end();
-//         }
-//         loopTimer = setInterval(mainLoop, loopPeriod);
-//     }
-// }
-
-
 // Create and start server
 function startServer() {
     const s = myws.createServer(pageHandler);
-    //s.on('websocket', wsHandler);
+    s.on('websocket', wsHandler);
     s.listen(80);
 }
 
 // Page request handler
 function pageHandler(req, res) {
-    console.log(JSON.stringify(req));
+    //console.log(JSON.stringify(req));
     clearInterval(loopTimer);
     var casevar;
     if (req.url == "/")
@@ -102,13 +71,28 @@ function pageHandler(req, res) {
             res.writeHead(200, {
                 'Content-Type': 'text/html'
             });
-            var startHTMLpage = 112;
-            numberOfPages = 6;
-            for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
-                var page = myflash.readPageString(p);
+            var HTMLpage = 112;
+            var endFound = false;
+            while (!endFound) {
+                //console.log(HTMLpage);
+                var page = myflash.readPageString(HTMLpage);
                 res.write(page);
-                console.log(p);
+                HTMLpage++;
+                if (page.includes("</html"))
+                    endFound = true;
             }
+
+            // numberOfPages = 80;
+            // for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+            //     var page = myflash.readPageString(p);
+            //     res.write(page);
+            //     console.log(p);
+            //     if (page.includes("</html")) {
+            //         console.log("end of page found");
+            //         //break;
+            //     }
+            // }
+
             res.end();
             break;
         case 2:
@@ -346,7 +330,7 @@ function mainLoop() {
 
 
     //console.log("broadcast clients " + JSON.stringify(clients));
-    //broadcast(JSON.stringify(sendmessage));
+    broadcast(JSON.stringify(sendmessage));
     //printValues();
 
     var line = makeLine();

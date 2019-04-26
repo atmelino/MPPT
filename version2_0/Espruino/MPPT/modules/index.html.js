@@ -36,20 +36,19 @@ myhtml = `<html>
 
 
         function pageLoaded() {
-            // ws = new WebSocket('ws://' + location.host, 'protocolOne');
-            // ws.onmessage = evt => {
-            //     receivedmessage = JSON.parse(evt.data);
+            ws = new WebSocket('ws://' + location.host, 'protocolOne');
+            ws.onmessage = evt => {
+                receivedmessage = JSON.parse(evt.data);
 
-            //     printlnMessage('messages', JSON.stringify(receivedmessage));
+                printlnMessage('messages', JSON.stringify(receivedmessage));
 
-            //     if (receivedmessage.type == 'values') {
-            //         var liveTable = document.getElementById('liveData');
-            //         receiveddata = receivedmessage.data;
-            //         liveTable.innerHTML = receiveddata;
-            //     }
-            // };
+                if (receivedmessage.type == 'values') {
+                    var liveTable = document.getElementById('liveData');
+                    receiveddata = receivedmessage.data;
+                    liveTable.innerHTML = receiveddata;
+                }
+            };
         }
-        //<body onload="pageLoaded()">
     </script>
 </head>
 
