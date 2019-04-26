@@ -54,6 +54,7 @@ function userMessage(msg) {
 // // Create and start server
 // function startServer() {
 //     http.createServer(onPageRequest).listen(80);
+//     //http.createServer(pageHandler).listen(80);
 // }
 
 // function onPageRequest(req, res) {
@@ -83,7 +84,7 @@ function userMessage(msg) {
 // Create and start server
 function startServer() {
     const s = myws.createServer(pageHandler);
-    s.on('websocket', wsHandler);
+    //s.on('websocket', wsHandler);
     s.listen(80);
 }
 
@@ -91,45 +92,35 @@ function startServer() {
 function pageHandler(req, res) {
     console.log(JSON.stringify(req));
     clearInterval(loopTimer);
-
-    if (req.url == "/") {
-        res.writeHead(200, {
-            'Content-Type': 'text/html'
-        });
-        //console.log("server connected");
-
-        var startHTMLpage = 112;
-        numberOfPages = 6;
-        const pageBypage = true;
-        if (pageBypage) {
+    var casevar;
+    if (req.url == "/")
+        casevar = 1;
+    if (req.url == "/functions.js")
+        casevar = 2;
+    switch (casevar) {
+        case 1:
+            res.writeHead(200, {
+                'Content-Type': 'text/html'
+            });
+            var startHTMLpage = 112;
+            numberOfPages = 6;
             for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
                 var page = myflash.readPageString(p);
                 res.write(page);
                 console.log(p);
             }
             res.end();
-        }
-        else {
-            var pageString = "";
-            for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
-                var page = myflash.readPageString(p);
-                console.log(p);
-                //console.log(myutils.hexdumpString(page, 16));
-                pageString += page;
-            }
-            //console.log(myutils.hexdumpString(pageString, 16));
-            res.write(pageString);
+            break;
+        case 2:
+            console.log("/functions.js requested");
+            res.writeHead(200);
+            res.write("function domore() {alert('more');}");
             res.end();
-        }
-    }
-    if (req.url == "/functions.js") {
-        console.log("/functions.js requested");
-        // res.writeHead(200, {
-        //     'Content-Type': 'text/javascript'
-        // });
-        res.writeHead(200);
-        res.write("function domore() {alert('more');}");
-        res.end();
+            break;
+        default:
+            res.writeHead(200);
+            res.end();
+            break;
     }
 
     loopTimer = setInterval(mainLoop, loopPeriod);
@@ -355,7 +346,7 @@ function mainLoop() {
 
 
     //console.log("broadcast clients " + JSON.stringify(clients));
-    broadcast(JSON.stringify(sendmessage));
+    //broadcast(JSON.stringify(sendmessage));
     //printValues();
 
     var line = makeLine();
