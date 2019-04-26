@@ -59,7 +59,8 @@ W25Q.prototype.writePage = function (pageNumber, arrayBuffer) {
       this.write(arrayBuffer[i]);
     else
       this.write(' ');
-  } this.finish();
+  }
+  this.finish();
 };
 
 W25Q.prototype.startWrite = function (pageNumber, offset) {
@@ -122,21 +123,20 @@ W25Q.prototype.setAddress = function (pageNumber, offset) {
   ]);
 };
 
-
 W25Q.prototype.readPage = function (page) {
   var x = new Uint8Array(256);
+  this.seek(page, 0);
   for (i = 0; i < 256; i++) {
-    this.seek(page, i);
-    x[i] = this.read();
+    x[i] = this.spi.send(0);
   }
   return x;
 }
 
 W25Q.prototype.readPageString = function (page) {
   var x = "";
+  this.seek(page, 0);
   for (i = 0; i < 256; i++) {
-    this.seek(page, i);
-    x += String.fromCharCode(this.read());
+    x += String.fromCharCode(this.spi.send(0));
   }
   return x;
 }

@@ -1,7 +1,7 @@
 var http = require("http");
 var wifi = require('Wifi');
 var myfl = require("W25Q");
-var myflash = new myfl(SPI1, B6 /*CS*/);
+var myflash = new myfl(SPI1, B6 /*CS*/ );
 var myut = require("utils");
 var myutils = new myut();
 
@@ -26,7 +26,9 @@ function showPage(number) {
 
 function onPageRequest(req, res) {
     var a = url.parse(req.url, true);
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, {
+        'Content-Type': 'text/html'
+    });
 
     // var page1 = myflash.readPageString(112);
     // console.log(page1);
@@ -72,7 +74,20 @@ function startWifi() {
     });
 }
 
-startWifi();
+function startWebRead() {
+    var startHTMLpage = 112;
+    numberOfPages = 44;
 
-//showPage(190);
+    for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
+        var page = myflash.readPageString(p);
+        console.log(page);
+    }
+}
+
+
+startWebRead();
+//startWifi();
+
+
+
 

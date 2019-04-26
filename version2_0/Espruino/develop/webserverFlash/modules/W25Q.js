@@ -52,7 +52,14 @@ W25Q.prototype.writePage = function (pageNumber, arrayBuffer) {
   // overwrites a page (256 bytes)
   // that memory MUST be erased first
   this.startWrite(pageNumber, 0);
-  for (var i = 0; i < arrayBuffer.length; i++) this.write(arrayBuffer[i]);
+  // for (var i = 0; i < arrayBuffer.length; i++) 
+  // this.write(arrayBuffer[i]);
+  for (var i = 0; i < 256; i++) {
+    if (i < arrayBuffer.length)
+      this.write(arrayBuffer[i]);
+    else
+      this.write(' ');
+  }
   this.finish();
 };
 
@@ -116,21 +123,20 @@ W25Q.prototype.setAddress = function (pageNumber, offset) {
   ]);
 };
 
-
 W25Q.prototype.readPage = function (page) {
   var x = new Uint8Array(256);
+  this.seek(page, 0);
   for (i = 0; i < 256; i++) {
-    this.seek(page, i);
-    x[i] = this.read();
+    x[i] = this.spi.send(0);
   }
   return x;
 }
 
 W25Q.prototype.readPageString = function (page) {
   var x = "";
+  this.seek(page, 0);
   for (i = 0; i < 256; i++) {
-    this.seek(page, i);
-    x += String.fromCharCode(this.read());
+    x += String.fromCharCode(this.spi.send(0));
   }
   return x;
 }
