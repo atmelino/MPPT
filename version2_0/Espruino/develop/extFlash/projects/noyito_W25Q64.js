@@ -42,7 +42,6 @@ function start() {
     console.log();
     //showPages(111, 60);
 
-
     // performance test
     var start, end;
 
@@ -55,6 +54,25 @@ function start() {
     readPages(111, 60);
     end = new Date();
     console.log("new: " + (end - start));
+
+
+    var sectorTest=false;
+    if (sectorTest) {
+        var startPage = 16;
+        console.log("before:");
+        showPages(15, 18);
+        console.log("erase 16 pages at " + startPage);
+        myflash.erase16Pages(startPage);
+        console.log("write sector");
+        const uint8 = new Uint8Array(16 * 256);
+        //(value, start position, end position);
+        uint8.fill(100, 0, 16 * 256);
+        console.log(uint8);
+        console.log(myutils.hexdump(uint8, 16));
+        myflash.writeSector(startPage, uint8);
+        console.log("after:");
+        showPages(15, 18);
+    }
 
 }
 

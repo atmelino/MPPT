@@ -38,7 +38,6 @@ function replaceAt(original, index, replacement) {
     // console.log("original \n" + original);
     // console.log("index " + index);
     // console.log("replacement " + replacement);
-
     return original.substr(0, index) + replacement + original.substr(index + replacement.length);
 }
 
@@ -46,7 +45,33 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
     currentDate = rtc.readDateTime();
     currentDateString = rtc.dateTimeToString(currentDate);
 
-    console.log("reading pages");
+    console.log("reading sector");
+    var mysector = myflash.readSector(1);
+    //console.log(mysector);
+    //console.log(myutils.hexdump(mysector, 16));
+
+    //modify sector
+    for (var i = 0; i < 4000; i += 75)
+        mysector[i] = 58;
+
+    console.log("modified sector");
+    //console.log(myutils.hexdump(mysector, 16));
+
+    if (actuallyDoErase) {
+        console.log("erase 16 pages at " + startPage);
+        myflash.erase16Pages(startPage);
+    }
+
+    if (actuallyDoWrite) {
+        console.log("write sector");
+        myflash.writeSector(startPage, mysector);
+    }
+
+}
+
+
+function oldstuff() {
+
     for (var p = startPage; p < startPage + 16; p++) {
         var page = myflash.readPageString(p);
         console.log("page " + p);
@@ -69,34 +94,17 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
     console.log("original page:\n" + pages[pfound - startPage]);
     console.log("new page:\n" + newpage);
 
-
-
-
-
     // var newpages = pages.replace("endlog\n", logLine);
     // console.log("new line\n");
     // console.log(pages);
     // console.log(newpages);
-
 
     // for (var p = 0; p < 16; p++) {
     //     console.log("log page: " + p);
     //     console.log(pages[p]);
     // }
 
-
-
     //console.log(pages[0]);
-
-    if (actuallyDoErase) {
-        console.log("erase 16 pages at " + startPage);
-        myflash.erase16Pages(startPage);
-    }
-
-    if (actuallyDoWrite) {
-        console.log("write html");
-        myflash.writePage(16, pages[0]);
-    }
 
 }
 
@@ -104,40 +112,18 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
 function start() {
 
     showFlashType();
-
-    //showPages(15, 18);
-    //showPages(15, 3);
-
-    var logEntry = "system start ";
-    //    newLogEntry(logEntry, false, false);
-    //newLogEntry(logEntry,false, true);
-    //newLogEntry(logEntry, true, true);
-
-    //showPages(15, 18);
-    //showPages(15, 3);
-
-
-    var mysector = myflash.readSector(1);
-    //console.log(mysector);
-    console.log(myutils.hexdump(mysector, 16));
-
-    //const uint8 = new Uint8Array(16 * 256);
-    // (value, start position, end position);
-    //uint8.fill(100, 0, 16 * 256);
-
-    //console.log(uint8);
-    //console.log(myutils.hexdump(uint8, 16));
-
     console.log("before:");
     showPages(15, 18);
-    myflash.erase16Pages(startPage);
-    myflash.writeSector(startPage, mysector);
+    var logEntry = "system start ";
+    //newLogEntry(logEntry, false, false);
+    //newLogEntry(logEntry,false, true);
+    newLogEntry(logEntry, true, true);
     console.log("after:");
     showPages(15, 18);
-
 }
 
 
 setTimeout(function () {
     start();
 }, (1000));
+
