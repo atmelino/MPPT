@@ -71,7 +71,7 @@ function writeHTML(myHTML, startPage, numberOfPages, actuallyDoErase, actuallyDo
         //console.log(pageContent);
         if (actuallyDoWrite) {
             console.log("write html");
-            myflash.writePage(pageToWriteTo, pageContent);
+            myflash.writePageFillSpace(pageToWriteTo, pageContent);
         }
     }
 }

@@ -13,9 +13,11 @@ var RTC = require("DS1307");
 var rtc = new RTC(i2c, {
     address: 0x68
 });
-//var pages = [];
-var pages = "";
-
+var pages = [];
+//var pages = "";
+var startPage = 16;
+var pfound;
+var ifound;
 
 function showFlashType() {
     var myJedec = myflash.getJedec();
@@ -32,26 +34,49 @@ function showPages(start, number) {
     }
 }
 
-function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
+function replaceAt(original, index, replacement) {
+    // console.log("original \n" + original);
+    // console.log("index " + index);
+    // console.log("replacement " + replacement);
 
+    return original.substr(0, index) + replacement + original.substr(index + replacement.length);
+}
+
+function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
     currentDate = rtc.readDateTime();
     currentDateString = rtc.dateTimeToString(currentDate);
-    console.log("currentDate: " + currentDateString);
 
-    for (var logpage = startPage; logpage < startPage + 16; logpage++) {
-        var page = myflash.readPageString(logpage);
-        //pages.push(page);
-        pages += page;
+    console.log("reading pages");
+    for (var p = startPage; p < startPage + 16; p++) {
+        var page = myflash.readPageString(p);
+        console.log("page " + p);
+        console.log(page);
+        pages.push(page);
+        //pages += page;
+        found = page.indexOf("endlog");
+        if (found > 0) {
+            ifound = found;
+            pfound = p;
+            console.log("endlog found in page " + pfound + " at position " + ifound);
+        }
     }
 
+    //console.log("currentDate: " + currentDateString);
     var logLine = currentDateString + " " + logEntry + "\n" + "endlog\n";
+    console.log("endlog found in page " + pfound + " at position " + ifound);
 
-    var newpages = pages.replace("endlog\n", logLine);
+    var newpage = replaceAt(pages[pfound - startPage], ifound, logLine);
+    console.log("original page:\n" + pages[pfound - startPage]);
+    console.log("new page:\n" + newpage);
 
 
-    console.log("new line\n");
-    console.log(pages);
-    console.log(newpages);
+
+
+
+    // var newpages = pages.replace("endlog\n", logLine);
+    // console.log("new line\n");
+    // console.log(pages);
+    // console.log(newpages);
 
 
     // for (var p = 0; p < 16; p++) {
@@ -60,18 +85,8 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
     // }
 
 
-    //var lines = pages[0].split('\n');
-    // console.log(lines);
-    // var a = lines.indexOf("endlog");
-    // console.log(a);
 
-    // lines[a] = logLine;
-    // lines[a + 1] = "endlog\n";
-    // console.log(lines);
-
-    // pages[0] = lines.join('');
-
-    console.log(pages[0]);
+    //console.log(pages[0]);
 
     if (actuallyDoErase) {
         console.log("erase 16 pages at " + startPage);
@@ -87,7 +102,6 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
 
 
 function start() {
-    startPage = 16;
 
     showFlashType();
 
@@ -95,12 +109,31 @@ function start() {
     //showPages(15, 3);
 
     var logEntry = "system start ";
-    newLogEntry(logEntry, false, false);
+    //    newLogEntry(logEntry, false, false);
     //newLogEntry(logEntry,false, true);
     //newLogEntry(logEntry, true, true);
 
     //showPages(15, 18);
     //showPages(15, 3);
+
+
+    var mysector = myflash.readSector(1);
+    //console.log(mysector);
+    console.log(myutils.hexdump(mysector, 16));
+
+    //const uint8 = new Uint8Array(16 * 256);
+    // (value, start position, end position);
+    //uint8.fill(100, 0, 16 * 256);
+
+    //console.log(uint8);
+    //console.log(myutils.hexdump(uint8, 16));
+
+    console.log("before:");
+    showPages(15, 18);
+    myflash.erase16Pages(startPage);
+    myflash.writeSector(startPage, mysector);
+    console.log("after:");
+    showPages(15, 18);
 
 }
 

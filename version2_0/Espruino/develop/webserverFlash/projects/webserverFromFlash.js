@@ -73,6 +73,12 @@ function startWifi() {
         });
     });
 }
+function readHTML() {
+    var webpage = require("index.html");
+    var mypage = new webpage();
+    var myhtml = mypage.gethtml().replace(/ +/g, ' ');
+    return myhtml;
+}
 
 function startWebRead() {
     var startHTMLpage = 112;

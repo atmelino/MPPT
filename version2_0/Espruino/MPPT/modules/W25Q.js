@@ -52,6 +52,15 @@ W25Q.prototype.writePage = function (pageNumber, arrayBuffer) {
   // overwrites a page (256 bytes)
   // that memory MUST be erased first
   this.startWrite(pageNumber, 0);
+  for (var i = 0; i < arrayBuffer.length; i++)
+    this.write(arrayBuffer[i]);
+  this.finish();
+};
+
+W25Q.prototype.writePageFillSpace = function (pageNumber, arrayBuffer) {
+  // overwrites a page (256 bytes)
+  // that memory MUST be erased first
+  this.startWrite(pageNumber, 0);
   // for (var i = 0; i < arrayBuffer.length; i++) 
   // this.write(arrayBuffer[i]);
   for (var i = 0; i < 256; i++) {
@@ -60,6 +69,17 @@ W25Q.prototype.writePage = function (pageNumber, arrayBuffer) {
     else
       this.write(' ');
   }
+  this.finish();
+};
+
+W25Q.prototype.writeSector = function (pageNumber, arrayBuffer) {
+  // overwrites a sector (256*16 bytes)
+  // that memory MUST be erased first
+  console.log("writeSector length in bytes" + arrayBuffer.length)
+  this.startWrite(pageNumber, 0);
+  for (var i = 0; i < arrayBuffer.length; i++)
+    this.write(arrayBuffer[i]);
+
   this.finish();
 };
 
@@ -123,7 +143,7 @@ W25Q.prototype.setAddress = function (pageNumber, offset) {
   ]);
 };
 
-W25Q.prototype.readPage = function (page) {
+W25Q.prototype.readPageOld = function (page) {
   var x = new Uint8Array(256);
   this.seek(page, 0);
   for (i = 0; i < 256; i++) {
@@ -132,10 +152,15 @@ W25Q.prototype.readPage = function (page) {
   return x;
 }
 
-
-W25Q.prototype.readPagenew = function(pageNumber) {
+W25Q.prototype.readPage = function (pageNumber) {
   this.seek(pageNumber, 0);
-  return this.spi.send({data: 0, count:256});
+  return this.spi.send({ data: 0, count: 256 });
+}
+
+W25Q.prototype.readSector = function (sector) {
+  var pageNumber = sector * 16;
+  this.seek(pageNumber, 0);
+  return this.spi.send({ data: 0, count: 256 * 16 });
 }
 
 W25Q.prototype.readPageString = function (page) {

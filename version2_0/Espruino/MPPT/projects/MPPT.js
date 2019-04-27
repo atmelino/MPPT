@@ -89,7 +89,7 @@ function pageHandler(req, res) {
             var HTMLpage = 112;
             var endFound = false;
             while (!endFound) {
-                console.log(HTMLpage);
+                //console.log(HTMLpage);
                 var page = myflash.readPageString(HTMLpage);
                 res.write(page);
                 HTMLpage++;
@@ -111,13 +111,6 @@ function pageHandler(req, res) {
     }
 
     loopTimer = setInterval(mainLoop, loopPeriod);
-}
-
-function readHTML() {
-    var webpage = require("index.html");
-    var mypage = new webpage();
-    var myhtml = mypage.gethtml().replace(/ +/g, ' ');
-    return myhtml;
 }
 
 // WebSocket request handler
@@ -340,7 +333,6 @@ function mainLoop() {
     allChannelsResult.PWM_target = PWM_target;
     sendmessage.type = 'values';
     sendmessage.data = allChannelsResult;
-
 
     //console.log("broadcast clients " + JSON.stringify(clients));
     broadcast(JSON.stringify(sendmessage));
