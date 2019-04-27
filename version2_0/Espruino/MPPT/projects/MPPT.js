@@ -23,8 +23,8 @@ var PWM_target = 0;
 var allChannelsResult;
 var wifi = require('Wifi');
 var clients = [];
-//var WIFI_NAME = "NETGEAR53";
-var WIFI_NAME = "TP-LINK_MR3040_4B611E";
+var WIFI_NAME = "NETGEAR53";
+//var WIFI_NAME = "TP-LINK_MR3040_4B611E";
 var WIFI_OPTIONS = {
     password: ""
 };
@@ -39,7 +39,7 @@ var sendmessage = {
 var bufferarray = [];
 var saveFileLines = 3;
 var myfl = require("W25Q");
-var myflash = new myfl(SPI1, B6 /*CS*/ );
+var myflash = new myfl(SPI1, B6 /*CS*/);
 SPI1.setup({
     mosi: B5,
     miso: B4,
@@ -78,7 +78,7 @@ function pageHandler(req, res) {
             res.writeHead(200);
             var webpage = require("indexStart.html");
             var mypage = new webpage();
-            var myhtml = mypage.gethtml().replace(/ +/g, ' ').replace(/Flash/,getFlashType());
+            var myhtml = mypage.gethtml().replace(/ +/g, ' ').replace(/Flash/, getFlashType());
             res.write(myhtml);
             res.end();
             break;
@@ -162,7 +162,7 @@ function wsHandler(ws) {
                 miso: B4,
                 sck: B3
             });
-            E.connectSDCard(SPI1, B6 /*CS*/ );
+            E.connectSDCard(SPI1, B6 /*CS*/);
             logFile = E.openFile("log.txt", "a");
             logFile.write(currentDateString + " loop period" + loopPeriod + "\n");
             logFile.close();
@@ -260,7 +260,9 @@ function startWifi() {
             userMessage("http://" + info.ip);
             startServer();
             console.log("Wifi connected");
-            //digitalPulse(LED2, 1, [1000, 500, 1000]); // green LED
+            digitalPulse(B13, 1, 50); // red LED
+            digitalPulse(B14, 1, 50); // orange LED
+            digitalPulse(B15, 1, 50); // green LED
         });
     });
 }
@@ -435,7 +437,7 @@ function writeDataFile() {
         dataFile.close();
         console.log('file ' + fullPath + ' written');
 
-    } catch (e) {}
+    } catch (e) { }
     //digitalPulse(LED2, 1, [500, 300, 500]); // green LED
 
 }
@@ -453,9 +455,9 @@ setWatch(function (e) {
     digitalPulse(LED1, 1, 500); // pulse red led as indicator
 
 }, BTN, {
-    repeat: true,
-    edge: 'rising'
-});
+        repeat: true,
+        edge: 'rising'
+    });
 
 setTimeout(function () {
     save();

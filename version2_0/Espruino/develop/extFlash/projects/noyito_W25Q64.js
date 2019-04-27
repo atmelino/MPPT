@@ -1,5 +1,5 @@
 var myfl = require("W25Q");
-var myflash = new myfl(SPI1, B6 /*CS*/ );
+var myflash = new myfl(SPI1, B6 /*CS*/);
 var myut = require("utils");
 var myutils = new myut();
 
@@ -25,8 +25,15 @@ function showPages(start, number) {
 
 function readPages(start, number) {
     for (var index = start; index < start + number; index++) {
-        console.log("page " + index + ":");
+        //console.log("page " + index + ":");
         myflash.readPage(index);
+    }
+}
+
+function readPagesOld(start, number) {
+    for (var index = start; index < start + number; index++) {
+        //console.log("page " + index + ":");
+        myflash.readPageOld(index);
     }
 }
 
@@ -37,11 +44,17 @@ function start() {
 
 
     // performance test
+    var start, end;
 
-    var start = new Date();
+    start = new Date();
+    readPagesOld(111, 60);
+    end = new Date();
+    console.log("old: " + (end - start));
+
+    start = new Date();
     readPages(111, 60);
-    var end = new Date();
-    console.log(end - start);
+    end = new Date();
+    console.log("new: " + (end - start));
 
 }
 

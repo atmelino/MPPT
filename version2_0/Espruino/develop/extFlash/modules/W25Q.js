@@ -123,7 +123,7 @@ W25Q.prototype.setAddress = function (pageNumber, offset) {
   ]);
 };
 
-W25Q.prototype.readPage = function (page) {
+W25Q.prototype.readPageOld = function (page) {
   var x = new Uint8Array(256);
   this.seek(page, 0);
   for (i = 0; i < 256; i++) {
@@ -132,8 +132,7 @@ W25Q.prototype.readPage = function (page) {
   return x;
 }
 
-
-W25Q.prototype.readPagenew = function(pageNumber) {
+W25Q.prototype.readPage = function(pageNumber) {
   this.seek(pageNumber, 0);
   return this.spi.send({data: 0, count:256});
 }
