@@ -95,6 +95,7 @@ function start() {
 
     //showPages(111, 50);
     //showPages(111, 6);
+    console.log("Finished!");
 
 }
 

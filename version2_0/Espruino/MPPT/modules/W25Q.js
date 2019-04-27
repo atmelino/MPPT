@@ -132,6 +132,12 @@ W25Q.prototype.readPage = function (page) {
   return x;
 }
 
+
+W25Q.prototype.readPagenew = function(pageNumber) {
+  this.seek(pageNumber, 0);
+  return this.spi.send({data: 0, count:256});
+}
+
 W25Q.prototype.readPageString = function (page) {
   var x = "";
   this.seek(page, 0);

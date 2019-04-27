@@ -1,6 +1,9 @@
 // Setup I2C
 var i2c = new I2C();
-i2c.setup({ sda: B9, scl: B8 });
+i2c.setup({
+    sda: B9,
+    scl: B8
+});
 var RTC = require("DS1307");
 var rtc = new RTC(i2c, {
     address: 0x68
@@ -20,8 +23,8 @@ var PWM_target = 0;
 var allChannelsResult;
 var wifi = require('Wifi');
 var clients = [];
-var WIFI_NAME = "NETGEAR53";
-//var WIFI_NAME = "TP-LINK_MR3040_4B611E";
+//var WIFI_NAME = "NETGEAR53";
+var WIFI_NAME = "TP-LINK_MR3040_4B611E";
 var WIFI_OPTIONS = {
     password: ""
 };
@@ -36,7 +39,7 @@ var sendmessage = {
 var bufferarray = [];
 var saveFileLines = 3;
 var myfl = require("W25Q");
-var myflash = new myfl(SPI1, B6 /*CS*/);
+var myflash = new myfl(SPI1, B6 /*CS*/ );
 SPI1.setup({
     mosi: B5,
     miso: B4,
@@ -64,38 +67,38 @@ function pageHandler(req, res) {
     var casevar;
     if (req.url == "/")
         casevar = 1;
-    if (req.url == "/functions.js")
+    if (req.url == "/go.html")
         casevar = 2;
+    if (req.url == "/functions.js")
+        casevar = 3;
+
     switch (casevar) {
         case 1:
+            console.log("/ requested");
+            res.writeHead(200);
+            var webpage = require("indexStart.html");
+            var mypage = new webpage();
+            var myhtml = mypage.gethtml().replace(/ +/g, ' ').replace(/Flash/,getFlashType());
+            res.write(myhtml);
+            res.end();
+            break;
+        case 2:
             res.writeHead(200, {
                 'Content-Type': 'text/html'
             });
             var HTMLpage = 112;
             var endFound = false;
             while (!endFound) {
-                //console.log(HTMLpage);
+                console.log(HTMLpage);
                 var page = myflash.readPageString(HTMLpage);
                 res.write(page);
                 HTMLpage++;
                 if (page.includes("</html"))
                     endFound = true;
             }
-
-            // numberOfPages = 80;
-            // for (var p = startHTMLpage; p < startHTMLpage + numberOfPages; p++) {
-            //     var page = myflash.readPageString(p);
-            //     res.write(page);
-            //     console.log(p);
-            //     if (page.includes("</html")) {
-            //         console.log("end of page found");
-            //         //break;
-            //     }
-            // }
-
             res.end();
             break;
-        case 2:
+        case 3:
             console.log("/functions.js requested");
             res.writeHead(200);
             res.write("function domore() {alert('more');}");
@@ -127,11 +130,15 @@ function wsHandler(ws) {
         //console.log(JSON.stringify(receivedmessage));
         if (receivedmessage.type == 'PWMminus') {
             PWM_actual -= 0.01;
-            analogWrite(A0, PWM_actual, { freq: 80000 });
+            analogWrite(A0, PWM_actual, {
+                freq: 80000
+            });
         }
         if (receivedmessage.type == 'PWMplus') {
             PWM_actual += 0.01;
-            analogWrite(A0, PWM_actual, { freq: 80000 });
+            analogWrite(A0, PWM_actual, {
+                freq: 80000
+            });
         }
         if (receivedmessage.type == "setRTC") {
             var year = receivedmessage.data.year;
@@ -150,8 +157,12 @@ function wsHandler(ws) {
             loopPeriod = receivedmessage.data;
             clearInterval(loopTimer);
             loopTimer = setInterval(mainLoop, loopPeriod);
-            SPI1.setup({ mosi: B5, miso: B4, sck: B3 });
-            E.connectSDCard(SPI1, B6 /*CS*/);
+            SPI1.setup({
+                mosi: B5,
+                miso: B4,
+                sck: B3
+            });
+            E.connectSDCard(SPI1, B6 /*CS*/ );
             logFile = E.openFile("log.txt", "a");
             logFile.write(currentDateString + " loop period" + loopPeriod + "\n");
             logFile.close();
@@ -164,11 +175,9 @@ function wsHandler(ws) {
                 logFile = E.openFile("log.txt", "a");
                 logContent = myfs.readFileSync("log.txt");
                 logFile.close();
-            }
-            catch (e) {
+            } catch (e) {
                 logContent = e.message;
-            }
-            finally {
+            } finally {
                 E.unmountSD();
                 sendmessage.type = 'getLog';
                 sendmessage.data = logContent;
@@ -180,11 +189,9 @@ function wsHandler(ws) {
             var fileContent;
             try {
                 fileContent = myfs.readFileSync(receivedmessage.data);
-            }
-            catch (e) {
+            } catch (e) {
                 fileContent = e.message;
-            }
-            finally {
+            } finally {
                 E.unmountSD();
                 sendmessage.type = 'getFile';
                 sendmessage.data = fileContent;
@@ -198,11 +205,9 @@ function wsHandler(ws) {
                 dirContent = myfs.readdirSync(receivedmessage.data);
                 //dirString = dirContent.join("\n");
                 //console.log(dirString);
-            }
-            catch (e) {
+            } catch (e) {
                 dirContent = e.message;
-            }
-            finally {
+            } finally {
                 E.unmountSD();
                 sendmessage.type = 'getDir';
                 sendmessage.data = dirContent;
@@ -293,13 +298,17 @@ function mainLoop() {
     // prevent battery overvoltage and overcurrent
     if (batteryVoltage > 8.4 || Math.abs(batteryCurrent) > 300) {
         PWM_actual -= 0.01;
-        analogWrite(A0, PWM_actual, { freq: 80000 });
+        analogWrite(A0, PWM_actual, {
+            freq: 80000
+        });
     }
 
     if (solarVoltage <= 9.0) {
         PWM_actual = 0.0;
         digitalWrite(B1, 0); // PWM off disable IR2104
-        analogWrite(A0, PWM_actual, { freq: 0 });
+        analogWrite(A0, PWM_actual, {
+            freq: 0
+        });
     }
 
     if (solarVoltage > 9.0) {
@@ -311,7 +320,9 @@ function mainLoop() {
             PWM_actual += 0.001;
         }
         digitalWrite(B1, 1); // PWM on enable IR2104
-        analogWrite(A0, PWM_actual, { freq: 80000 });
+        analogWrite(A0, PWM_actual, {
+            freq: 80000
+        });
     }
 
     // prevent battery over discharge
@@ -356,6 +367,15 @@ function showPages(start, number) {
         console.log("page " + index + ":");
         console.log(myutils.hexdump(myflash.readPage(index), 16));
     }
+}
+
+function getFlashType() {
+    var myJedec = myflash.getJedec();
+    line1 = "manufacturer ID: " + myJedec.manufacturerId.toString(16);
+    line2 = "device ID: " + myJedec.deviceId.toString(16);
+    line3 = "capacity: " + myflash.getCapacity();
+
+    return line1 + "<br>" + line2 + "<br>" + line3 + "<br>";
 }
 
 
@@ -415,9 +435,7 @@ function writeDataFile() {
         dataFile.close();
         console.log('file ' + fullPath + ' written');
 
-    }
-    catch (e) {
-    }
+    } catch (e) {}
     //digitalPulse(LED2, 1, [500, 300, 500]); // green LED
 
 }
@@ -434,7 +452,10 @@ setWatch(function (e) {
     clearInterval(loopTimer);
     digitalPulse(LED1, 1, 500); // pulse red led as indicator
 
-}, BTN, { repeat: true, edge: 'rising' });
+}, BTN, {
+    repeat: true,
+    edge: 'rising'
+});
 
 setTimeout(function () {
     save();

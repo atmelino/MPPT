@@ -23,11 +23,26 @@ function showPages(start, number) {
     }
 }
 
+function readPages(start, number) {
+    for (var index = start; index < start + number; index++) {
+        console.log("page " + index + ":");
+        myflash.readPage(index);
+    }
+}
+
+
 function start() {
     console.log();
-    showPages(111, 6);
+    //showPages(111, 60);
 
-    //console.log("data before erase");
+
+    // performance test
+
+    var start = new Date();
+    readPages(111, 60);
+    var end = new Date();
+    console.log(end - start);
+
 }
 
 
