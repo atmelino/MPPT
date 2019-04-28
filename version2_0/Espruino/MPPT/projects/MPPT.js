@@ -63,7 +63,6 @@ function startServer() {
 // Page request handler
 function pageHandler(req, res) {
     //console.log(JSON.stringify(req));
-    clearInterval(loopTimer);
     var casevar;
     if (req.url == "/")
         casevar = 1;
@@ -83,6 +82,7 @@ function pageHandler(req, res) {
             res.end();
             break;
         case 2:
+            clearInterval(loopTimer);
             res.writeHead(200, {
                 'Content-Type': 'text/html'
             });
@@ -97,6 +97,8 @@ function pageHandler(req, res) {
                     endFound = true;
             }
             res.end();
+            loopTimer = setInterval(mainLoop, loopPeriod);
+
             break;
         case 3:
             console.log("/functions.js requested");
@@ -110,7 +112,6 @@ function pageHandler(req, res) {
             break;
     }
 
-    loopTimer = setInterval(mainLoop, loopPeriod);
 }
 
 // WebSocket request handler
