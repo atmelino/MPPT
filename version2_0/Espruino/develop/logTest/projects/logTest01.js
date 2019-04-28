@@ -1,23 +1,22 @@
 var myut = require("utils");
 var myutils = new myut();
 var myfl = require("W25Q");
-var myflash = new myfl(SPI1, B6 /*CS*/);
+var myflash = new myfl(SPI1, B6 /*CS*/ );
 SPI1.setup({
     mosi: B5,
     miso: B4,
     sck: B3
 });
 var i2c = new I2C();
-i2c.setup({ sda: B9, scl: B8 });
+i2c.setup({
+    sda: B9,
+    scl: B8
+});
 var RTC = require("DS1307");
 var rtc = new RTC(i2c, {
     address: 0x68
 });
-var pages = [];
-//var pages = "";
 var startPage = 16;
-var pfound;
-var ifound;
 
 function showFlashType() {
     var myJedec = myflash.getJedec();
@@ -34,29 +33,54 @@ function showPages(start, number) {
     }
 }
 
-function replaceAt(original, index, replacement) {
-    // console.log("original \n" + original);
-    // console.log("index " + index);
-    // console.log("replacement " + replacement);
-    return original.substr(0, index) + replacement + original.substr(index + replacement.length);
-}
-
 function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
-    currentDate = rtc.readDateTime();
-    currentDateString = rtc.dateTimeToString(currentDate);
 
+    // read sector
     console.log("reading sector");
     var mysector = myflash.readSector(1);
     //console.log(mysector);
     //console.log(myutils.hexdump(mysector, 16));
+    console.log("original sector in memory");
+    console.log(myutils.hexdump(mysector.slice(0, 32 * 10), 16));
 
     //modify sector
-    for (var i = 0; i < 4000; i += 75)
-        mysector[i] = 58;
+    if (mysector[0] != 123) { //initialize root
+        logpos = {
+            name: "logpos",
+            pos: 0
+        };
+    } else { // update root
+        var str = "";
+        for (var i = 0; i < 32; i++) {
+            str += String.fromCharCode(parseInt(mysector[i]));
+        }
+        logpos = JSON.parse(str);
+    }
+    console.log(logpos);
+    logpos.pos += 1;
+    console.log(logpos);
+    rootentry = JSON.stringify(logpos);
+    for (i = 0; i < 32; i++) {
+        if (i < rootentry.length)
+            mysector[i] = rootentry.charCodeAt(i);
+        else
+            mysector[i] = 32;
+    }
+    currentDate = rtc.readDateTime();
+    currentDateString = rtc.dateTimeToString(currentDate);
+    var logLine = currentDateString + " " + logEntry + "\n" + "endlog\n";
 
-    console.log("modified sector");
+    var index = logpos.pos * 32;
+    for (i = 0; i < 32; i++)
+        mysector[index + i] = logLine.charCodeAt(i);
+
+
+
+    console.log("modified sector in memory");
     //console.log(myutils.hexdump(mysector, 16));
+    console.log(myutils.hexdump(mysector.slice(0, 32 * 10), 16));
 
+    // write sector
     if (actuallyDoErase) {
         console.log("erase 16 pages at " + startPage);
         myflash.erase16Pages(startPage);
@@ -69,61 +93,22 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
 
 }
 
-
-function oldstuff() {
-
-    for (var p = startPage; p < startPage + 16; p++) {
-        var page = myflash.readPageString(p);
-        console.log("page " + p);
-        console.log(page);
-        pages.push(page);
-        //pages += page;
-        found = page.indexOf("endlog");
-        if (found > 0) {
-            ifound = found;
-            pfound = p;
-            console.log("endlog found in page " + pfound + " at position " + ifound);
-        }
-    }
-
-    //console.log("currentDate: " + currentDateString);
-    var logLine = currentDateString + " " + logEntry + "\n" + "endlog\n";
-    console.log("endlog found in page " + pfound + " at position " + ifound);
-
-    var newpage = replaceAt(pages[pfound - startPage], ifound, logLine);
-    console.log("original page:\n" + pages[pfound - startPage]);
-    console.log("new page:\n" + newpage);
-
-    // var newpages = pages.replace("endlog\n", logLine);
-    // console.log("new line\n");
-    // console.log(pages);
-    // console.log(newpages);
-
-    // for (var p = 0; p < 16; p++) {
-    //     console.log("log page: " + p);
-    //     console.log(pages[p]);
-    // }
-
-    //console.log(pages[0]);
-
-}
-
-
 function start() {
 
     showFlashType();
     console.log("before:");
-    showPages(15, 18);
+    //showPages(15, 3);
+    //showPages(15, 18);
     var logEntry = "system start ";
     //newLogEntry(logEntry, false, false);
     //newLogEntry(logEntry,false, true);
     newLogEntry(logEntry, true, true);
     console.log("after:");
-    showPages(15, 18);
+    //showPages(15, 3);
+    //showPages(15, 18);
 }
 
 
 setTimeout(function () {
     start();
 }, (1000));
-
