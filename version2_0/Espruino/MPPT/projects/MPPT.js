@@ -163,19 +163,32 @@ function wsHandler(ws) {
         }
 
         if (receivedmessage.type == "getLog") {
-            var logContent;
-            try {
-                logFile = E.openFile("log.txt", "a");
-                logContent = myfs.readFileSync("log.txt");
-                logFile.close();
-            } catch (e) {
-                logContent = e.message;
-            } finally {
-                E.unmountSD();
-                sendmessage.type = 'getLog';
-                sendmessage.data = logContent;
-                broadcast(JSON.stringify(sendmessage));
+
+            var mysector = myflash.readSector(1);
+            //   return mysector;
+            var str = "";
+            for (var i = 0; i < mysector.length; i++) {
+                str += String.fromCharCode(parseInt(mysector[i]));
             }
+
+            sendmessage.type = 'getLog';
+            sendmessage.data = str;
+            //console.log(JSON.stringify(sendmessage));
+            broadcast(JSON.stringify(sendmessage));
+
+            // var logContent;
+            // try {
+            //     logFile = E.openFile("log.txt", "a");
+            //     logContent = myfs.readFileSync("log.txt");
+            //     logFile.close();
+            // } catch (e) {
+            //     logContent = e.message;
+            // } finally {
+            //     E.unmountSD();
+            //     sendmessage.type = 'getLog';
+            //     sendmessage.data = logContent;
+            //     broadcast(JSON.stringify(sendmessage));
+            // }
         }
 
         if (receivedmessage.type == "getFile") {
@@ -268,10 +281,8 @@ function start() {
     userMessage("Start Wifi");
     startWifi();
 
-    // logFile = E.openFile("log.txt", "a");
-    // currentDate = rtc.readDateTime();
-    // logFile.write(currentDate + "," + "program start" + "\r\n");
-    // logFile.close();
+    newLogEntry("system start ");
+
     loopTimer = setInterval(mainLoop, loopPeriod);
 }
 
@@ -384,6 +395,54 @@ function makeLine() {
 function printValues() {
     console.log(makeLine());
 }
+
+function newLogEntry(logEntry) {
+    // message needs to be string of exactly 13 characters 
+    var startPage = 16;
+
+    // read sector
+    var mysector = myflash.readSector(1);
+
+    //modify sector
+    if (mysector[0] != 123) { //initialize root
+        logpos = {
+            name: "logpos",
+            pos: 0
+        };
+    } else { // update root
+        var str = "";
+        for (var i = 0; i < 32; i++) {
+            str += String.fromCharCode(parseInt(mysector[i]));
+        }
+        logpos = JSON.parse(str);
+    }
+
+    // circular log
+    if (logpos.pos > 126) {
+        logpos.pos = 1;
+    } else {
+        logpos.pos += 1;
+    }
+
+    rootentry = JSON.stringify(logpos);
+    for (let i = 0; i < 32; i++) {
+        if (i < rootentry.length)
+            mysector[i] = rootentry.charCodeAt(i);
+        else
+            mysector[i] = 32;
+    }
+    currentDate = rtc.readDateTime();
+    currentDateString = rtc.dateTimeToString(currentDate);
+    var logLine = currentDateString + " " + logEntry + "\n" + "endlog\n";
+
+    var index = logpos.pos * 32;
+    for (let i = 0; i < 32; i++)
+        mysector[index + i] = logLine.charCodeAt(i);
+
+    myflash.erase16Pages(startPage);
+    myflash.writeSector(startPage, mysector);
+}
+
 
 function writeDataFile() {
     buffer = bufferarray.join();

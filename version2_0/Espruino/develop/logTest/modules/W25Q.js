@@ -48,12 +48,21 @@ W25Q.prototype.erase16Pages = function (pageNumber) {
   this.waitReady();
 };
 
-W25Q.prototype.writePage = function (pageNumber, arrayBuffer) {
+W25Q.prototype.writePageOld = function (pageNumber, arrayBuffer) {
   // overwrites a page (256 bytes)
   // that memory MUST be erased first
   this.startWrite(pageNumber, 0);
   for (var i = 0; i < arrayBuffer.length; i++)
     this.write(arrayBuffer[i]);
+  this.finish();
+};
+
+W25Q.prototype.writePage = function (pageNumber, arrayBuffer) {
+  // overwrites a page (256 bytes)
+  // that memory MUST be erased first
+  //console.log(arrayBuffer);
+  this.startWrite(pageNumber, 0);
+  this.spi.write(arrayBuffer);
   this.finish();
 };
 
@@ -72,12 +81,11 @@ W25Q.prototype.writePageFillSpace = function (pageNumber, arrayBuffer) {
   this.finish();
 };
 
-W25Q.prototype.writeSector = function (pageNumber, arrayBuffer) {
+W25Q.prototype.writeSectorOld = function (pageNumber, arrayBuffer) {
   // overwrites a sector (256*16 bytes)
   // that memory MUST be erased first
   // todo: deal with too few bytes in arrayBuffer
   //console.log("writeSector length in bytes " + arrayBuffer.length)
-
   for (p = 0; p < 16; p++) {
     pageStart = p * 256;
     pageToWrite = pageNumber + p;
@@ -87,6 +95,25 @@ W25Q.prototype.writeSector = function (pageNumber, arrayBuffer) {
       //console.log("byte written " + arrayBuffer[pageStart + i]);
       this.write(arrayBuffer[pageStart + i]);
     }
+    this.finish();
+  }
+};
+
+W25Q.prototype.writeSector = function (pageNumber, arrayBuffer) {
+  // overwrites a sector (256*16 bytes)
+  // that memory MUST be erased first
+  // todo: deal with too few bytes in arrayBuffer
+  //console.log("writeSector length in bytes " + arrayBuffer.length)
+  //console.log("arrayBuffer " + arrayBuffer);
+  for (p = 0; p < 16; p++) {
+    pageToWrite = pageNumber + p;
+    pageStart = p * 256;
+    pageEnd = pageStart + 256;
+    page = arrayBuffer.slice(pageStart, pageEnd);
+    // console.log("pageToWrite " + pageToWrite);
+    // console.log("page " + page);
+    this.startWrite(pageToWrite, 0);
+    this.spi.write(page);
     this.finish();
   }
 };

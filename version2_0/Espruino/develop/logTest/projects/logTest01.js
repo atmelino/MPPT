@@ -1,7 +1,7 @@
 var myut = require("utils");
 var myutils = new myut();
 var myfl = require("W25Q");
-var myflash = new myfl(SPI1, B6 /*CS*/ );
+var myflash = new myfl(SPI1, B6 /*CS*/);
 SPI1.setup({
     mosi: B5,
     miso: B4,
@@ -40,8 +40,8 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
     var mysector = myflash.readSector(1);
     //console.log(mysector);
     //console.log(myutils.hexdump(mysector, 16));
-    console.log("original sector in memory");
-    console.log(myutils.hexdump(mysector.slice(0, 32 * 10), 16));
+    // console.log("original sector in memory");
+    // console.log(myutils.hexdump(mysector.slice(0, 32 * 10), 16));
 
     //modify sector
     if (mysector[0] != 123) { //initialize root
@@ -57,10 +57,19 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
         logpos = JSON.parse(str);
     }
     console.log(logpos);
-    logpos.pos += 1;
+
+    // circular log
+    if (logpos.pos > 126) {
+        logpos.pos = 1;
+    } else {
+        logpos.pos += 1;
+    }
+
+    //logpos.pos = 120;
+
     console.log(logpos);
     rootentry = JSON.stringify(logpos);
-    for (i = 0; i < 32; i++) {
+    for (let i = 0; i < 32; i++) {
         if (i < rootentry.length)
             mysector[i] = rootentry.charCodeAt(i);
         else
@@ -71,14 +80,13 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
     var logLine = currentDateString + " " + logEntry + "\n" + "endlog\n";
 
     var index = logpos.pos * 32;
-    for (i = 0; i < 32; i++)
+    for (let i = 0; i < 32; i++)
         mysector[index + i] = logLine.charCodeAt(i);
 
 
-
-    console.log("modified sector in memory");
+    // console.log("modified sector in memory");
     //console.log(myutils.hexdump(mysector, 16));
-    console.log(myutils.hexdump(mysector.slice(0, 32 * 10), 16));
+    // console.log(myutils.hexdump(mysector.slice(0, 32 * 10), 16));
 
     // write sector
     if (actuallyDoErase) {
@@ -93,19 +101,40 @@ function newLogEntry(logEntry, actuallyDoErase, actuallyDoWrite) {
 
 }
 
-function start() {
+function readLog() {
+    var mysector = myflash.readSector(1);
+    //   return mysector;
+    var str = "";
+    for (var i = 0; i < mysector.length; i++) {
+        str += String.fromCharCode(parseInt(mysector[i]));
+    }
+    return str;
+}
 
-    showFlashType();
+function start() {
+    // performance test
+    var start, end;
+
+    // showFlashType();
     console.log("before:");
     //showPages(15, 3);
     //showPages(15, 18);
+    showPages(16, 1);
+    showPages(31, 1);
+
+    start = new Date();
     var logEntry = "system start ";
     //newLogEntry(logEntry, false, false);
     //newLogEntry(logEntry,false, true);
     newLogEntry(logEntry, true, true);
+    end = new Date();
+    console.log("duration: " + (end - start));
+
     console.log("after:");
     //showPages(15, 3);
     //showPages(15, 18);
+    showPages(16, 1);
+    showPages(30, 2);
 }
 
 
