@@ -82,7 +82,7 @@ function pageHandler(req, res) {
             res.end();
             break;
         case 2:
-            clearInterval(loopTimer);
+            //clearInterval(loopTimer);
             res.writeHead(200, {
                 'Content-Type': 'text/html'
             });
@@ -97,8 +97,7 @@ function pageHandler(req, res) {
                     endFound = true;
             }
             res.end();
-            loopTimer = setInterval(mainLoop, loopPeriod);
-
+            //loopTimer = setInterval(mainLoop, loopPeriod);
             break;
         case 3:
             console.log("/functions.js requested");

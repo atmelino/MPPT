@@ -9,10 +9,14 @@ SPI1.setup({
     sck: B3
 });
 
-var myJedec = myflash.getJedec();
-console.log("manufacturer ID: " + myJedec.manufacturerId.toString(16));
-console.log("      device ID: " + myJedec.deviceId.toString(16));
-console.log("capacity: " + myflash.getCapacity());
+function getFlashType() {
+    var myJedec = myflash.getJedec();
+    line1 = "manufacturer ID: " + myJedec.manufacturerId.toString(16);
+    line2 = "device ID: " + myJedec.deviceId.toString(16);
+    line3 = "capacity: " + myflash.getCapacity();
+
+    return line1 + "\n" + line2 + "\n" + line3 + "\n";
+}
 
 
 function showPages(start, number) {
@@ -43,6 +47,8 @@ function start() {
 
     // performance test
     var start, end;
+
+    console.log(getFlashType());
 
     var writePageTest = false;
     if (writePageTest) {
@@ -82,7 +88,7 @@ function start() {
         console.log("new: " + (end - start));
     }
 
-    var writeSectorTest = true;
+    var writeSectorTest = false;
     if (writeSectorTest) {
         var startPage = 400;
 
