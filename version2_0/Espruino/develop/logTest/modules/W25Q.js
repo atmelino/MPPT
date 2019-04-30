@@ -84,7 +84,7 @@ W25Q.prototype.writePageFillSpace = function (pageNumber, arrayBuffer) {
 W25Q.prototype.writeSectorOld = function (pageNumber, arrayBuffer) {
   // overwrites a sector (256*16 bytes)
   // that memory MUST be erased first
-  // todo: deal with too few bytes in arrayBuffer
+  // todo: check if arrayBuffer has 256*16 bytes
   //console.log("writeSector length in bytes " + arrayBuffer.length)
   for (p = 0; p < 16; p++) {
     pageStart = p * 256;
