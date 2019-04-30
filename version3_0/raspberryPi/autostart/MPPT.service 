@@ -1,0 +1,23 @@
+
+
+
+[Unit]
+Description=server.js MPPT application
+Documentation=https://atmelino.github.io/MPPT/
+After=network.target
+
+[Service]
+Environment=NODE_PORT=3002
+Type=simple
+User=root
+WorkingDirectory=/home/pi/github/MPPT/version3_0/raspberryPi/MPPT
+ExecStart=/usr/local/bin/node /home/pi/github/MPPT/version3_0/raspberryPi/MPPT/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+
