@@ -1,5 +1,0 @@
-var Ina3221 = require("./sdlIna3221");
-var ina3221 = new Ina3221(i2c, {
-    address: 0x40
-});
-
