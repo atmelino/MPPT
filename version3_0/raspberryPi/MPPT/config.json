@@ -1,0 +1,11 @@
+{
+  "port": "/dev/ttyAMA0",
+  "debuglevel": "0",
+  "portArduinoUNO": "/dev/ttyAMA0",
+  "portArduinoProMini": "/dev/ttyUSB0",
+  "portArduinoBeetle": "/dev/ttyACM0",
+  "clock": "RTC",
+  "clockPC": "PC",
+  "clockRTC": "RTC",
+  "clockSim": "Sim"
+}
