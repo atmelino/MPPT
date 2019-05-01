@@ -20,6 +20,7 @@ var rtc = new RTC(rpio);
 const INA3221 = require("./INA3221.js");
 var ina3221 = new INA3221(rpio);
 var inaValues;
+var relaypin=16;
 // other
 var sendpacket = {
     type: "none",
@@ -215,6 +216,8 @@ function mainLoop() {
 }
 
 function start() {
+    rpio.open(relaypin, rpio.OUTPUT, rpio.LOW);
+    rpio.write(relaypin, rpio.HIGH);
 
     var server = httpServer.listen(8080, function () {
         var host = server.address().address;
