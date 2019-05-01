@@ -128,7 +128,7 @@ class RTC {
         this.dateTime.seconds = this.bcdToDec(rxbuf[0]);
     }
 
-    readDateTimeUTC() {
+    readDateTime() {
         this.getDateTime();
         //var d = new Date(this.bcdToDec(rxbuf[6]) + century, this.bcdToDec(rxbuf[5]), this.bcdToDec(rxbuf[4]), this.bcdToDec(rxbuf[2]), this.bcdToDec(rxbuf[1]), this.bcdToDec(rxbuf[0]), 0);
         var d = new Date(this.dateTime.year + century, this.dateTime.month, this.dateTime.date, this.dateTime.hours, this.dateTime.minutes, this.dateTime.seconds, 0);
@@ -136,7 +136,7 @@ class RTC {
         return d;
     }
 
-    readDateTimeUTCString() {
+    readDateTimeString() {
         this.getDateTime();
         let y = this.dateTime.year + century;
         let m = ("0" + (this.dateTime.month + 1)).slice(-2);
@@ -145,7 +145,7 @@ class RTC {
         let mi = ("0" + this.dateTime.minutes).slice(-2);
         let s = ("0" + this.dateTime.seconds).slice(-2);
         //var date = this.dateTime.year + century + "-" + this.dateTime.month+1 + "-" + this.dateTime.date + " " + this.dateTime.hours + ":" + this.dateTime.minutes + ":" + this.dateTime.seconds;
-        var date = y + "-" + m + "-" + d + " " + h + ":" + mi + ":" + s;
+        var date = y + "-" + m + "-" + d + "_" + h + ":" + mi + ":" + s;
         return date;
     }
 

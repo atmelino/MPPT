@@ -13,16 +13,20 @@ class INA3221 {
             shunt2: 0.1,
             shunt3: 0.1
         };
+
         this.result = {
-            BusVoltage1: 0,
-            ShuntVoltage1: 0,
+            busVoltage1: 0,
+            shuntVoltage1: 0,
             current_mA1: 0,
-            BusVoltage2: 0,
-            ShuntVoltage2: 0,
+            power_mW1: 0,
+            busVoltage2: 0,
+            shuntVoltage2: 0,
             current_mA2: 0,
-            BusVoltage3: 0,
-            ShuntVoltage3: 0,
-            current_mA3: 0
+            power_mW2: 0,
+            busVoltage3: 0,
+            shuntVoltage3: 0,
+            current_mA3: 0,
+            power_mW3: 0
         };
         this.rpio = rpio;
     }
@@ -106,12 +110,15 @@ class INA3221 {
         this.result.shuntVoltage1 = this.getShuntVoltage1();
         this.result.busVoltage1 = this.getBusVoltage1();
         this.result.current_mA1 = this.result.shuntVoltage1 / this.options.shunt1;
+        this.result.power_mW1 = this.result.busVoltage1 * this.result.current_mA1;
         this.result.shuntVoltage2 = this.getShuntVoltage2();
         this.result.busVoltage2 = this.getBusVoltage2();
         this.result.current_mA2 = this.result.shuntVoltage2 / this.options.shunt2;
+        this.result.power_mW2 = this.result.busVoltage2 * this.result.current_mA2;
         this.result.shuntVoltage3 = this.getShuntVoltage3();
         this.result.busVoltage3 = this.getBusVoltage3();
         this.result.current_mA3 = this.result.shuntVoltage3 / this.options.shunt3;
+        this.result.power_mW3 = this.result.busVoltage3 * this.result.current_mA3;
         return this.result;
     };
 
