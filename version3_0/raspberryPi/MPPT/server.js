@@ -13,6 +13,9 @@ var config = require("./config.json");
 console.log("debug level " + config.debuglevel);
 const RTC = require("./RTC.js");
 var rtc = new RTC();
+const INA3221 = require("./INA3221.js");
+var ina3221 = new INA3221();
+var allChannelsResult;
 var ip = require("ip");
 const fs = require("fs");
 const fse = require("fs-extra");
@@ -155,23 +158,7 @@ function connectClient(newClient) {
 }
 
 function listen(data) {
-  var newUTCdate;
-  debugMsgln(data, 2);
-  if (config.clock == "RTC") newUTCdate = rtc.readDate();
-  if (config.clock == "PC") newUTCdate = new Date();
-  if (config.clock == "Sim") {
-    tmpDate = new Date();
-    newUTCdate = new Date(tmpDate.getTime() + simmonth * 2700000000);
-  }
-  const t1 = oldBufferDate.toISOString();
-  const t2 = newUTCdate.toISOString();
-  var localdate = new Date(
-    newUTCdate.getTime() - newUTCdate.getTimezoneOffset() * 60000
-  );
-  var localdatestring = localdate
-    .toISOString()
-    .replace(/:/g, "_")
-    .slice(0, 19);
+
   var receivedmessage;
   try {
     var receivedmessage = JSON.parse(data);
@@ -300,27 +287,42 @@ function debugMsg(message, level) {
   }
 }
 
+function makeLine() {
+  var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3;
+  var batteryvals = allChannelsResult.busVoltage1 + ' ' + allChannelsResult.current_mA1 + ' ' + allChannelsResult.power_mW1;
+  var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals + ' ' + PWM_actual + '\n';
+  return line;
+}
+
+function printValues() {
+  console.log(makeLine());
+}
 
 function mainLoop() {
   //console.log("I'm running! :-)");
+  allChannelsResult = ina3221.getAllChannels();
+  solarVoltage = allChannelsResult.busVoltage3;
+  batteryVoltage = allChannelsResult.busVoltage1;
+  batteryCurrent = allChannelsResult.current_mA1;
 
-  var newUTCdate;
-  if (config.clock == "RTC") newUTCdate = rtc.readDate();
-  if (config.clock == "PC") newUTCdate = new Date();
-  if (config.clock == "Sim") {
-    tmpDate = new Date();
-    newUTCdate = new Date(tmpDate.getTime() + simmonth * 2700000000);
-  }
+  // if (config.clock == "RTC") newUTCdate = rtc.readDate();
+  // if (config.clock == "PC") newUTCdate = new Date();
+  // if (config.clock == "Sim") {
+  //     tmpDate = new Date();
+  //     newUTCdate = new Date(tmpDate.getTime() + simmonth * 2700000000);
+  // }
+  // currentDate = rtc.readDateTime();
+  // currentDateString = rtc.dateTimeToString(currentDate);
+  // allChannelsResult.dateString = currentDateString;
+  // allChannelsResult.number = counter++;
+  // allChannelsResult.PWM_actual = PWM_actual;
+  // //printValues();
+
+  currentDate = rtc.readDate();
+  console.log(JSON.stringify(currentDate);
+
   const t1 = oldBufferDate.toISOString();
   const t2 = newUTCdate.toISOString();
-  var localdate = new Date(
-    newUTCdate.getTime() - newUTCdate.getTimezoneOffset() * 60000
-  );
-  var localdatestring = localdate
-    .toISOString()
-    .replace(/:/g, "_")
-    .slice(0, 19);
-  console.log(localdatestring);
 
 }
 

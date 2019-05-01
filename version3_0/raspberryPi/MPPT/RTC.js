@@ -27,10 +27,20 @@ class RTCPi {
     /**
      * Initialise the RTC Pi I2C connection and set the default configuration to the control register
      */
-    constructor () {
+    constructor() {
         rpio.i2cBegin();
         rpio.i2cSetSlaveAddress(rtcAddress);
         this.i2cWriteByte(CONTROL, config);
+        this.dateTime =
+            {
+                seconds: 0,
+                minutes: 0,
+                hours: 0,
+                dow: 0,
+                date: 0,
+                month: 0,
+                year: 0
+            };
     }
 
     // Private functions
@@ -109,25 +119,20 @@ class RTCPi {
         this.i2cWriteByte(DAY, this.decToBcd(date.getDate()));
         this.i2cWriteByte(MONTH, this.decToBcd(date.getMonth() - 1));
         this.i2cWriteByte(YEAR, this.decToBcd(date.getFullYear() - century));
-
     }
 
-    setDateNumbers(year, month, day, hours, minutes, seconds,dayofweek) {
-       
+    setDateNumbers(year, month, day, hours, minutes, seconds, dayofweek) {
+
         this.i2cWriteByte(SECONDS, this.decToBcd(seconds));
         this.i2cWriteByte(MINUTES, this.decToBcd(minutes));
         this.i2cWriteByte(HOURS, this.decToBcd(hours));
         this.i2cWriteByte(DAY, this.decToBcd(day));
-        this.i2cWriteByte(MONTH, this.decToBcd(month -1));
+        this.i2cWriteByte(MONTH, this.decToBcd(month - 1));
         this.i2cWriteByte(YEAR, this.decToBcd(year - century));
         this.i2cWriteByte(DAYOFWEEK, this.decToBcd(dayofweek));
-
     }
 
-    /**
-     * Read the date and time from the RTC
-     * @returns  {Date} - Returns the date as a javascript Date object
-     */
+ 
     readDate() {
         var txbuf = new Buffer(1);
         var rxbuf = new Buffer(7);
@@ -136,10 +141,31 @@ class RTCPi {
         rpio.i2cWrite(txbuf);
         rpio.i2cRead(rxbuf, 7);
 
-        var d = new Date(this.bcdToDec(rxbuf[6]) + century, this.bcdToDec(rxbuf[5]), this.bcdToDec(rxbuf[4]), this.bcdToDec(rxbuf[2]), this.bcdToDec(rxbuf[1]), this.bcdToDec(rxbuf[0]), 0);
+        this.dateTime.year = this.bcdToDec(rxbuf[6]);
+        this.dateTime.month = this.bcdToDec(rxbuf[5]);
+        this.dateTime.date = this.bcdToDec(rxbuf[4]);
+        this.dateTime.hours = this.bcdToDec(rxbuf[2]);
+        this.dateTime.minutes = this.bcdToDec(rxbuf[1]);
+        this.dateTime.seconds = this.bcdToDec(rxbuf[0]);
 
-        return d;
+        //var d = new Date(this.bcdToDec(rxbuf[6]) + century, this.bcdToDec(rxbuf[5]), this.bcdToDec(rxbuf[4]), this.bcdToDec(rxbuf[2]), this.bcdToDec(rxbuf[1]), this.bcdToDec(rxbuf[0]), 0);
+
+        return dateTime;
     }
+
+    dateTimeString() {
+        var newUTCdate;
+
+        var localdate = new Date(
+            newUTCdate.getTime() - newUTCdate.getTimezoneOffset() * 60000
+        );
+        var localdatestring = localdate
+            .toISOString()
+            .replace(/:/g, "_")
+            .slice(0, 19);
+        return localdatestring;
+    }
+
 
     /**
      * Enable the output pin
