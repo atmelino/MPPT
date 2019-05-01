@@ -23,7 +23,7 @@ function sendIntro() {
 }
 
 function readMessage(event) {
-  //console.log('readMessage');
+  //console.Data('readMessage');
   //printlnMessage("messages", event.type);
   receivedmessage = JSON.parse(event.data);
   if (receivedmessage.type != "livedata") {
@@ -55,9 +55,9 @@ function readMessage(event) {
 
   if (receivedmessage.type == "status") {
     printlnMessage("messages", JSON.stringify(receivedmessage));
-    document.getElementById("LogPeriod").value = receivedmessage.data.LogPeriod;
-    document.getElementById("LogFilePeriod").value =
-      receivedmessage.data.LogFilePeriod;
+    document.getElementById("DataPeriod").value = receivedmessage.data.DataPeriod;
+    document.getElementById("DataFilePeriod").value =
+      receivedmessage.data.DataFilePeriod;
     document.getElementById("bufferLength").value =
       receivedmessage.data.bufferLength;
   }
@@ -74,7 +74,7 @@ function refreshTable(tableName, data) {
   }
   var row = table.insertRow(l);
   var cell = [];
-  for (var j = 0; j < 11; j++) {
+  for (var j = 0; j < 9; j++) {
     cell[j] = row.insertCell(j);
     cell[j].innerHTML = splitString[j];
     if (j == 9) {
@@ -348,37 +348,37 @@ function setRTC() {
   alert("Date set to " + msg);
 }
 
-function enableLogs() {
-  enableLogschecked = document.getElementById("enableLogs").checked;
-  sendmessage.type = "enableLogs";
-  if (enableLogschecked == true) {
-    document.getElementById("enableLogscontent").style.display = "block";
+function enableDataFiles() {
+  enableDataFileschecked = document.getElementById("enableDataFiles").checked;
+  sendmessage.type = "enableDataFiles";
+  if (enableDataFileschecked == true) {
+    document.getElementById("enableDataFilescontent").style.display = "block";
     value = "true";
   } else {
-    document.getElementById("enableLogscontent").style.display = "none";
+    document.getElementById("enableDataFilescontent").style.display = "none";
     value = "false";
   }
   sendmessage.data = value;
   socket.send(JSON.stringify(sendmessage));
 }
 
-function setLogPeriodButton() {
-  var value = document.getElementById("LogPeriod").value;
-  sendmessage.type = "LogPeriod";
+function setDataPeriodButton() {
+  var value = document.getElementById("DataPeriod").value;
+  sendmessage.type = "DataPeriod";
   sendmessage.data = value;
   socket.send(JSON.stringify(sendmessage));
 }
 
-function setLogFilePeriodButton() {
-  var value = document.getElementById("LogFilePeriod").value;
-  sendmessage.type = "LogFilePeriod";
+function setDataFilePeriodButton() {
+  var value = document.getElementById("DataFilePeriod").value;
+  sendmessage.type = "DataFilePeriod";
   sendmessage.data = value;
   socket.send(JSON.stringify(sendmessage));
 }
 
 function requestStatus() {
-  document.getElementById("LogPeriod").value = "query..";
-  document.getElementById("LogFilePeriod").value = "query..";
+  document.getElementById("DataPeriod").value = "query..";
+  document.getElementById("DataFilePeriod").value = "query..";
   document.getElementById("bufferLength").value = "query..";
   sendmessage.type = "status";
   sendmessage.data = " ";
