@@ -1,16 +1,14 @@
 /**
  * INA3221 Class
  */
-var rpio = require('rpio');
 
 // variables
 var ina3221Address = 0x40;  // I2C address
 
 class INA3221 {
 
-    constructor() {
+    constructor(rpio) {
         this.options = {
-            address: 0x40,
             shunt1: 0.1,
             shunt2: 0.1,
             shunt3: 0.1
@@ -26,17 +24,16 @@ class INA3221 {
             ShuntVoltage3: 0,
             current_mA3: 0
         };
-
-        rpio.i2cBegin();
-        rpio.i2cSetSlaveAddress(ina3221Address);
+        this.rpio = rpio;
     }
 
     // Private functions
 
     readWord(register) {
-        var dbytes = new Buffer(7);
+        var dbytes = new Buffer(2);
         this.i2cWriteByte(register, 0x06);
-        rpio.i2cRead(dbytes, 2);
+        this.rpio.i2cSetSlaveAddress(ina3221Address);
+        this.rpio.i2cRead(dbytes, 2);
         var dword = dbytes[1] | (dbytes[0] << 8);
         if (dword > 32767) dword -= 65536;
 
@@ -54,8 +51,8 @@ class INA3221 {
      */
     i2cWriteByte(register, val) {
         var txbuf = new Buffer([register, val]);
-        rpio.i2cSetSlaveAddress(ina3221Address);
-        rpio.i2cWrite(txbuf);
+        this.rpio.i2cSetSlaveAddress(ina3221Address);
+        this.rpio.i2cWrite(txbuf);
     }
 
     // public functions
