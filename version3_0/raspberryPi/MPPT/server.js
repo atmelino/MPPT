@@ -9,32 +9,32 @@ var loopTimer;
 var loopPeriod = 1000;
 var UTCdate;
 
-UTCdate = rtc.readDate();
-console.log(UTCdate);
 
-inaValues = ina3221.readAllChannels();
-solarVoltage = inaValues.busVoltage3;
-batteryVoltage = inaValues.busVoltage1;
-batteryCurrent = inaValues.current_mA1;
-let line1 = "bus " + inaValues.busVoltage1.toFixed(3) + " V shunt " + inaValues.shuntVoltage1.toFixed(3) + " mV current " + inaValues.current_mA1.toFixed(3) + " mA";
-line3 = "bus " + inaValues.busVoltage3.toFixed(3) + " V shunt " + inaValues.shuntVoltage3.toFixed(3) + " mV current " + inaValues.current_mA3.toFixed(3) + " mA";
-console.log("channel 1: " + line1 + " channel 3: " + line3);
 
-UTCdate = rtc.readDate();
-console.log(UTCdate);
+
+function makeLine() {
+    var solarvals = allChannelsResult.busVoltage3 + ' ' + allChannelsResult.current_mA3 + ' ' + allChannelsResult.power_mW3;
+    var batteryvals = allChannelsResult.busVoltage1 + ' ' + allChannelsResult.current_mA1 + ' ' + allChannelsResult.power_mW1;
+    var line = allChannelsResult.dateString.replace(/ /g, "_") + ' ' + allChannelsResult.number + ' ' + solarvals + ' ' + batteryvals + ' ' + PWM_actual + '\n';
+    return line;
+}
+
 
 
 function mainLoop() {
-    // inaValues = ina3221.readAllChannels();
-    // solarVoltage = inaValues.busVoltage3;
-    // batteryVoltage = inaValues.busVoltage1;
-    // batteryCurrent = inaValues.current_mA1;
-    // let line1 = "bus " + inaValues.busVoltage1.toFixed(3) + " V shunt " + inaValues.shuntVoltage1.toFixed(3) + " mV current " + inaValues.current_mA1.toFixed(3) + " mA";
-    // line3 = "bus " + inaValues.busVoltage3.toFixed(3) + " V shunt " + inaValues.shuntVoltage3.toFixed(3) + " mV current " + inaValues.current_mA3.toFixed(3) + " mA";
-    // console.log("channel 1: " + line1 + " channel 3: " + line3);
+    UTCdate = rtc.readDateTimeUTC();
+    console.log(UTCdate);
 
-    // var UTCdate = rtc.readDate();
-    // console.log(UTCdate);
+    console.log(rtc.readDateTimeUTCString());
+
+    inaValues = ina3221.readAllChannels();
+    solarVoltage = inaValues.busVoltage3;
+    batteryVoltage = inaValues.busVoltage1;
+    batteryCurrent = inaValues.current_mA1;
+    let line1 = "bus " + inaValues.busVoltage1.toFixed(3) + " V shunt " + inaValues.shuntVoltage1.toFixed(3) + " mV current " + inaValues.current_mA1.toFixed(3) + " mA";
+    line3 = "bus " + inaValues.busVoltage3.toFixed(3) + " V shunt " + inaValues.shuntVoltage3.toFixed(3) + " mV current " + inaValues.current_mA3.toFixed(3) + " mA";
+    console.log("channel 1: " + line1 + " channel 3: " + line3);
+
 
 }
 
@@ -46,7 +46,7 @@ function start() {
 
 
 
-    //loopTimer = setInterval(mainLoop, loopPeriod);
+    loopTimer = setInterval(mainLoop, loopPeriod);
 
 
 }
