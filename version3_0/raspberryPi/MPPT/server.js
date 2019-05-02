@@ -263,7 +263,7 @@ function mainLoop() {
         sendpacket.data = line;
         broadcast(JSON.stringify(sendpacket)); // send them the data as a string
     }
-    console.log(line);
+    //console.log(line);
 
 
     // let line1 = "bus " + inaValues.busVoltage1.toFixed(3) + " V shunt " + inaValues.shuntVoltage1.toFixed(3) + " mV current " + inaValues.current_mA1.toFixed(3) + " mA";
