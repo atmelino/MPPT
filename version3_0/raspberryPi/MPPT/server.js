@@ -35,7 +35,7 @@ var sendpacket = {
 var loopTimer;
 var loopPeriod = 1000;
 var buckConverter;
-var PWM_actual = 0.0;
+var PWM_actual = 0.3;
 var count = 0;
 var countDots = 0;
 var debugLevel = 1;
@@ -197,6 +197,8 @@ function makeDataLine() {
 function mainLoop() {
     count++;
     //console.log(rtc.readDateTimeString());
+    PWM_actual=1.0/count;
+    myPWM();
 
     inaValues = ina3221.readAllChannels();
     solarVoltage = inaValues.busVoltage3;
@@ -225,6 +227,13 @@ function mainLoop() {
 
 }
 
+function myPWM() {
+    buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
+    //buckConverter.write(duty);
+    buckConverter.write(PWM_actual);
+    console.log(buckConverter);
+}
+
 function start() {
     rpio.open(relaypin, rpio.OUTPUT, rpio.LOW);
     rpio.open(LEDgreen, rpio.OUTPUT, rpio.LOW);
@@ -233,11 +242,15 @@ function start() {
     rpio.write(relaypin, rpio.HIGH);
     rpio.open(IR2104enablepin, rpio.OUTPUT, rpio.HIGH);
 
-    raspi.init(() => {
-        buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
-        buckConverter.write(0.8); // 50% Duty Cycle, aka half brightness
 
-    });
+    console.log(buckConverter);
+    // raspi.init(() => {
+    //     buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
+    //     buckConverter.write(0.8);
+    //     console.log(buckConverter);
+    // });
+    raspi.init(myPWM);
+    console.log(buckConverter);
 
 
     var server = httpServer.listen(8080, function () {
