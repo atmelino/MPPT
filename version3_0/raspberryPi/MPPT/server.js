@@ -27,6 +27,8 @@ var IR2104enablepin = 18;
 var LEDgreen = 11;
 var LEDorange = 13;
 var LEDred = 15;
+var LEDOnOff = false;
+var blinkInterval;
 // other
 var sendpacket = {
     type: "none",
@@ -197,17 +199,62 @@ function makeDataLine() {
 function mainLoop() {
     count++;
     //console.log(rtc.readDateTimeString());
-    PWM_actual=1.0/count;
-    myPWM();
 
     inaValues = ina3221.readAllChannels();
     solarVoltage = inaValues.busVoltage3;
     batteryVoltage = inaValues.busVoltage1;
     batteryCurrent = inaValues.current_mA1;
-    // set LEDs
-    // rpio.write(LEDgreen, rpio.HIGH);
-    // rpio.write(LEDorange, rpio.HIGH);
-    // rpio.write(LEDred, rpio.HIGH);
+
+    // LED indicators
+    if (batteryVoltage < 7.7) {
+        rpio.write(LEDred, rpio.HIGH);
+        setTimeout(endBlink, 100); 
+    }
+    if (batteryVoltage >= 7.7 && batteryVoltage < 8.0) {
+        rpio.write(LEDorange, rpio.HIGH);
+        setTimeout(endBlink, 100); 
+    }
+    if (batteryVoltage >= 8.0) {
+        rpio.write(LEDgreen, rpio.HIGH);
+        setTimeout(endBlink, 100); 
+    }
+
+    // prevent battery overvoltage and overcurrent
+    if (batteryVoltage > 8.4 || Math.abs(batteryCurrent) > 300) {
+        PWM_actual -= 0.01;
+        // analogWrite(A0, PWM_actual, {
+        //     freq: 80000
+        // });
+    }
+
+    if (solarVoltage <= 9.0) {
+        PWM_actual = 0.0;
+        // digitalWrite(B1, 0); // PWM off disable IR2104
+        // analogWrite(A0, PWM_actual, {
+        //     freq: 0
+        // });
+    }
+
+    if (solarVoltage > 9.0) {
+        // digitalWrite(B0, 1); // connect battery
+        if (batteryVoltage < 8.2) {
+            PWM_actual += 0.02;
+        }
+        if (batteryVoltage >= 8.2 && batteryVoltage < 8.4) {
+            PWM_actual += 0.001;
+        }
+        // digitalWrite(B1, 1); // PWM on enable IR2104
+        // analogWrite(A0, PWM_actual, {
+        //     freq: 80000
+        // });
+    }
+
+    // prevent battery over discharge
+    if (batteryVoltage < 7.6 && solarVoltage <= 8.0) {
+        digitalWrite(B0, 0); //turn system off
+    }
+    //PWM_actual = 1.0 / count;
+    myPWM();
 
 
     line = makeDataLine();
@@ -227,11 +274,28 @@ function mainLoop() {
 
 }
 
+function startBlink(LEDpin) {
+    blinkInterval = setInterval(blinkLED, 250, LEDpin);
+}
+
+function blinkLED(LEDpin) { //function to start blinking
+    if (LEDOnOff)
+        rpio.write(LEDpin, rpio.HIGH);
+    else
+        rpio.write(LEDpin, rpio.LOW);
+    LEDOnOff = !LEDOnOff;
+}
+
+function endBlink() { //function to stop blinking
+    clearInterval(blinkInterval); // Stop blink intervals
+    rpio.write(LEDred, rpio.LOW);
+    rpio.write(LEDorange, rpio.LOW);
+    rpio.write(LEDgreen, rpio.LOW);
+}
+
 function myPWM() {
     buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
-    //buckConverter.write(duty);
     buckConverter.write(PWM_actual);
-    console.log(buckConverter);
 }
 
 function start() {
@@ -242,15 +306,7 @@ function start() {
     rpio.write(relaypin, rpio.HIGH);
     rpio.open(IR2104enablepin, rpio.OUTPUT, rpio.HIGH);
 
-
-    console.log(buckConverter);
-    // raspi.init(() => {
-    //     buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
-    //     buckConverter.write(0.8);
-    //     console.log(buckConverter);
-    // });
     raspi.init(myPWM);
-    console.log(buckConverter);
 
 
     var server = httpServer.listen(8080, function () {
