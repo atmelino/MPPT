@@ -14,13 +14,19 @@ const fs = require("fs");
 const fse = require("fs-extra");
 // hardware
 var rpio = require('rpio');
+const raspi = require('raspi');
+const pwm = require('raspi-pwm');
 rpio.i2cBegin();
 const RTC = require('./RTC.js');
 var rtc = new RTC(rpio);
 const INA3221 = require("./INA3221.js");
 var ina3221 = new INA3221(rpio);
 var inaValues;
-var relaypin=16;
+var relaypin = 16;
+var IR2104enablepin = 18;
+var LEDgreen = 11;
+var LEDorange = 13;
+var LEDred = 15;
 // other
 var sendpacket = {
     type: "none",
@@ -196,6 +202,9 @@ function mainLoop() {
     batteryVoltage = inaValues.busVoltage1;
     batteryCurrent = inaValues.current_mA1;
     // set LEDs
+    // rpio.write(LEDgreen, rpio.HIGH);
+    // rpio.write(LEDorange, rpio.HIGH);
+    // rpio.write(LEDred, rpio.HIGH);
 
 
     line = makeDataLine();
@@ -217,8 +226,17 @@ function mainLoop() {
 
 function start() {
     rpio.open(relaypin, rpio.OUTPUT, rpio.LOW);
+    rpio.open(LEDgreen, rpio.OUTPUT, rpio.LOW);
+    rpio.open(LEDorange, rpio.OUTPUT, rpio.LOW);
+    rpio.open(LEDred, rpio.OUTPUT, rpio.LOW);
     rpio.write(relaypin, rpio.HIGH);
+    rpio.open(IR2104enablepin, rpio.OUTPUT, rpio.HIGH);
 
+    raspi.init(() => {
+        const led = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
+        led.write(0.5); // 50% Duty Cycle, aka half brightness
+    });
+    
     var server = httpServer.listen(8080, function () {
         var host = server.address().address;
         host = host == "::" ? "localhost" : host;
