@@ -27,8 +27,6 @@ var IR2104enablepin = 18;
 var LEDgreen = 11;
 var LEDorange = 13;
 var LEDred = 15;
-var LEDOnOff = false;
-var blinkInterval;
 // other
 var sendpacket = {
     type: "none",
@@ -208,15 +206,15 @@ function mainLoop() {
     // LED indicators
     if (batteryVoltage < 7.7) {
         rpio.write(LEDred, rpio.HIGH);
-        setTimeout(endBlink, 100); 
+        setTimeout(LEDsoff, 100); 
     }
     if (batteryVoltage >= 7.7 && batteryVoltage < 8.0) {
         rpio.write(LEDorange, rpio.HIGH);
-        setTimeout(endBlink, 100); 
+        setTimeout(LEDsoff, 100); 
     }
     if (batteryVoltage >= 8.0) {
         rpio.write(LEDgreen, rpio.HIGH);
-        setTimeout(endBlink, 100); 
+        setTimeout(LEDsoff, 100); 
     }
 
     // prevent battery overvoltage and overcurrent
@@ -274,20 +272,7 @@ function mainLoop() {
 
 }
 
-function startBlink(LEDpin) {
-    blinkInterval = setInterval(blinkLED, 250, LEDpin);
-}
-
-function blinkLED(LEDpin) { //function to start blinking
-    if (LEDOnOff)
-        rpio.write(LEDpin, rpio.HIGH);
-    else
-        rpio.write(LEDpin, rpio.LOW);
-    LEDOnOff = !LEDOnOff;
-}
-
-function endBlink() { //function to stop blinking
-    clearInterval(blinkInterval); // Stop blink intervals
+function LEDsoff() { 
     rpio.write(LEDred, rpio.LOW);
     rpio.write(LEDorange, rpio.LOW);
     rpio.write(LEDgreen, rpio.LOW);
