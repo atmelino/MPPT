@@ -34,6 +34,7 @@ var sendpacket = {
 };
 var loopTimer;
 var loopPeriod = 1000;
+var buckConverter;
 var PWM_actual = 0.0;
 var count = 0;
 var countDots = 0;
@@ -233,10 +234,12 @@ function start() {
     rpio.open(IR2104enablepin, rpio.OUTPUT, rpio.HIGH);
 
     raspi.init(() => {
-        const led = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
-        led.write(0.5); // 50% Duty Cycle, aka half brightness
+        buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
+        buckConverter.write(0.8); // 50% Duty Cycle, aka half brightness
+
     });
-    
+
+
     var server = httpServer.listen(8080, function () {
         var host = server.address().address;
         host = host == "::" ? "localhost" : host;
