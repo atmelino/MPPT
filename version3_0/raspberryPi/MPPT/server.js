@@ -206,53 +206,51 @@ function mainLoop() {
     // LED indicators
     if (batteryVoltage < 7.7) {
         rpio.write(LEDred, rpio.HIGH);
-        setTimeout(LEDsoff, 100); 
+        setTimeout(LEDsoff, 100);
     }
     if (batteryVoltage >= 7.7 && batteryVoltage < 8.0) {
         rpio.write(LEDorange, rpio.HIGH);
-        setTimeout(LEDsoff, 100); 
+        setTimeout(LEDsoff, 100);
     }
     if (batteryVoltage >= 8.0) {
         rpio.write(LEDgreen, rpio.HIGH);
-        setTimeout(LEDsoff, 100); 
+        setTimeout(LEDsoff, 100);
     }
 
-    // prevent battery overvoltage and overcurrent
-    if (batteryVoltage > 8.4 || Math.abs(batteryCurrent) > 300) {
-        PWM_actual -= 0.01;
-        // analogWrite(A0, PWM_actual, {
-        //     freq: 80000
-        // });
-    }
 
-    if (solarVoltage <= 9.0) {
-        PWM_actual = 0.0;
-        // digitalWrite(B1, 0); // PWM off disable IR2104
-        // analogWrite(A0, PWM_actual, {
-        //     freq: 0
-        // });
-    }
-
-    if (solarVoltage > 9.0) {
-        // digitalWrite(B0, 1); // connect battery
-        if (batteryVoltage < 8.2) {
-            PWM_actual += 0.02;
-        }
-        if (batteryVoltage >= 8.2 && batteryVoltage < 8.4) {
+    switch (true) {
+        case batteryVoltage > 8.4: // prevent battery overvoltage
+            //console.log("battery over voltage");
+            PWM_actual -= 0.01;
+            setPWM();
+            break;
+        case Math.abs(batteryCurrent) > 1050:
+            //console.log("battery over current");
+            PWM_actual -= 0.01;
+            setPWM();
+            break;
+        case solarVoltage > 10.0 && batteryVoltage >= 8.3:
+            //console.log("increase voltage slow");
+            // rpio.write(relaypin, rpio.HIGH); // connect battery
             PWM_actual += 0.001;
-        }
-        // digitalWrite(B1, 1); // PWM on enable IR2104
-        // analogWrite(A0, PWM_actual, {
-        //     freq: 80000
-        // });
+            setPWM();
+            break;
+        case solarVoltage > 10.0 && batteryVoltage < 8.3:
+            //console.log("increase voltage fast");
+            // rpio.write(relaypin, rpio.HIGH); // connect battery
+            PWM_actual += 0.02;
+            setPWM();
+            break;
+        case solarVoltage <= 10.0 && batteryVoltage >= 7.6:
+            //console.log("solar under voltage");
+            stopPWM();
+            break;
+        case solarVoltage <= 10.0 && batteryVoltage < 7.6: // prevent battery over discharge
+            //console.log("solar and battery under voltage");
+            stopPWM();
+            // rpio.write(relaypin, rpio.LOW); // disconnect battery
+            break;
     }
-
-    // prevent battery over discharge
-    if (batteryVoltage < 7.6 && solarVoltage <= 8.0) {
-        digitalWrite(B0, 0); //turn system off
-    }
-    //PWM_actual = 1.0 / count;
-    myPWM();
 
 
     line = makeDataLine();
@@ -265,33 +263,35 @@ function mainLoop() {
     }
     //console.log(line);
 
-
-    // let line1 = "bus " + inaValues.busVoltage1.toFixed(3) + " V shunt " + inaValues.shuntVoltage1.toFixed(3) + " mV current " + inaValues.current_mA1.toFixed(3) + " mA";
-    // line3 = "bus " + inaValues.busVoltage3.toFixed(3) + " V shunt " + inaValues.shuntVoltage3.toFixed(3) + " mV current " + inaValues.current_mA3.toFixed(3) + " mA";
-    // console.log("channel 1: " + line1 + " channel 3: " + line3);
-
 }
 
-function LEDsoff() { 
+function LEDsoff() {
     rpio.write(LEDred, rpio.LOW);
     rpio.write(LEDorange, rpio.LOW);
     rpio.write(LEDgreen, rpio.LOW);
 }
 
-function myPWM() {
+function setPWM() {
+    rpio.write(IR2104enablepin, rpio.HIGH); // PWM on, enable IR2104
     buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
+    if (PWM_actual > 1.0)
+        PWM_actual = 1.0;
     buckConverter.write(PWM_actual);
 }
 
+function stopPWM() {
+    PWM_actual = 0.0;
+    rpio.write(IR2104enablepin, rpio.LOW); // PWM off, disable IR2104
+}
+
+
 function start() {
-    rpio.open(relaypin, rpio.OUTPUT, rpio.LOW);
+    rpio.open(relaypin, rpio.OUTPUT, rpio.HIGH);
     rpio.open(LEDgreen, rpio.OUTPUT, rpio.LOW);
     rpio.open(LEDorange, rpio.OUTPUT, rpio.LOW);
     rpio.open(LEDred, rpio.OUTPUT, rpio.LOW);
-    rpio.write(relaypin, rpio.HIGH);
     rpio.open(IR2104enablepin, rpio.OUTPUT, rpio.HIGH);
-
-    raspi.init(myPWM);
+    raspi.init(setPWM);
 
 
     var server = httpServer.listen(8080, function () {
@@ -309,3 +309,38 @@ function start() {
 
 start();
 
+    // // prevent battery overvoltage
+    // if (batteryVoltage > 8.4) {
+    //     console.log("battery over voltage");
+    //     PWM_actual -= 0.01;
+    // }
+
+    // // prevent battery overvoltage and overcurrent
+    // if (Math.abs(batteryCurrent) > 300) {
+    //     console.log("battery over current");
+    //     PWM_actual -= 0.01;
+    // }
+
+    // if (solarVoltage <= 9.0) {
+    //     console.log("solar under voltage");
+    //     PWM_actual = 0.0;
+    //     // digitalWrite(B1, 0); // PWM off disable IR2104
+    // }
+
+    // if (solarVoltage > 9.0) {
+    //     // digitalWrite(B0, 1); // connect battery
+    //     if (batteryVoltage < 8.3) {
+    //         console.log("increase voltage fast");
+    //         PWM_actual += 0.02;
+    //     }
+    //     if (batteryVoltage >= 8.3 && batteryVoltage < 8.4) {
+    //         console.log("increase voltage slow");
+    //         PWM_actual += 0.001;
+    //     }
+    //     // digitalWrite(B1, 1); // PWM on enable IR2104
+    // }
+
+    // // prevent battery over discharge
+    // if (batteryVoltage < 7.6 && solarVoltage <= 8.0) {
+    //     // rpio.write(relaypin, rpio.LOW);        //turn system off
+    // }
