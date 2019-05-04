@@ -14,9 +14,9 @@ const fs = require("fs");
 const fse = require("fs-extra");
 // hardware
 var rpio = require('rpio');
+rpio.i2cBegin();
 const raspi = require('raspi');
 const pwm = require('raspi-pwm');
-rpio.i2cBegin();
 const RTC = require('./RTC.js');
 var rtc = new RTC(rpio);
 const INA3221 = require("./INA3221.js");
@@ -28,6 +28,7 @@ var LEDgreen = 11;
 var LEDorange = 13;
 var LEDred = 15;
 // other
+var bufferarray = [];
 var sendpacket = {
     type: "none",
     data: "empty"
@@ -186,12 +187,63 @@ function broadcast(data) {
     });
 }
 
-function makeDataLine() {
+function LEDsoff() {
+    rpio.write(LEDred, rpio.LOW);
+    rpio.write(LEDorange, rpio.LOW);
+    rpio.write(LEDgreen, rpio.LOW);
+}
+
+function setPWM() {
+    rpio.write(IR2104enablepin, rpio.HIGH); // PWM on, enable IR2104
+    buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
+    if (PWM_actual > 1.0)
+        PWM_actual = 1.0;
+    buckConverter.write(PWM_actual);
+}
+
+function stopPWM() {
+    PWM_actual = 0.0;
+    rpio.write(IR2104enablepin, rpio.LOW); // PWM off, disable IR2104
+}
+
+function makeDataLine(dateTimeString) {
     var solarvals = inaValues.busVoltage3.toFixed(3) + " " + inaValues.current_mA3.toFixed(3) + " " + inaValues.power_mW3.toFixed(3);
     var batteryvals = inaValues.busVoltage1.toFixed(3) + " " + inaValues.current_mA1.toFixed(3) + " " + inaValues.power_mW1.toFixed(3);
     var c = ("00000" + count).slice(-5);
-    var line = rtc.readDateTimeString() + " " + c + " " + solarvals + " " + batteryvals + " " + PWM_actual.toFixed(2);
+    var line = dateTimeString + " " + c + " " + solarvals + " " + batteryvals + " " + PWM_actual.toFixed(2);
     return line;
+}
+
+function makeDataDir(year, month) {
+    const dir = "./public/data/" + year + "/" + month;
+    fse.ensureDirSync(dir);
+    //console.log("existence of folder ensured" + dir, 1);
+}
+
+function writeDataFile(dateTimeString) {
+    const year = dateTimeString.slice(0, 4);
+    const month = dateTimeString.slice(5, 7);
+    const filename = dateTimeString.replace(/:/g, "_");
+    const dir = "./public/data/" + year + "/" + month + "/";
+    var path = dir + filename + ".txt";
+
+    makeDataDir(year, month);
+
+    buffer = new Buffer.from(bufferarray.join("\n"));
+    // clear bufferarray
+    bufferarray.length = 0;
+
+    fs.open(path, "w", function (err, fd) {
+        if (err) {
+            throw "error opening file: " + err;
+        }
+        fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+            if (err) throw "error writing file: " + err;
+            fs.close(fd, function () {
+                //console.log("file written " + path, 1);
+            });
+        });
+    });
 }
 
 function mainLoop() {
@@ -252,8 +304,8 @@ function mainLoop() {
             break;
     }
 
-
-    line = makeDataLine();
+    var dateTimeString = rtc.readDateTimeString();
+    line = makeDataLine(dateTimeString);
     if (wss.clients.size > 0) {
         // if there are any clients
         //debugMsgln('clients');
@@ -263,25 +315,12 @@ function mainLoop() {
     }
     //console.log(line);
 
-}
+    bufferarray.push(line);
+    //console.log(bufferarray);
+    if (bufferarray.length > 100) {
+        writeDataFile(dateTimeString);
+    }
 
-function LEDsoff() {
-    rpio.write(LEDred, rpio.LOW);
-    rpio.write(LEDorange, rpio.LOW);
-    rpio.write(LEDgreen, rpio.LOW);
-}
-
-function setPWM() {
-    rpio.write(IR2104enablepin, rpio.HIGH); // PWM on, enable IR2104
-    buckConverter = new pwm.PWM({ pin: 'P1-12', frequency: 80000 });
-    if (PWM_actual > 1.0)
-        PWM_actual = 1.0;
-    buckConverter.write(PWM_actual);
-}
-
-function stopPWM() {
-    PWM_actual = 0.0;
-    rpio.write(IR2104enablepin, rpio.LOW); // PWM off, disable IR2104
 }
 
 
@@ -309,38 +348,3 @@ function start() {
 
 start();
 
-    // // prevent battery overvoltage
-    // if (batteryVoltage > 8.4) {
-    //     console.log("battery over voltage");
-    //     PWM_actual -= 0.01;
-    // }
-
-    // // prevent battery overvoltage and overcurrent
-    // if (Math.abs(batteryCurrent) > 300) {
-    //     console.log("battery over current");
-    //     PWM_actual -= 0.01;
-    // }
-
-    // if (solarVoltage <= 9.0) {
-    //     console.log("solar under voltage");
-    //     PWM_actual = 0.0;
-    //     // digitalWrite(B1, 0); // PWM off disable IR2104
-    // }
-
-    // if (solarVoltage > 9.0) {
-    //     // digitalWrite(B0, 1); // connect battery
-    //     if (batteryVoltage < 8.3) {
-    //         console.log("increase voltage fast");
-    //         PWM_actual += 0.02;
-    //     }
-    //     if (batteryVoltage >= 8.3 && batteryVoltage < 8.4) {
-    //         console.log("increase voltage slow");
-    //         PWM_actual += 0.001;
-    //     }
-    //     // digitalWrite(B1, 1); // PWM on enable IR2104
-    // }
-
-    // // prevent battery over discharge
-    // if (batteryVoltage < 7.6 && solarVoltage <= 8.0) {
-    //     // rpio.write(relaypin, rpio.LOW);        //turn system off
-    // }

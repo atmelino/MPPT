@@ -1,0 +1,22 @@
+{
+    "name": "writeFile01",
+    "_comment": "to install all dependencies, run 'npm install'",
+    "preferGlobal": true,
+    "version": "0.0.1",
+    "author": "atmelino",
+    "description": "writeFile01",
+    "license": "MIT",
+    "engines": {
+        "node": ">=0.10"
+    },
+    "scripts": {
+        "start": "node ./writeFile01.js"
+    },
+    "dependencies": {
+        "fs": "*",
+        "fs-extra": "*",
+        "readdirp": "*",
+        "recursive-readdir": "*",
+        "rpio": "*"
+    }
+}
