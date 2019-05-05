@@ -47,17 +47,22 @@ function readMessage(event) {
     filesComboSelect();
   }
   if (receivedmessage.type == "filedata") {
-    str = receivedmessage.data.replace(/(?:\r\n|\r|\n)/g, "<br>");
-    //document.getElementById("storedDatatmp").innerHTML = str;
+    //str = receivedmessage.data.replace(/(?:\r\n|\r|\n)/g, "<br>");
     fillTable("storedTable", receivedmessage.data);
-    //fillTable(receivedmessage.data);
   }
-
+  if (receivedmessage.type == "getLog") {
+    //printlnMessage("messages", JSON.stringify(receivedmessage));
+    //printlnMessage("messages", receivedmessage.data);
+    var logDiv = document.getElementById('logDiv');
+    var logContent = receivedmessage.data.replace(/\n/g, '<br>');
+    //printlnMessage("messages", logContent);
+    logDiv.innerHTML = logContent;
+  }
   if (receivedmessage.type == "status") {
     printlnMessage("messages", JSON.stringify(receivedmessage));
-    document.getElementById("DataPeriod").value = receivedmessage.data.DataPeriod;
-    document.getElementById("DataFilePeriod").value =
-      receivedmessage.data.DataFilePeriod;
+    document.getElementById("keepMeasurement").value = receivedmessage.data.keepMeasurement;
+    document.getElementById("DataFileLines").value =
+      receivedmessage.data.DataFileLines;
     document.getElementById("bufferLength").value =
       receivedmessage.data.bufferLength;
   }
@@ -362,25 +367,37 @@ function enableDataFiles() {
   socket.send(JSON.stringify(sendmessage));
 }
 
-function setDataPeriodButton() {
-  var value = document.getElementById("DataPeriod").value;
-  sendmessage.type = "DataPeriod";
+function setkeepMeasurementButton() {
+  var value = document.getElementById("keepMeasurement").value;
+  sendmessage.type = "keepMeasurement";
   sendmessage.data = value;
   socket.send(JSON.stringify(sendmessage));
 }
 
-function setDataFilePeriodButton() {
-  var value = document.getElementById("DataFilePeriod").value;
-  sendmessage.type = "DataFilePeriod";
+function setDataFileLinesButton() {
+  var value = document.getElementById("DataFileLines").value;
+  sendmessage.type = "DataFileLines";
   sendmessage.data = value;
   socket.send(JSON.stringify(sendmessage));
 }
 
 function requestStatus() {
-  document.getElementById("DataPeriod").value = "query..";
-  document.getElementById("DataFilePeriod").value = "query..";
+  document.getElementById("keepMeasurement").value = "query..";
+  document.getElementById("DataFileLines").value = "query..";
   document.getElementById("bufferLength").value = "query..";
   sendmessage.type = "status";
+  sendmessage.data = " ";
+  socket.send(JSON.stringify(sendmessage));
+}
+
+function saveNow() {
+  sendmessage.type = "saveNow";
+  sendmessage.data = " ";
+  socket.send(JSON.stringify(sendmessage));
+}
+
+function showLog() {
+  sendmessage.type = "getLog";
   sendmessage.data = " ";
   socket.send(JSON.stringify(sendmessage));
 }

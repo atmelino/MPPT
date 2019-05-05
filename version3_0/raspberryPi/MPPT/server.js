@@ -28,6 +28,9 @@ var LEDgreen = 11;
 var LEDorange = 13;
 var LEDred = 15;
 // other
+DataFilesYesNo = true;
+var keepMeasurement = 1;
+var DataFileLines = 100;
 var bufferarray = [];
 var sendpacket = {
     type: "none",
@@ -66,7 +69,7 @@ function connectClient(newClient) {
         if (receivedmessage.type == "listyears") {
             var path = "./public/data";
             fs.readdir(path, function (err, items) {
-                debugMsgln(items, 1);
+                //debugMsgln(items, 1);
                 if (wss.clients.size > 0) {
                     // if there are any clients
                     sendpacket.type = "listyears";
@@ -78,9 +81,9 @@ function connectClient(newClient) {
         if (receivedmessage.type == "listmonths") {
             const year = receivedmessage.data.year;
             var path = "./public/data/" + year;
-            debugMsgln(path, 1);
+            //debugMsgln(path, 1);
             fs.readdir(path, function (err, items) {
-                debugMsgln(items, 1);
+                //debugMsgln(items, 1);
                 if (wss.clients.size > 0) {
                     // if there are any clients
                     sendpacket.type = "listmonths";
@@ -94,7 +97,7 @@ function connectClient(newClient) {
             const month = receivedmessage.data.month;
             var path = "./public/data/" + year + "/" + month;
             fs.readdir(path, function (err, items) {
-                debugMsgln(items, 2);
+                //debugMsgln(items, 2);
                 if (wss.clients.size > 0) {
                     // if there are any clients
                     sendpacket.type = "listdir";
@@ -108,11 +111,11 @@ function connectClient(newClient) {
             const month = receivedmessage.data.month;
             const fileName = receivedmessage.data.fileName;
             var path = "./public/data/" + year + "/" + month + "/";
-            rnd = Math.random();
+            //rnd = Math.random();
             //name = path + fileName + "?rnd=" + rnd;
             name = path + fileName;
-            debugMsg("r", 1);
-            debugMsgln("readfile: " + name, 2);
+            //debugMsg("r", 1);
+            //debugMsgln("readfile: " + name, 2);
 
             fs.readFile(name, "utf8", function (err, contents) {
                 //debugMsgln(contents);
@@ -121,13 +124,17 @@ function connectClient(newClient) {
                 broadcast(JSON.stringify(sendpacket)); // send the data as a string
             });
         }
+        if (receivedmessage.type == "getLog") {
+            var path = "./public/data/log.txt";
+            fs.readFile(path, "utf8", function (err, contents) {
+                //debugMsgln(contents);
+                sendpacket.type = "getLog";
+                sendpacket.data = contents;
+                broadcast(JSON.stringify(sendpacket)); // send the data as a string
+            });
+        }
         if (receivedmessage.type == "PWM") {
-            var arduinoMessage = {
-                PWM: receivedmessage.data
-            };
-            var arduinoMessageJSON = JSON.stringify(arduinoMessage);
-            debugMsgln("serial port write" + arduinoMessageJSON, 1);
-            myPort.write(arduinoMessageJSON);
+            debugMsgln("set PWM to " + receivedmessage.data, 1);
         }
         if (receivedmessage.type == "SetRTC") {
             debugMsgln("SetRTC" + JSON.stringify(receivedmessage), 1);
@@ -143,48 +150,53 @@ function connectClient(newClient) {
         if (receivedmessage.type == "enableDataFiles") {
             debugMsgln("enableDataFiles" + JSON.stringify(receivedmessage), 1);
             if (receivedmessage.data == "true") {
-                DataYesNo = true;
-                debugMsgln("enableDataFiles: " + DataYesNo, 1);
+                DataFilesYesNo = true;
+                debugMsgln("enableDataFiles: " + DataFilesYesNo, 1);
             } else {
-                DataYesNo = false;
-                debugMsgln("enableDataFiles: " + DataYesNo, 1);
+                DataFilesYesNo = false;
+                debugMsgln("enableDataFiles: " + DataFilesYesNo, 1);
             }
         }
-        if (receivedmessage.type == "DataPeriod") {
-            debugMsgln("data period: " + receivedmessage.data, 1);
-            DataPeriod = receivedmessage.data;
+        if (receivedmessage.type == "keepMeasurement") {
+            debugMsgln("Keep every " + receivedmessage.data + " measurements", 1);
+            keepMeasurement = receivedmessage.data;
         }
-        if (receivedmessage.type == "DataFilePeriod") {
-            debugMsgln("data file period: " + receivedmessage.data, 1);
-            DataFilePeriod = receivedmessage.data;
+        if (receivedmessage.type == "DataFileLines") {
+            debugMsgln("Save Data file every " + receivedmessage.data + " measurements", 1);
+            DataFileLines = receivedmessage.data;
         }
         if (receivedmessage.type == "status") {
-            debugMsgln("status", 1);
+            //debugMsgln("status", 1);
             sendpacket.type = "status";
             sendpacket.data = {
-                DataPeriod: DataPeriod,
-                DataFilePeriod: DataFilePeriod,
+                keepMeasurement: keepMeasurement,
+                DataFileLines: DataFileLines,
                 bufferLength: bufferarray.length
             };
             broadcast(JSON.stringify(sendpacket)); // send the data as a string
+        }
+        if (receivedmessage.type == "saveNow") {
+            var dateTimeString = rtc.readDateTimeString();
+            writeDataFile(dateTimeString);
         }
     }
 
     // set up event listeners:
     newClient.on("message", readMessage);
     // acknowledge new client:
-    //debugMsgln("new client");
-    debugMsgln("connectClient - number of clients " + wss.clients.size, 1);
+    logEntry("connectClient - number of clients " + wss.clients.size);
+    //debugMsgln("connectClient - number of clients " + wss.clients.size, 1);
 }
 
 // broadcast data to connected webSocket clients:
 function broadcast(data) {
     //debugMsgln("broadcast - number of clients " + wss.clients.size);
-
-    wss.clients.forEach(function each(client) {
-        //debugMsgln('sending to client');
-        client.send(data);
-    });
+    try {
+        wss.clients.forEach(function each(client) {
+            client.send(data);
+        });
+        //} catch (e) { console.log(e); }
+    } catch (e) { console.log("WebSocket send requested but not open"); }
 }
 
 function LEDsoff() {
@@ -246,9 +258,25 @@ function writeDataFile(dateTimeString) {
     });
 }
 
+function logEntry(text) {
+    var dateTimeString = rtc.readDateTimeString();
+    var logLine = dateTimeString + " " + text + "\n";
+    buffer = new Buffer.from(logLine);
+    const dir = "./public/data/";
+    var path = dir + "log.txt";
+    fs.open(path, "a", function (err, fd) {
+        if (err) {
+            throw "error opening file: " + err;
+        }
+        fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+            if (err) throw "error writing file: " + err;
+            fs.close(fd, function () {
+            });
+        });
+    });
+}
+
 function mainLoop() {
-    count++;
-    //console.log(rtc.readDateTimeString());
 
     inaValues = ina3221.readAllChannels();
     solarVoltage = inaValues.busVoltage3;
@@ -268,7 +296,6 @@ function mainLoop() {
         rpio.write(LEDgreen, rpio.HIGH);
         setTimeout(LEDsoff, 100);
     }
-
 
     switch (true) {
         case batteryVoltage > 8.4: // prevent battery overvoltage
@@ -299,13 +326,17 @@ function mainLoop() {
             break;
         case solarVoltage <= 10.0 && batteryVoltage < 7.6: // prevent battery over discharge
             //console.log("solar and battery under voltage");
+            logEntry("low battery shutdown");
             stopPWM();
+            // give it a bit of time before turning off power
             // rpio.write(relaypin, rpio.LOW); // disconnect battery
             break;
     }
 
+    count++;
     var dateTimeString = rtc.readDateTimeString();
     line = makeDataLine(dateTimeString);
+    debugMsgln(line, 2);
     if (wss.clients.size > 0) {
         // if there are any clients
         //debugMsgln('clients');
@@ -313,14 +344,19 @@ function mainLoop() {
         sendpacket.data = line;
         broadcast(JSON.stringify(sendpacket)); // send them the data as a string
     }
-    //console.log(line);
 
-    bufferarray.push(line);
-    //console.log(bufferarray);
-    if (bufferarray.length > 100) {
-        writeDataFile(dateTimeString);
+    if (DataFilesYesNo) {
+        //debugMsgln("Keep every " + keepMeasurement + " measurements", 0);
+        //debugMsgln("count " + count + " remainder " + count % keepMeasurement, 0);
+
+        if (count % keepMeasurement == 0) {
+            //console.log("keep measurement");
+            bufferarray.push(line);
+        }
+        if (bufferarray.length > DataFileLines) {
+            writeDataFile(dateTimeString);
+        }
     }
-
 }
 
 
@@ -332,7 +368,6 @@ function start() {
     rpio.open(IR2104enablepin, rpio.OUTPUT, rpio.HIGH);
     raspi.init(setPWM);
 
-
     var server = httpServer.listen(8080, function () {
         var host = server.address().address;
         host = host == "::" ? "localhost" : host;
@@ -342,9 +377,9 @@ function start() {
 
     wss.on("connection", connectClient); // listen for webSocket messages
 
+    logEntry("system start");
 
     loopTimer = setInterval(mainLoop, loopPeriod);
 }
 
 start();
-
