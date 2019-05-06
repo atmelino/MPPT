@@ -29,8 +29,8 @@ var LEDorange = 13;
 var LEDred = 15;
 // other
 DataFilesYesNo = true;
-var keepMeasurement = 1;
-var DataFileLines = 100;
+var keepMeasurement = 10;
+var DataFileLines = 90;
 var bufferarray = [];
 var sendpacket = {
     type: "none",
@@ -40,6 +40,8 @@ var loopTimer;
 var loopPeriod = 1000;
 var buckConverter;
 var PWM_actual = 0.3;
+var PWM_requested = 0.3;
+var PWMModeMPPT = true;
 var count = 0;
 var countDots = 0;
 var debugLevel = 1;
@@ -133,8 +135,16 @@ function connectClient(newClient) {
                 broadcast(JSON.stringify(sendpacket)); // send the data as a string
             });
         }
+        if (receivedmessage.type == "PWMMode") {
+            debugMsgln("set PWMMode to " + receivedmessage.data, 1);
+            if (receivedmessage.data == "MPPT")
+                PWMModeMPPT = true
+            else
+                PWMModeMPPT = false;
+        }
         if (receivedmessage.type == "PWM") {
             debugMsgln("set PWM to " + receivedmessage.data, 1);
+            PWM_requested = parseFloat(receivedmessage.data);
         }
         if (receivedmessage.type == "SetRTC") {
             debugMsgln("SetRTC" + JSON.stringify(receivedmessage), 1);
@@ -297,42 +307,55 @@ function mainLoop() {
         setTimeout(LEDsoff, 100);
     }
 
-    switch (true) {
-        case batteryVoltage > 8.4: // prevent battery overvoltage
+
+    if (PWMModeMPPT) {
+        switch (true) {
+            case batteryVoltage > 8.4: // prevent battery overvoltage
+                //console.log("battery over voltage");
+                PWM_actual -= 0.01;
+                setPWM();
+                break;
+            case Math.abs(batteryCurrent) > 1050:
+                //console.log("battery over current");
+                PWM_actual -= 0.01;
+                setPWM();
+                break;
+            case solarVoltage > 10.0 && batteryVoltage >= 8.3:
+                //console.log("increase voltage slow");
+                // rpio.write(relaypin, rpio.HIGH); // connect battery
+                PWM_actual += 0.001;
+                setPWM();
+                break;
+            case solarVoltage > 10.0 && batteryVoltage < 8.3:
+                //console.log("increase voltage fast");
+                // rpio.write(relaypin, rpio.HIGH); // connect battery
+                PWM_actual += 0.02;
+                setPWM();
+                break;
+            case solarVoltage <= 10.0 && batteryVoltage >= 7.6:
+                //console.log("solar under voltage");
+                stopPWM();
+                break;
+            case solarVoltage <= 10.0 && batteryVoltage < 7.6: // prevent battery over discharge
+                //console.log("solar and battery under voltage");
+                logEntry("low battery shutdown");
+                stopPWM();
+                // give it a bit of time before turning off power
+                // rpio.write(relaypin, rpio.LOW); // disconnect battery
+                break;
+        }
+    } else {
+        if (batteryVoltage > 8.4) // prevent battery overvoltage
+        {
             //console.log("battery over voltage");
             PWM_actual -= 0.01;
+            PWM_requested = PWM_actual;
             setPWM();
-            break;
-        case Math.abs(batteryCurrent) > 1050:
-            //console.log("battery over current");
-            PWM_actual -= 0.01;
+        } else {
+            PWM_actual = PWM_requested;
             setPWM();
-            break;
-        case solarVoltage > 10.0 && batteryVoltage >= 8.3:
-            //console.log("increase voltage slow");
-            // rpio.write(relaypin, rpio.HIGH); // connect battery
-            PWM_actual += 0.001;
-            setPWM();
-            break;
-        case solarVoltage > 10.0 && batteryVoltage < 8.3:
-            //console.log("increase voltage fast");
-            // rpio.write(relaypin, rpio.HIGH); // connect battery
-            PWM_actual += 0.02;
-            setPWM();
-            break;
-        case solarVoltage <= 10.0 && batteryVoltage >= 7.6:
-            //console.log("solar under voltage");
-            stopPWM();
-            break;
-        case solarVoltage <= 10.0 && batteryVoltage < 7.6: // prevent battery over discharge
-            //console.log("solar and battery under voltage");
-            logEntry("low battery shutdown");
-            stopPWM();
-            // give it a bit of time before turning off power
-            // rpio.write(relaypin, rpio.LOW); // disconnect battery
-            break;
+        }
     }
-
     count++;
     var dateTimeString = rtc.readDateTimeString();
     line = makeDataLine(dateTimeString);
@@ -361,6 +384,7 @@ function mainLoop() {
 
 
 function start() {
+
     rpio.open(relaypin, rpio.OUTPUT, rpio.HIGH);
     rpio.open(LEDgreen, rpio.OUTPUT, rpio.LOW);
     rpio.open(LEDorange, rpio.OUTPUT, rpio.LOW);
@@ -383,3 +407,4 @@ function start() {
 }
 
 start();
+

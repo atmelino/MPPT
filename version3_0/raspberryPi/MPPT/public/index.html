@@ -9,18 +9,16 @@
 </head>
 
 <body>
-  <div id="menuheader">
+  <div id="menuheader" style=" white-space: nowrap;">
     <div style="display: table; background-color: #eeeeff;">
       <div style="display: table-row">
-        <div style="width: 20%; display: table-cell; white-space: nowrap;">
+        <div style="width: 10%; display: table-cell; white-space: nowrap;">
           Status: <label id="divStatus"></label>
         </div>
         <div style="width: 30%; display: table-cell; white-space: nowrap;">
-          <label style="white-space: nowrap"><input type="radio" name="LS" id="live" onclick="liveStored()"
-              checked="true" />live</label>
+          <label><input type="radio" name="LS" id="live" onclick="liveStored()" checked="true" />live</label>
           <!-- -->
-          <label style="white-space: nowrap"><input type="radio" name="LS" id="stored"
-              onclick="liveStored()" />stored</label>
+          <label><input type="radio" name="LS" id="stored" onclick="liveStored()" />stored</label>
           <span style=" visibility:hidden" id="fileSelect">
             <select id="yearsComboBox" onchange="yearsComboSelect()">
               <option>2019</option>
@@ -33,15 +31,19 @@
             </select>
           </span>
         </div>
-        <div style="width: 12%; display: table-cell; white-space: nowrap;" id="PWMmanualdiv">
-          PWM: <input id="PWMact" name="PWMact" value="???" size="5" disabled /><input id="PWM" name="PWM" value="128"
-            size="5" />
-          <button id="setPWM" onclick="setPWMButton()">set PWM</button>
+        <div style="width: 50%; display: table-cell; white-space: nowrap;">PWM:
+          <label><input type="radio" name="PWM" id="MPPT" onclick="PWMMode()" checked="true" />MPPT</label>
+          <!-- -->
+          <label><input type="radio" name="PWM" id="PWMmanual" onclick="PWMMode()" />Manual</label>
+
+          <span style="visibility : hidden ; white-space: nowrap;" id="PWMmanualdiv">
+            <label><input id="PWM" name="PWM" value="0.5" size="5"></label>
+            <button id="setPWM" onclick="setPWMButton()">set PWM</button>
+          </span>
+
         </div>
-        <div style="width: 12%; display: table-cell; white-space: nowrap; display:none" id="MPPTdiv">
-          MPPT
-        </div>
-        <div style="width: 12%; display: table-cell; white-space: nowrap;">
+
+        <div style="width: 10%; display: table-cell; white-space: nowrap;">
           <img src="settings.png" alt="settings" height="20" width="20" onclick="settingsClicked()" />
         </div>
       </div>
@@ -143,7 +145,8 @@
             </div>
             <div style='width: 40%; display: table-cell; white-space: nowrap;'>
               <button onclick="setRTC()">Set Real Time Clock</button><br>
-              <button onclick="showLog()">Show Log</button><button onclick="hideLog()">Hide Log</button> <br>
+              <button onclick="showLog()">Show Log</button>
+              <button onclick="hideLog()">Hide Log</button> <br>
               <button onclick="printCookies()">show cookies</button><br>
               <button onclick="attribution()">attribution</button> <br>
             </div>

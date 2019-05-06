@@ -51,11 +51,8 @@ function readMessage(event) {
     fillTable("storedTable", receivedmessage.data);
   }
   if (receivedmessage.type == "getLog") {
-    //printlnMessage("messages", JSON.stringify(receivedmessage));
-    //printlnMessage("messages", receivedmessage.data);
     var logDiv = document.getElementById('logDiv');
     var logContent = receivedmessage.data.replace(/\n/g, '<br>');
-    //printlnMessage("messages", logContent);
     logDiv.innerHTML = logContent;
   }
   if (receivedmessage.type == "status") {
@@ -109,22 +106,6 @@ function fillTable(tableName, data) {
   }
 }
 
-function printMessage(target, message) {
-  elementId = document.getElementById(target);
-  if (elementId != null) {
-    elementId.innerHTML += message;
-    elementId.scrollTop = elementId.scrollHeight;
-  }
-}
-
-function printlnMessage(target, message) {
-  elementId = document.getElementById(target);
-  if (elementId != null) {
-    printMessage(target, message);
-    elementId.innerHTML += "\n";
-  }
-}
-
 function liveStored() {
   ldchecked = document.getElementById("live").checked;
   //printlnMessage("messages", ldchecked);
@@ -175,18 +156,6 @@ function setFilesComboBox(items) {
   }
 }
 
-function AddItem(Element, Text, Value) {
-  // Create an Option object
-  var opt = document.createElement("option");
-
-  // Add an Option object to Drop Down/List Box
-  document.getElementById(Element).options.add(opt);
-
-  // Assign text and value to Option object
-  opt.text = Text;
-  opt.value = Value;
-}
-
 function yearsComboSelect() {
   const year = getSelectedText("yearsComboBox");
   sendmessage.type = "listmonths";
@@ -214,12 +183,6 @@ function filesComboSelect() {
   refreshData(year, month, fileName);
 }
 
-function getSelectedText(elementId) {
-  var elt = document.getElementById(elementId);
-  if (elt.selectedIndex == -1) return null;
-  return elt.options[elt.selectedIndex].text;
-}
-
 function refreshData(year, month, fileName) {
   sendmessage.type = "readfile";
   sendmessage.data = {
@@ -230,33 +193,32 @@ function refreshData(year, month, fileName) {
   socket.send(JSON.stringify(sendmessage));
 }
 
-function showHide(name) {
-  var x = document.getElementById(name);
-  if (x.style.display === "none") {
-    x.style.display = "block";
+function setPWMButton() {
+  var value = document.getElementById("PWM").value;
+  sendmessage.type = "PWM";
+  sendmessage.data = value;
+  socket.send(JSON.stringify(sendmessage));
+
+  // if (existCookie('simulation') != true)
+  //   setCookie('simulation', 0, 100);
+  // if (getCookie('simulation') == '1')
+  //   sim = 1;
+  // else
+  //   sim = 0;
+}
+
+function PWMMode() {
+  PWMmanualchecked = document.getElementById("PWMmanual").checked;
+  sendmessage.type = "PWMMode";
+  if (PWMmanualchecked == true) {
+    visible("PWMmanualdiv");
+    value = "PWMmanual";
   } else {
-    x.style.display = "none";
+    invisible("PWMmanualdiv");
+    value = "MPPT";
   }
-}
-
-function show(name) {
-  var x = document.getElementById(name);
-  x.style.display = "block";
-}
-
-function visible(name) {
-  var x = document.getElementById(name);
-  x.style.visibility = "visible";
-}
-
-function hide(name) {
-  var x = document.getElementById(name);
-  x.style.display = "none";
-}
-
-function invisible(name) {
-  var x = document.getElementById(name);
-  x.style.visibility = "hidden";
+  sendmessage.data = value;
+  socket.send(JSON.stringify(sendmessage));
 }
 
 function settingsClicked() {
@@ -286,35 +248,6 @@ function attribution() {
   alert(att0 + att1 + att2 + att3);
 }
 
-function setPWMButton() {
-  var value = document.getElementById("PWM").value;
-  sendmessage.type = "PWM";
-  sendmessage.data = value;
-  socket.send(JSON.stringify(sendmessage));
-
-  // if (existCookie('simulation') != true)
-  //   setCookie('simulation', 0, 100);
-  // if (getCookie('simulation') == '1')
-  //   sim = 1;
-  // else
-  //   sim = 0;
-}
-
-function PWMMode() {
-  manualchecked = document.getElementById("manual").checked;
-  sendmessage.type = "PWMMode";
-  if (manualchecked == true) {
-    show("PWMmanualdiv");
-    hide("MPPTdiv");
-    value = "manual";
-  } else {
-    show("MPPTdiv");
-    hide("PWMmanualdiv");
-    value = "MPPT";
-  }
-  sendmessage.data = value;
-  socket.send(JSON.stringify(sendmessage));
-}
 
 function setRTC() {
   var currentDate = new Date(Date.now());
@@ -402,9 +335,82 @@ function showLog() {
   socket.send(JSON.stringify(sendmessage));
 }
 
+
+function hideLog() {
+  var logDiv = document.getElementById('logDiv');
+  logDiv.innerHTML = "";
+}
+
+
+// Helper functions
+
 function debugMsgln(message, level) {
   if (level <= debugLevel)
     printlnMessage("messages", message);
+}
+
+function printMessage(target, message) {
+  elementId = document.getElementById(target);
+  if (elementId != null) {
+    elementId.innerHTML += message;
+    elementId.scrollTop = elementId.scrollHeight;
+  }
+}
+
+function printlnMessage(target, message) {
+  elementId = document.getElementById(target);
+  if (elementId != null) {
+    printMessage(target, message);
+    elementId.innerHTML += "\n";
+  }
+}
+
+function show(name) {
+  var x = document.getElementById(name);
+  x.style.display = "block";
+}
+
+function hide(name) {
+  var x = document.getElementById(name);
+  x.style.display = "none";
+}
+
+function showHide(name) {
+  var x = document.getElementById(name);
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+
+function visible(name) {
+  var x = document.getElementById(name);
+  x.style.visibility = "visible";
+}
+
+function invisible(name) {
+  var x = document.getElementById(name);
+  x.style.visibility = "hidden";
+}
+
+
+function AddItem(Element, Text, Value) {
+  // Create an Option object
+  var opt = document.createElement("option");
+
+  // Add an Option object to Drop Down/List Box
+  document.getElementById(Element).options.add(opt);
+
+  // Assign text and value to Option object
+  opt.text = Text;
+  opt.value = Value;
+}
+
+function getSelectedText(elementId) {
+  var elt = document.getElementById(elementId);
+  if (elt.selectedIndex == -1) return null;
+  return elt.options[elt.selectedIndex].text;
 }
 
 
