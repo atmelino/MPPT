@@ -194,7 +194,7 @@ function connectClient(newClient) {
     // set up event listeners:
     newClient.on("message", readMessage);
     // acknowledge new client:
-    logEntry("connectClient - number of clients " + wss.clients.size);
+    //logEntry("connectClient - number of clients " + wss.clients.size);
     //debugMsgln("connectClient - number of clients " + wss.clients.size, 1);
 }
 
@@ -213,6 +213,15 @@ function LEDsoff() {
     rpio.write(LEDred, rpio.LOW);
     rpio.write(LEDorange, rpio.LOW);
     rpio.write(LEDgreen, rpio.LOW);
+}
+
+function LEDblink() {
+    var status = rpio.read(LEDred);
+    if (status == rpio.LOW)
+        rpio.write(LEDred, rpio.HIGH);
+    else
+        rpio.write(LEDred, rpio.LOW);
+    setTimeout(LEDblink, 40);
 }
 
 function setPWM() {
@@ -337,11 +346,16 @@ function mainLoop() {
                 stopPWM();
                 break;
             case solarVoltage <= 10.0 && batteryVoltage < 7.6: // prevent battery over discharge
+                clearInterval(loopTimer);
                 //console.log("solar and battery under voltage");
                 logEntry("low battery shutdown");
                 stopPWM();
+                DataFilesYesNo = false;
+                LEDblink();
                 // give it a bit of time before turning off power
-                // rpio.write(relaypin, rpio.LOW); // disconnect battery
+                setInterval(function () {
+                    rpio.write(relaypin, rpio.LOW);// disconnect battery
+                }, 5000);
                 break;
         }
     } else {
@@ -371,9 +385,7 @@ function mainLoop() {
     if (DataFilesYesNo) {
         //debugMsgln("Keep every " + keepMeasurement + " measurements", 0);
         //debugMsgln("count " + count + " remainder " + count % keepMeasurement, 0);
-
         if (count % keepMeasurement == 0) {
-            //console.log("keep measurement");
             bufferarray.push(line);
         }
         if (bufferarray.length > DataFileLines) {
