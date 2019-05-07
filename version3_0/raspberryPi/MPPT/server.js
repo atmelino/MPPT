@@ -346,16 +346,18 @@ function mainLoop() {
                 stopPWM();
                 break;
             case solarVoltage <= 10.0 && batteryVoltage < 7.6: // prevent battery over discharge
-                clearInterval(loopTimer);
                 //console.log("solar and battery under voltage");
                 logEntry("low battery shutdown");
                 stopPWM();
                 DataFilesYesNo = false;
-                LEDblink();
-                // give it a bit of time before turning off power
-                setInterval(function () {
-                    rpio.write(relaypin, rpio.LOW);// disconnect battery
-                }, 5000);
+                if (true) {
+                    LEDblink();
+                    clearInterval(loopTimer);
+                    // give it a bit of time before turning off power
+                    setInterval(function () {
+                        rpio.write(relaypin, rpio.LOW);// disconnect battery
+                    }, 10000);
+                }
                 break;
         }
     } else {
