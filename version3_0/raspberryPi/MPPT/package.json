@@ -1,0 +1,24 @@
+{
+  "name": "mppt",
+  "version": "1.0.0",
+  "description": "MPPT RPi",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "fs-extra": "^7.0.1",
+    "raspi": "^6.0.1",
+    "raspi-pwm": "^6.0.0",
+    "rpio": "^1.0.13"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atmelino/MPPT/tree/master/version3_0/raspberryPi"
+  },
+  "author": "atmelino",
+  "license": "MIT"
+}
