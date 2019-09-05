@@ -1,24 +1,26 @@
 
 
 
-
+// Import required libraries
+#include "WiFi.h"
+#include "ESPAsyncWebServer.h"
+#include "SPIFFS.h"
 #include <Wire.h>
 #include <SDL_Arduino_INA3221.h>
 
 SDL_Arduino_INA3221 ina3221;
-
 // the three channels of the INA3221 named for SunAirPlus Solar Power Controller channels (www.switchdoc.com)
-#define CHANNEL_BATTERY 2
-#define CHANNEL_SOLAR 3
-#define OUTPUT_CHANNEL 1
+#define CHANNEL_BATTERY 1 // channel 2 but 1 for array
+#define CHANNEL_SOLAR 2// channel 3 but 2 for array
 
 uint8_t pulseWidth = 0;          // a value from 0 to 255 representing the hue
 uint32_t freq = 82000;
 uint8_t resolution_bits = 8;
 uint8_t channel = 1;
 uint8_t PWM_OUT = 4;
-uint8_t PWM_ENABLE_PIN = 2;
-uint8_t myLed = 5;  // on-board blue led (also internally pulled up)
+uint8_t PWM_ENABLE_PIN = 18;
+const int ledPin = 2; // on-board blue led (also internally pulled up)
+
 byte requestedPulseWidth = 130;
 
 static char line[4][21] = {"                    ", "                    ", "                    ", "                    "};
@@ -28,6 +30,28 @@ static char cmAstr[10];
 static char pwstr[10];
 static char pwmstr[10];
 static char tapwmstr[10];
+// Replace with your network credentials
+const char* ssid = "NETGEAR53";
+const char* password = "";
+String ledState;
+
+// Create AsyncWebServer object on port 80
+AsyncWebServer server(80);
+// Replaces placeholder with LED state value
+String processor(const String& var) {
+  Serial.println(var);
+  if (var == "STATE") {
+    if (digitalRead(ledPin)) {
+      ledState = "ON";
+    }
+    else {
+      ledState = "OFF";
+    }
+    //Serial.print(ledState);
+    return ledState;
+  }
+  return String();
+}
 
 int count = 0;
 
@@ -36,13 +60,61 @@ void setup(void)
 
   Serial.begin(115200);
   Serial.println("MPPT ESP32");
+
+  // Initialize SPIFFS
+  if (!SPIFFS.begin(true)) {
+    //Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
+  else {
+    digitalWrite(ledPin, HIGH);
+    delay(300);
+  }
+    // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    digitalWrite(ledPin, LOW);
+    delay(1000);
+    digitalWrite(ledPin, HIGH);
+
+    //Serial.println("Connecting to WiFi..");
+  }
+
+  // Print ESP32 Local IP Address
+  //Serial.println(WiFi.localIP());
+
+  // Route for root / web page
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/index.html", String(), false, processor);
+  });
+
+  // Route to load style.css file
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/style.css", "text/css");
+  });
+
+  // Route to set GPIO to HIGH
+  server.on("/on", HTTP_GET, [](AsyncWebServerRequest * request) {
+    digitalWrite(ledPin, HIGH);
+    request->send(SPIFFS, "/index.html", String(), false, processor);
+  });
+
+  // Route to set GPIO to LOW
+  server.on("/off", HTTP_GET, [](AsyncWebServerRequest * request) {
+    digitalWrite(ledPin, LOW);
+    request->send(SPIFFS, "/index.html", String(), false, processor);
+  });
+
+  // Start server
+  server.begin();
+  
   Serial.println("no  Volt     mA   mW     Volt     mA   mW   eff    PWM   target");
 
   ina3221.begin();
 
-  pinMode(myLed, OUTPUT);
-  digitalWrite(myLed, LOW);// Turn off on-board blue led
-  //digitalWrite(myLed, HIGH);
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, LOW);// Turn off on-board blue led
+  //digitalWrite(ledPin, HIGH);
 
   // enable MOSFET driver chip
   pinMode(PWM_ENABLE_PIN, OUTPUT); // GPIO as output
@@ -61,27 +133,6 @@ void loop(void)
 {
   count++;
 
-  Serial.println("------------------------------");
-
-
-
-//  float shuntvoltage1 = 0;
-//  float busvoltage1 = 0;
-//  float current_mA1 = 0;
-//  float loadvoltage1 = 0;
-//
-//  busvoltage1 = ina3221.getBusVoltage_V(CHANNEL_BATTERY);
-//  shuntvoltage1 = ina3221.getShuntVoltage_mV(CHANNEL_BATTERY);
-//  current_mA1 = -ina3221.getCurrent_mA(CHANNEL_BATTERY);  // minus is to get the "sense" right.   - means the battery is charging, + that it is discharging
-//  loadvoltage1 = busvoltage1 + (shuntvoltage1 / 1000);
-//
-//  Serial.print("LIPO_Battery Bus Voltage:   "); Serial.print(busvoltage1); Serial.println(" V");
-//  Serial.print("LIPO_Battery Shunt Voltage: "); Serial.print(shuntvoltage1); Serial.println(" mV");
-//  Serial.print("LIPO_Battery Load Voltage:  "); Serial.print(loadvoltage1); Serial.println(" V");
-//  Serial.print("LIPO_Battery Current 1:       "); Serial.print(current_mA1); Serial.println(" mA");
-//  Serial.println("");
-
-
   // acquire voltages and currents
   for (int i = 0; i < 3; i++) {
     bv[i] = ina3221.getBusVoltage_V(i + 1);
@@ -94,22 +145,6 @@ void loop(void)
 
   printValuesSerial(  bv, cmA,  pw);
   
-  float shuntvoltage2 = sv[2];
-  float busvoltage2 = bv[2];
-  float current_mA2 = cmA[2];
-  float loadvoltage2 = lv[2];
-
-//  busvoltage2 = ina3221.getBusVoltage_V(CHANNEL_SOLAR);
-//  shuntvoltage2 = ina3221.getShuntVoltage_mV(CHANNEL_SOLAR);
-//  current_mA2 = -ina3221.getCurrent_mA(CHANNEL_SOLAR);
-//  loadvoltage2 = busvoltage2 + (shuntvoltage2 / 1000);
-
-  Serial.print("Solar Cell Bus Voltage 2:   "); Serial.print(busvoltage2); Serial.println(" V");
-  Serial.print("Solar Cell Shunt Voltage 2: "); Serial.print(shuntvoltage2); Serial.println(" mV");
-  Serial.print("Solar Cell Load Voltage 2:  "); Serial.print(loadvoltage2); Serial.println(" V");
-  Serial.print("Solar Cell Current 2:       "); Serial.print(current_mA2); Serial.println(" mA");
-  Serial.println("");
-
   
   delay(2000);
 
@@ -135,7 +170,6 @@ void printValuesSerial(  float bv[], float cmA[], float pw[]) {
   Serial.print(pulseWidth);
   Serial.print(" ");
   Serial.print(requestedPulseWidth);
-  Serial.print("\"}");
   Serial.println();
 }
 
