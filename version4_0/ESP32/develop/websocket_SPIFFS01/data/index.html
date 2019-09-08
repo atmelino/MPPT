@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+
+  <script type="text/javascript">
+    function WebSocketTest() {
+      if ("WebSocket" in window) {
+        alert("WebSocket is supported by your Browser!");
+        // Let us open a web socket
+        var ws = new WebSocket("ws://192.168.1.7/ws");
+        ws.onopen = function () {
+          // Web Socket is connected, send data using send()
+          ws.send("Message to send");
+          alert("Message is sent...");
+        };
+        ws.onmessage = function (evt) {
+          var received_msg = evt.data;
+          alert("Message is received...");
+          printlnMessage("messages", "Message is received...");
+
+        };
+        ws.onclose = function () {
+          // websocket is closed.
+          alert("Connection is closed...");
+        };
+      } else {
+        // The browser doesn't support WebSocket
+        alert("WebSocket NOT supported by your Browser!");
+      }
+    }
+    // Helper functions
+    function printMessage(target, message) {
+      elementId = document.getElementById(target);
+      if (elementId != null) {
+        elementId.innerHTML += message;
+        elementId.scrollTop = elementId.scrollHeight;
+      }
+    }
+
+    function printlnMessage(target, message) {
+      elementId = document.getElementById(target);
+      if (elementId != null) {
+        printMessage(target, message);
+        elementId.innerHTML += "\n";
+      }
+    }
+
+
+
+  </script>
+
+</head>
+
+<body>
+  <div id="sse">
+    <a href="javascript:WebSocketTest()">Run WebSocket</a>
+  </div>
+  <div id="messagesDiv" style="display: block">
+    <textarea id="messages" rows="20" cols="60" style="width: 100%;"></textarea>
+  </div>
+</body>
+
+</html>
