@@ -1,12 +1,10 @@
-
-
-
 // Import required libraries
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
 #include "SPIFFS.h"
 #include <Wire.h>
 #include <SDL_Arduino_INA3221.h>
+#include <ArduinoJson.h>
 
 SDL_Arduino_INA3221 ina3221;
 // the three channels of the INA3221 named for SunAirPlus Solar Power Controller channels (www.switchdoc.com)
@@ -33,27 +31,32 @@ static char tapwmstr[10];
 // Replace with your network credentials
 const char* ssid = "NETGEAR53";
 const char* password = "";
-String ledState;
+int count = 0;
+char JSONMessage[] = " {\"type\": \"livedata\", \"data\": 10}"; //Original message
+StaticJsonDocument<200> doc;
+char json_string[256];
 
-// Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
-// Replaces placeholder with LED state value
-String processor(const String& var) {
-  Serial.println(var);
-  if (var == "STATE") {
-    if (digitalRead(ledPin)) {
-      ledState = "ON";
-    }
-    else {
-      ledState = "OFF";
-    }
-    //Serial.print(ledState);
-    return ledState;
+AsyncWebSocket ws("/ws");
+void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
+  if (type == WS_EVT_CONNECT) {
+    Serial.println("Websocket client connection received");
+    //client->text("Hello from ESP32 Server");
+
+
+    doc["type"] = "livedata";
+    doc["data"] = line[0];
+    //serializeJson(doc, Serial);
+    //serializeJson(doc, char* output, size_t outputSize);
+    serializeJson(doc, json_string);
+
+    client->text(json_string);
+
+  } else if (type == WS_EVT_DISCONNECT) {
+    Serial.println("Client disconnected");
   }
-  return String();
 }
 
-int count = 0;
 
 void setup(void)
 {
@@ -70,7 +73,7 @@ void setup(void)
     digitalWrite(ledPin, HIGH);
     delay(300);
   }
-    // Connect to Wi-Fi
+  // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(ledPin, LOW);
@@ -81,33 +84,21 @@ void setup(void)
   }
 
   // Print ESP32 Local IP Address
-  //Serial.println(WiFi.localIP());
+  Serial.println(WiFi.localIP());
 
-  // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(SPIFFS, "/index.html", String(), false, processor);
-  });
-
-  // Route to load style.css file
-  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(SPIFFS, "/style.css", "text/css");
-  });
-
-  // Route to set GPIO to HIGH
-  server.on("/on", HTTP_GET, [](AsyncWebServerRequest * request) {
-    digitalWrite(ledPin, HIGH);
-    request->send(SPIFFS, "/index.html", String(), false, processor);
-  });
-
-  // Route to set GPIO to LOW
-  server.on("/off", HTTP_GET, [](AsyncWebServerRequest * request) {
-    digitalWrite(ledPin, LOW);
-    request->send(SPIFFS, "/index.html", String(), false, processor);
-  });
 
   // Start server
+  ws.onEvent(onWsEvent);
+  server.addHandler(&ws);
+  // Route for root / web pages and javascript
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/index.html", "text/html");
+  });
+  server.on("/MPPT.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/MPPT.js", "text/javascript");
+  });
   server.begin();
-  
+
   Serial.println("no  Volt     mA   mW     Volt     mA   mW   eff    PWM   target");
 
   ina3221.begin();
@@ -142,10 +133,8 @@ void loop(void)
     pw[i] = bv[i] * cmA[i];
   }
 
-
   printValuesSerial(  bv, cmA,  pw);
-  
-  
+
   delay(2000);
 
   //pulseWidth += 5;

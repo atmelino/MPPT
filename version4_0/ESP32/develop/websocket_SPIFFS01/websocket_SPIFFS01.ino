@@ -7,8 +7,7 @@ const char* ssid = "NETGEAR53";
 const char* password = "";
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
-const int ledPin = 2;
-String ledState;
+
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
   if (type == WS_EVT_CONNECT) {
@@ -17,22 +16,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   } else if (type == WS_EVT_DISCONNECT) {
     Serial.println("Client disconnected");
   }
-}
-
-// Replaces placeholder with LED state value
-String processor(const String& var) {
-  Serial.println(var);
-  if (var == "STATE") {
-    if (digitalRead(ledPin)) {
-      ledState = "ON";
-    }
-    else {
-      ledState = "OFF";
-    }
-    Serial.print(ledState);
-    return ledState;
-  }
-  return String();
 }
 
 void setup() {
@@ -56,11 +39,13 @@ void setup() {
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
 
-  // Route for root / web page
+  // Route for root / web pages and javascript
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(SPIFFS, "/index.html", String(), false, processor);
+    request->send(SPIFFS, "/index.html", "text/html");
   });
-
+  server.on("/MPPT.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/MPPT.js", "text/javascript");
+  });
 
   server.begin();
 }
