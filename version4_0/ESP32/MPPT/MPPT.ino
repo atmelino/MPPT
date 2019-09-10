@@ -35,6 +35,7 @@ int count = 0;
 char JSONMessage[] = " {\"type\": \"livedata\", \"data\": 10}"; //Original message
 StaticJsonDocument<200> doc;
 char json_string[256];
+char dataLine[100];
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -45,7 +46,9 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
 
     doc["type"] = "livedata";
-    doc["data"] = line[0];
+    //doc["data"] = line[0];
+    doc["data"] = dataLine;
+    
     //serializeJson(doc, Serial);
     //serializeJson(doc, char* output, size_t outputSize);
     serializeJson(doc, json_string);
@@ -94,6 +97,9 @@ void setup(void)
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, "/index.html", "text/html");
   });
+  server.on("/MPPT.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/MPPT.css", "text/css");
+  });
   server.on("/MPPT.js", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, "/MPPT.js", "text/javascript");
   });
@@ -134,14 +140,47 @@ void loop(void)
   }
 
   printValuesSerial(  bv, cmA,  pw);
+  makeDataLine();
+  Serial.println(dataLine);
+
 
   delay(2000);
 
   //pulseWidth += 5;
   pulseWidth = 200;
-  ledcWrite(1, pulseWidth); // write red component to channel 1, etc.
+  ledcWrite(1, pulseWidth); //
 
 }
+
+
+
+
+void makeDataLine() {
+  char* myDate = "2019-09-09_14:57:34";
+
+  int i;
+  i = CHANNEL_SOLAR;
+
+  sprintf(dataLine, "%s %5d %.3f %.3f", myDate, count, bv[1],cmA[1]);
+
+  //memcpy(dataLine, "2019-09-09_14:57:34 100 ", 0 );
+  i = CHANNEL_SOLAR;
+  dtostrf(bv[i], 5, 2, bvstr);
+  dtostrf(cmA[i], 7, 2, cmAstr);
+  dtostrf(pw[i], 7, 2, pwstr);
+  line[0][5] = ' ';
+  memcpy(&line[0][6], cmAstr, 6);
+  line[0][12] = ' ';
+  memcpy(&line[0][13], pwstr, 6);
+
+  //  var solarvals = inaValues.busVoltage3.toFixed(3) + " " + inaValues.current_mA3.toFixed(3) + " " + inaValues.power_mW3.toFixed(3);
+  //  var batteryvals = inaValues.busVoltage1.toFixed(3) + " " + inaValues.current_mA1.toFixed(3) + " " + inaValues.power_mW1.toFixed(3);
+  //  var c = ("00000" + count).slice(-5);
+  //  var line = dateTimeString + " " + c + " " + solarvals + " " + batteryvals + " " + PWM_actual.toFixed(2);
+  //  return line;
+}
+
+
 
 
 void printValuesSerial(  float bv[], float cmA[], float pw[]) {
@@ -161,6 +200,9 @@ void printValuesSerial(  float bv[], float cmA[], float pw[]) {
   Serial.print(requestedPulseWidth);
   Serial.println();
 }
+
+
+
 
 void makeLines( float bv[], float cmA[], float pw[])  {
   int i;
