@@ -3,8 +3,11 @@ var host = document.location.host;
 var socket; // the websocket
 
 
+function myonload(){
+    alert("onload");
+}
 
-function WebSocketTest() {
+function setup() {
     if ("WebSocket" in window) {
         printlnMessage("messages", "WebSocket is supported by your Browser!");
 
@@ -31,7 +34,7 @@ function WebSocketTest() {
 
 function readMessage(event) {
     var received_msg = event.data;
-    printlnMessage("messages", "Message is received..." + event.data);
+    //printlnMessage("messages", "Message is received..." + event.data);
     receivedmessage = JSON.parse(event.data);
     if (receivedmessage.type == "livedata") {
         //printlnMessage("messages", event.data);

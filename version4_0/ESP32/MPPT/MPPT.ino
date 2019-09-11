@@ -8,8 +8,8 @@
 
 SDL_Arduino_INA3221 ina3221;
 // the three channels of the INA3221 named for SunAirPlus Solar Power Controller channels (www.switchdoc.com)
-#define CHANNEL_BATTERY 1 // channel 2 but 1 for array
-#define CHANNEL_SOLAR 2// channel 3 but 2 for array
+#define CHB 1 // Battery INA channel 2 but 1 for array
+#define CHS 2// Solar INA channel 3 but 2 for array
 
 uint8_t pulseWidth = 0;          // a value from 0 to 255 representing the hue
 uint32_t freq = 82000;
@@ -32,10 +32,8 @@ static char tapwmstr[10];
 const char* ssid = "NETGEAR53";
 const char* password = "";
 int count = 0;
-char JSONMessage[] = " {\"type\": \"livedata\", \"data\": 10}"; //Original message
-StaticJsonDocument<200> doc;
-char json_string[256];
-char dataLine[100];
+
+char dataLine[200];
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -43,18 +41,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   if (type == WS_EVT_CONNECT) {
     Serial.println("Websocket client connection received");
     //client->text("Hello from ESP32 Server");
-
-
-    doc["type"] = "livedata";
-    //doc["data"] = line[0];
-    doc["data"] = dataLine;
-    
-    //serializeJson(doc, Serial);
-    //serializeJson(doc, char* output, size_t outputSize);
-    serializeJson(doc, json_string);
-
-    client->text(json_string);
-
   } else if (type == WS_EVT_DISCONNECT) {
     Serial.println("Client disconnected");
   }
@@ -105,7 +91,7 @@ void setup(void)
   });
   server.begin();
 
-  Serial.println("no  Volt     mA   mW     Volt     mA   mW   eff    PWM   target");
+  makeHeaderLine();  Serial.println(dataLine);
 
   ina3221.begin();
 
@@ -123,7 +109,6 @@ void setup(void)
   // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
   ledcSetup( channel,  freq, resolution_bits);
   //ledcSetup(1, 82000, 8); // 12 kHz PWM, 8-bit resolution
-
 }
 
 void loop(void)
@@ -139,96 +124,37 @@ void loop(void)
     pw[i] = bv[i] * cmA[i];
   }
 
-  printValuesSerial(  bv, cmA,  pw);
   makeDataLine();
   Serial.println(dataLine);
-
+  sendDataLine();
 
   delay(2000);
 
   //pulseWidth += 5;
-  pulseWidth = 200;
+  pulseWidth = 190;
   ledcWrite(1, pulseWidth); //
 
 }
 
+void sendDataLine() {
+  StaticJsonDocument<200> doc;
+  char json_string[256];
+  doc["type"] = "livedata";
+  doc["data"] = dataLine;
+  serializeJson(doc, json_string);
+  //Serial.println(json_string);
 
+  ws.printfAll(json_string);
 
+}
 
 void makeDataLine() {
   char* myDate = "2019-09-09_14:57:34";
 
-  int i;
-  i = CHANNEL_SOLAR;
-
-  sprintf(dataLine, "%s %5d %.3f %.3f", myDate, count, bv[1],cmA[1]);
-
-  //memcpy(dataLine, "2019-09-09_14:57:34 100 ", 0 );
-  i = CHANNEL_SOLAR;
-  dtostrf(bv[i], 5, 2, bvstr);
-  dtostrf(cmA[i], 7, 2, cmAstr);
-  dtostrf(pw[i], 7, 2, pwstr);
-  line[0][5] = ' ';
-  memcpy(&line[0][6], cmAstr, 6);
-  line[0][12] = ' ';
-  memcpy(&line[0][13], pwstr, 6);
-
-  //  var solarvals = inaValues.busVoltage3.toFixed(3) + " " + inaValues.current_mA3.toFixed(3) + " " + inaValues.power_mW3.toFixed(3);
-  //  var batteryvals = inaValues.busVoltage1.toFixed(3) + " " + inaValues.current_mA1.toFixed(3) + " " + inaValues.power_mW1.toFixed(3);
-  //  var c = ("00000" + count).slice(-5);
-  //  var line = dateTimeString + " " + c + " " + solarvals + " " + batteryvals + " " + PWM_actual.toFixed(2);
-  //  return line;
+  sprintf(dataLine, "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d", myDate, count, bv[CHS], cmA[CHS], pw[CHS], bv[CHB], cmA[CHB], pw[CHB], pulseWidth);
 }
 
+void makeHeaderLine() {
 
-
-
-void printValuesSerial(  float bv[], float cmA[], float pw[]) {
-  float eff = pw[CHANNEL_BATTERY] / pw[CHANNEL_SOLAR];
-  makeLines( bv, cmA,  pw) ;
-  //Serial.print("{\"type\":\"data\",\"line\":\"");
-  Serial.print(count);
-  Serial.print(" ");
-  Serial.print(line[0]);
-  Serial.print(" ");
-  Serial.print(line[1]);
-  Serial.print(" ");
-  Serial.print(eff);
-  Serial.print(" ");
-  Serial.print(pulseWidth);
-  Serial.print(" ");
-  Serial.print(requestedPulseWidth);
-  Serial.println();
-}
-
-
-
-
-void makeLines( float bv[], float cmA[], float pw[])  {
-  int i;
-  i = CHANNEL_SOLAR;
-  dtostrf(bv[i], 5, 2, bvstr);
-  dtostrf(cmA[i], 7, 2, cmAstr);
-  dtostrf(pw[i], 7, 2, pwstr);
-  memcpy(line[0], bvstr, 5);
-  line[0][5] = ' ';
-  memcpy(&line[0][6], cmAstr, 6);
-  line[0][12] = ' ';
-  memcpy(&line[0][13], pwstr, 6);
-
-  i = CHANNEL_BATTERY;
-  dtostrf(bv[i], 5, 2, bvstr);
-  dtostrf(cmA[i], 7, 2, cmAstr);
-  dtostrf(pw[i], 7, 2, pwstr);
-  memcpy(line[1], bvstr, 5);
-  line[1][5] = ' ';
-  memcpy(&line[1][6], cmAstr, 6);
-  line[1][12] = ' ';
-  memcpy(&line[1][13], pwstr, 6);
-
-  dtostrf(pulseWidth, 5, 2, pwmstr);
-  dtostrf(requestedPulseWidth, 5, 2, tapwmstr);
-  memcpy(line[2], pwmstr, 5);
-  line[2][5] = ' ';
-  memcpy(&line[2][6], tapwmstr, 6);
+  sprintf(dataLine, "%19s %5s %6s %6s %6s %5s %5s %5s %3s", "Date", "no", "Volt", "mA", "mW", "Volt", "mA", "mW", "PWM");
 }
