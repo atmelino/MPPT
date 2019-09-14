@@ -5,6 +5,9 @@
 #include <Wire.h>
 #include <SDL_Arduino_INA3221.h>
 #include <ArduinoJson.h>
+#include "FS.h"
+#include "SD.h"
+#include "SPI.h"
 
 SDL_Arduino_INA3221 ina3221;
 // the three channels of the INA3221 named for SunAirPlus Solar Power Controller channels (www.switchdoc.com)
@@ -16,7 +19,7 @@ uint32_t freq = 82000;
 uint8_t resolution_bits = 8;
 uint8_t channel = 1;
 uint8_t PWM_OUT = 4;
-uint8_t PWM_ENABLE_PIN = 18;
+uint8_t PWM_ENABLE_PIN = 15;
 const int ledPin = 2; // on-board blue led (also internally pulled up)
 
 byte requestedPulseWidth = 130;
@@ -91,7 +94,8 @@ void setup(void)
   });
   server.begin();
 
-  makeHeaderLine();  Serial.println(dataLine);
+  makeHeaderLine();
+  Serial.println(dataLine);
 
   ina3221.begin();
 
@@ -99,9 +103,21 @@ void setup(void)
   digitalWrite(ledPin, LOW);// Turn off on-board blue led
   //digitalWrite(ledPin, HIGH);
 
+
+  if (!SD.begin()) {
+    Serial.println("Card Mount Failed");
+    return;
+  } else {
+    Serial.println("Card Mount success");
+    listDir(SD, "/", 0);
+
+  }
+
+
   // enable MOSFET driver chip
   pinMode(PWM_ENABLE_PIN, OUTPUT); // GPIO as output
   digitalWrite(PWM_ENABLE_PIN, LOW);
+  digitalWrite(PWM_ENABLE_PIN, HIGH);
 
   ledcAttachPin(PWM_OUT, 1); // assign IR2104 PWM signal to channels
 
@@ -128,7 +144,7 @@ void loop(void)
   Serial.println(dataLine);
   sendDataLine();
 
-  delay(2000);
+  delay(1000);
 
   //pulseWidth += 5;
   pulseWidth = 190;
@@ -157,4 +173,35 @@ void makeDataLine() {
 void makeHeaderLine() {
 
   sprintf(dataLine, "%19s %5s %6s %6s %6s %5s %5s %5s %3s", "Date", "no", "Volt", "mA", "mW", "Volt", "mA", "mW", "PWM");
+}
+
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels) {
+  Serial.printf("Listing directory: %s\n", dirname);
+
+  File root = fs.open(dirname);
+  if (!root) {
+    Serial.println("Failed to open directory");
+    return;
+  }
+  if (!root.isDirectory()) {
+    Serial.println("Not a directory");
+    return;
+  }
+
+  File file = root.openNextFile();
+  while (file) {
+    if (file.isDirectory()) {
+      Serial.print("  DIR : ");
+      Serial.println(file.name());
+      if (levels) {
+        listDir(fs, file.name(), levels - 1);
+      }
+    } else {
+      Serial.print("  FILE: ");
+      Serial.print(file.name());
+      Serial.print("  SIZE: ");
+      Serial.println(file.size());
+    }
+    file = root.openNextFile();
+  }
 }
