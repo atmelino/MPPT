@@ -8,14 +8,17 @@
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
+#include "RTClib.h"
+
+RTC_DS1307 rtc;
 
 SDL_Arduino_INA3221 ina3221;
-// the three channels of the INA3221 named for SunAirPlus Solar Power Controller channels (www.switchdoc.com)
 #define CHB 1 // Battery INA channel 2 but 1 for array
 #define CHS 2// Solar INA channel 3 but 2 for array
 
 uint8_t pulseWidth = 0;          // a value from 0 to 255 representing the hue
-uint32_t freq = 82000;
+//uint32_t freq = 82000;
+uint32_t freq = 80000;
 uint8_t resolution_bits = 8;
 uint8_t channel = 1;
 uint8_t PWM_OUT = 4;
@@ -36,16 +39,38 @@ const char* ssid = "NETGEAR53";
 const char* password = "";
 int count = 0;
 
+char dateTime[20];
 char dataLine[200];
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
+  Serial.println("WebSocket onWsEvent");
   if (type == WS_EVT_CONNECT) {
     Serial.println("Websocket client connection received");
     //client->text("Hello from ESP32 Server");
   } else if (type == WS_EVT_DISCONNECT) {
     Serial.println("Client disconnected");
+  } else if (type == WS_EVT_DATA) {
+    Serial.println("WebSocket onWsEvent WS_EVT_DATA");
+    AwsFrameInfo * info = (AwsFrameInfo*)arg;
+    String msg = "";
+    if (info->final && info->index == 0 && info->len == len) {
+      //the whole message is in a single frame and we got all of it's data
+      Serial.printf("ws[%s][%u] %s-message[%llu]: ", server->url(), client->id(), (info->opcode == WS_TEXT) ? "text" : "binary", info->len);
+      if (info->opcode == WS_TEXT) {
+        for (size_t i = 0; i < info->len; i++) {
+          msg += (char) data[i];
+        }
+      } else {
+        char buff[3];
+        for (size_t i = 0; i < info->len; i++) {
+          sprintf(buff, "%02x ", (uint8_t) data[i]);
+          msg += buff ;
+        }
+      }
+      Serial.printf("%s\n", msg.c_str());
+    }
   }
 }
 
@@ -55,6 +80,10 @@ void setup(void)
 
   Serial.begin(115200);
   Serial.println("MPPT ESP32");
+
+  if (! rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+  }
 
   // Initialize SPIFFS
   if (!SPIFFS.begin(true)) {
@@ -166,8 +195,8 @@ void sendDataLine() {
 
 void makeDataLine() {
   char* myDate = "2019-09-09_14:57:34";
-
-  sprintf(dataLine, "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d", myDate, count, bv[CHS], cmA[CHS], pw[CHS], bv[CHB], cmA[CHB], pw[CHB], pulseWidth);
+  makeDateTime();
+  sprintf(dataLine, "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d", dateTime, count, bv[CHS], cmA[CHS], pw[CHS], bv[CHB], cmA[CHB], pw[CHB], pulseWidth);
 }
 
 void makeHeaderLine() {
@@ -175,7 +204,13 @@ void makeHeaderLine() {
   sprintf(dataLine, "%19s %5s %6s %6s %6s %5s %5s %5s %3s", "Date", "no", "Volt", "mA", "mW", "Volt", "mA", "mW", "PWM");
 }
 
-void listDir(fs::FS &fs, const char * dirname, uint8_t levels) {
+void makeDateTime() {
+  DateTime now = rtc.now();
+
+  sprintf(dateTime, "%4d-%02d-%02d_%02d:%02d:%02d\0", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+}
+
+void listDir(fs::FS & fs, const char * dirname, uint8_t levels) {
   Serial.printf("Listing directory: %s\n", dirname);
 
   File root = fs.open(dirname);

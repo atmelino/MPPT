@@ -1,9 +1,12 @@
 // where the serial server is (your local machine):
 var host = document.location.host;
 var socket; // the websocket
+var sendmessage = {
+    type: "none",
+    data: "empty"
+};
 
-
-function myonload(){
+function myonload() {
     alert("onload");
 }
 
@@ -63,7 +66,49 @@ function refreshTable(tableName, data) {
     }
 }
 
+function settingsClicked() {
+    requestStatus();
+    var settings = document.getElementById("settings");
+    settings.style.display = "block";
+    //alert('status');
+}
 
+function requestStatus() {
+    document.getElementById("keepMeasurement").value = "query..";
+    document.getElementById("DataFileLines").value = "query..";
+    document.getElementById("bufferLength").value = "query..";
+    // sendmessage.type = "status";
+    // sendmessage.data = " ";
+    // socket.send(JSON.stringify(sendmessage));
+}
+
+function PWMMode() {
+    PWMmanualchecked = document.getElementById("PWMmanual").checked;
+    //sendmessage.type = "PWMMode";
+    if (PWMmanualchecked == true) {
+        visible("PWMmanualdiv");
+        value = "PWMmanual";
+    } else {
+        invisible("PWMmanualdiv");
+        value = "MPPT";
+    }
+    //sendmessage.data = value;
+    //socket.send(JSON.stringify(sendmessage));
+}
+
+function setPWMButton() {
+    var value = document.getElementById("PWM").value;
+    sendmessage.type = "PWM";
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+
+    // if (existCookie('simulation') != true)
+    //   setCookie('simulation', 0, 100);
+    // if (getCookie('simulation') == '1')
+    //   sim = 1;
+    // else
+    //   sim = 0;
+}
 
 // Helper functions
 function printMessage(target, message) {
@@ -82,6 +127,15 @@ function printlnMessage(target, message) {
     }
 }
 
+function visible(name) {
+    var x = document.getElementById(name);
+    x.style.visibility = "visible";
+}
+
+function invisible(name) {
+    var x = document.getElementById(name);
+    x.style.visibility = "hidden";
+}
 
 
 
