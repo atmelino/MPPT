@@ -21,7 +21,9 @@ function setup() {
 
         socket.onopen = function () {
             // Web Socket is connected, send data using send()
-            socket.send("Message to send");
+            sendmessage.type = "msg";
+            sendmessage.data = "websocket connected";
+            socket.send(JSON.stringify(sendmessage));
             printlnMessage("messages", "Message is sent...");
         };
         socket.onmessage = readMessage;

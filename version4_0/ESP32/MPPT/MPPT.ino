@@ -27,13 +27,7 @@ const int ledPin = 2; // on-board blue led (also internally pulled up)
 
 byte requestedPulseWidth = 130;
 
-static char line[4][21] = {"                    ", "                    ", "                    ", "                    "};
 float sv[3], bv[3], cmA[3], lv[3], pw[3];
-static char bvstr[10];
-static char cmAstr[10];
-static char pwstr[10];
-static char pwmstr[10];
-static char tapwmstr[10];
 // Replace with your network credentials
 const char* ssid = "NETGEAR53";
 const char* password = "";
@@ -45,6 +39,7 @@ char dataLine[200];
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
+  StaticJsonDocument<256> doc;
   Serial.println("WebSocket onWsEvent");
   if (type == WS_EVT_CONNECT) {
     Serial.println("Websocket client connection received");
@@ -52,26 +47,34 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   } else if (type == WS_EVT_DISCONNECT) {
     Serial.println("Client disconnected");
   } else if (type == WS_EVT_DATA) {
-    Serial.println("WebSocket onWsEvent WS_EVT_DATA");
+    //Serial.println("WebSocket onWsEvent WS_EVT_DATA");
     AwsFrameInfo * info = (AwsFrameInfo*)arg;
     String msg = "";
-    if (info->final && info->index == 0 && info->len == len) {
-      //the whole message is in a single frame and we got all of it's data
-      Serial.printf("ws[%s][%u] %s-message[%llu]: ", server->url(), client->id(), (info->opcode == WS_TEXT) ? "text" : "binary", info->len);
-      if (info->opcode == WS_TEXT) {
-        for (size_t i = 0; i < info->len; i++) {
-          msg += (char) data[i];
-        }
-      } else {
-        char buff[3];
-        for (size_t i = 0; i < info->len; i++) {
-          sprintf(buff, "%02x ", (uint8_t) data[i]);
-          msg += buff ;
-        }
-      }
-      Serial.printf("%s\n", msg.c_str());
+    Serial.printf("ws[%s][%u] text-message[%llu]: ", server->url(), client->id(), len);
+    for (size_t i = 0; i < len; i++) {
+      msg += (char) data[i];
     }
+    Serial.printf("%s\n", msg.c_str());
+
+    auto error = deserializeJson(doc, msg);
+    if (error) {
+      Serial.print(F("deserializeJson() failed with code "));
+      Serial.println(error.c_str());
+      return;
+    }
+
+    String type = doc["type"];
+
+    Serial.println("JSON doc type");
+    Serial.println(type);
+    if (type == "PWM") {
+      String PWM = doc["data"];
+      pulseWidth = PWM.toInt();
+      ledcWrite(1, pulseWidth);
+    }
+
   }
+
 }
 
 
@@ -154,6 +157,9 @@ void setup(void)
   // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
   ledcSetup( channel,  freq, resolution_bits);
   //ledcSetup(1, 82000, 8); // 12 kHz PWM, 8-bit resolution
+  //pulseWidth += 5;
+  pulseWidth = 190;
+  ledcWrite(1, pulseWidth); //
 }
 
 void loop(void)
@@ -175,9 +181,7 @@ void loop(void)
 
   delay(1000);
 
-  //pulseWidth += 5;
-  pulseWidth = 190;
-  ledcWrite(1, pulseWidth); //
+
 
 }
 
