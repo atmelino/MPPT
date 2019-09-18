@@ -10,30 +10,32 @@
 #include "SPI.h"
 #include "RTClib.h"
 
-RTC_DS1307 rtc;
+// pin assignment
+const int ledPin = 2; // on-board blue led (also internally pulled up)
+const int PWM_OUT = 4;
+const int PWM_ENABLE_PIN = 15;
+const int RelayPin = 32;
 
-SDL_Arduino_INA3221 ina3221;
-#define CHB 1 // Battery INA channel 2 but 1 for array
-#define CHS 2// Solar INA channel 3 but 2 for array
-
-uint8_t pulseWidth = 0;          // a value from 0 to 255 representing the hue
+// PWM
+uint8_t PWM_actual = 100; // a value from 0 to 255
+uint8_t PWM_requested = 130;
+boolean PWMModeMPPT = true;
 //uint32_t freq = 82000;
 uint32_t freq = 80000;
 uint8_t resolution_bits = 8;
 uint8_t channel = 1;
-uint8_t PWM_OUT = 4;
-uint8_t PWM_ENABLE_PIN = 15;
-const int ledPin = 2; // on-board blue led (also internally pulled up)
 
-byte requestedPulseWidth = 130;
-
-float sv[3], bv[3], cmA[3], lv[3], pw[3];
 // Replace with your network credentials
 const char* ssid = "NETGEAR53";
 const char* password = "";
 int count = 0;
 
+RTC_DS1307 rtc;
 char dateTime[20];
+SDL_Arduino_INA3221 ina3221;
+#define CHB 1 // Battery INA channel 2 but 1 for array
+#define CHS 2// Solar INA channel 3 but 2 for array
+float sv[3], bv[3], cmA[3], lv[3], pw[3];
 char dataLine[200];
 
 AsyncWebServer server(80);
@@ -69,8 +71,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     Serial.println(type);
     if (type == "PWM") {
       String PWM = doc["data"];
-      pulseWidth = PWM.toInt();
-      ledcWrite(1, pulseWidth);
+      PWM_actual = PWM.toInt();
+      ledcWrite(1, PWM_actual);
     }
 
   }
@@ -142,24 +144,22 @@ void setup(void)
   } else {
     Serial.println("Card Mount success");
     listDir(SD, "/", 0);
-
   }
 
-
-  // enable MOSFET driver chip
+  // PWM
   pinMode(PWM_ENABLE_PIN, OUTPUT); // GPIO as output
-  digitalWrite(PWM_ENABLE_PIN, LOW);
   digitalWrite(PWM_ENABLE_PIN, HIGH);
-
   ledcAttachPin(PWM_OUT, 1); // assign IR2104 PWM signal to channels
-
-  // Initialize channels
   // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
   ledcSetup( channel,  freq, resolution_bits);
-  //ledcSetup(1, 82000, 8); // 12 kHz PWM, 8-bit resolution
-  //pulseWidth += 5;
-  pulseWidth = 190;
-  ledcWrite(1, pulseWidth); //
+  //PWM_actual += 5;
+  PWM_actual = 190;
+  ledcWrite(1, PWM_actual); //
+
+  // Relay to battery
+  pinMode(RelayPin, OUTPUT);
+  digitalWrite(RelayPin, HIGH);
+
 }
 
 void loop(void)
@@ -175,6 +175,62 @@ void loop(void)
     pw[i] = bv[i] * cmA[i];
   }
 
+  float batteryVoltage = bv[CHB];
+  float solarVoltage = bv[CHS];
+  float batteryCurrent = cmA[CHB];
+
+  if (PWMModeMPPT) {
+    if (batteryVoltage > 8.4) { // prevent battery overvoltage
+      //Serial.println("battery over voltage");
+      PWM_actual -= 5;
+      setPWM();
+    }
+    if (abs(batteryCurrent) > 1050) {
+      //Serial.println("battery over current");
+      PWM_actual -= 5;
+      setPWM();
+    }
+    if (solarVoltage > 10.0 && batteryVoltage >= 8.2) {
+      //Serial.println("increase voltage slow");
+      PWM_actual += 1;
+      setPWM();
+    }
+    if (solarVoltage > 10.0 && batteryVoltage < 8.2) {
+      //Serial.println("increase voltage fast");
+      PWM_actual += 5;
+      setPWM();
+    }
+    if (solarVoltage <= 10.0 && batteryVoltage >= 7.6) {
+      //Serial.println("solar under voltage");
+      stopPWM();
+    }
+    if (solarVoltage <= 10.0 && batteryVoltage < 7.6) { // prevent battery over discharge
+      //Serial.println("solar and battery under voltage");
+      //logEntry("low battery shutdown");
+      stopPWM();
+      //DataFilesYesNo = false;
+      //        if (true) {
+      //          LEDblink();
+      //          clearInterval(loopTimer);
+      //          // give it a bit of time before turning off power
+      //          setInterval(function () {
+      //            rpio.write(relaypin, rpio.LOW);// disconnect battery
+      //          }, 10000);
+      //        }
+    }
+
+  } else {
+    if (batteryVoltage > 8.4) // prevent battery overvoltage
+    {
+      //Serial.println("battery over voltage");
+      PWM_actual -= 5;
+      PWM_requested = PWM_actual;
+      setPWM();
+    } else {
+      PWM_actual = PWM_requested;
+      setPWM();
+    }
+  }
   makeDataLine();
   Serial.println(dataLine);
   sendDataLine();
@@ -184,6 +240,19 @@ void loop(void)
 
 
 }
+
+
+void setPWM() {
+  digitalWrite(PWM_ENABLE_PIN, HIGH);  // PWM on, enable IR2104
+  //if (PWM_actual > 254)    PWM_actual = 254;
+  ledcWrite(1, PWM_actual); //
+}
+
+void stopPWM() {
+  PWM_actual = 0;
+  digitalWrite(PWM_ENABLE_PIN, LOW); // PWM off, disable IR2104
+}
+
 
 void sendDataLine() {
   StaticJsonDocument<200> doc;
@@ -200,7 +269,7 @@ void sendDataLine() {
 void makeDataLine() {
   char* myDate = "2019-09-09_14:57:34";
   makeDateTime();
-  sprintf(dataLine, "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d", dateTime, count, bv[CHS], cmA[CHS], pw[CHS], bv[CHB], cmA[CHB], pw[CHB], pulseWidth);
+  sprintf(dataLine, "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d", dateTime, count, bv[CHS], cmA[CHS], pw[CHS], bv[CHB], cmA[CHB], pw[CHB], PWM_actual);
 }
 
 void makeHeaderLine() {
