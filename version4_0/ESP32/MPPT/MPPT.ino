@@ -37,7 +37,7 @@ SDL_Arduino_INA3221 ina3221;
 #define CHS 2// Solar INA channel 3 but 2 for array
 float sv[3], bv[3], cmA[3], lv[3], pw[3];
 char headerLine[80];
-# define maxLines 3
+# define maxLines 240
 char dataLines[maxLines][80];
 int linePointer = 0;
 boolean DataFilesYesNo = true;
@@ -269,30 +269,60 @@ void loop(void)
 
 
 void writeDataFile(char* dateTime) {
-  char filename[25];
+  char filename[40];
   char year[5] = {'2', '0', '0', '0', '\0'};
   char month[3] = {'0', '0', '\0'};
-  Serial.println(dateTime);
+  //Serial.println(dateTime);
 
-  printHEX(year, 5);
-  Serial.println();
 
-  //dateTime[13] = '_';
-  //dateTime[16] = '_';
-  //charcpy(dateTime,year,  4);
-  //memcpy(year, dateTime, 4);
-  //memcpy(month, dateTime + 5, 2);
+  dateTime[13] = '_';
+  dateTime[16] = '_';
+  memcpy(year, dateTime, 4);
+  memcpy(month, dateTime + 5, 2);
   //Serial.println(year);
   //Serial.println(month);
 
-  sprintf(filename, "/%s.txt", dateTime);
+  makeDataDir(year, month);
+
+  sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
   //  filename[14] = '_';
   //  filename[17] = '_';
   Serial.println(filename);
-  //writeFile(SD, filename, dataLines[0]);
+  writeFile(SD, filename, dataLines[0]);
 
 }
 
+
+void makeDataDir(char *year, char* month) {
+  //char *path = "/2000/01";
+  //char path[] = {'/', '2', '1', '1', '0', '/', '2', '1', '\0'};
+  //char path[] = {'/', '2', '1', '1', '0', '\0'};
+
+  char yearpath[10];
+  char yearmonthpath[10];
+  sprintf(yearpath, "/%s", year);
+  sprintf(yearmonthpath, "/%s/%s", year, month);
+
+  //  path[1] = year[0];
+  //  path[2] = year[1];
+  //  path[3] = year[2];
+  //Serial.print("path=");
+  //Serial.println(path);
+
+  Serial.print(yearpath);
+  if (!SD.exists(yearpath)) {
+    Serial.println(" not exists");
+    createDir(SD, yearpath);
+  } else
+    Serial.println(" exists");
+
+  Serial.print(yearmonthpath);
+  if (!SD.exists(yearmonthpath)) {
+    Serial.println(" not exists");
+    createDir(SD, yearmonthpath);
+  } else
+    Serial.println(" exists");
+}
 
 void setPWM() {
   digitalWrite(PWM_ENABLE_PIN, HIGH);  // PWM on, enable IR2104
@@ -382,17 +412,11 @@ void writeFile(fs::FS &fs, const char * path, const char * message) {
   file.close();
 }
 
-
-void charcpy(char* from, char* to, int num)
-{
-  int i;
-  for (i = 0; i < num; i++)
-    to[i] = from[i];
-}
-void printHEX(char* cp, int num)
-{
-  int i;
-  for (i = 0; i < num; i++)
-    Serial.print(cp[i], HEX);
-
+void createDir(fs::FS & fs, const char * path) {
+  Serial.printf("Creating Dir: %s\n", path);
+  if (fs.mkdir(path)) {
+    Serial.println("Dir created");
+  } else {
+    Serial.println("mkdir failed");
+  }
 }
