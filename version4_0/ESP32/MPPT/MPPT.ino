@@ -36,7 +36,11 @@ SDL_Arduino_INA3221 ina3221;
 #define CHB 1 // Battery INA channel 2 but 1 for array
 #define CHS 2// Solar INA channel 3 but 2 for array
 float sv[3], bv[3], cmA[3], lv[3], pw[3];
-char dataLine[200];
+char headerLine[80];
+# define maxLines 3
+char dataLines[maxLines][80];
+int linePointer = 0;
+boolean DataFilesYesNo = true;
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -74,7 +78,10 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       PWM_actual = PWM.toInt();
       ledcWrite(1, PWM_actual);
     }
-
+    if (type == "SetRTC") {
+      // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+      rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    }
   }
 
 }
@@ -129,7 +136,7 @@ void setup(void)
   server.begin();
 
   makeHeaderLine();
-  Serial.println(dataLine);
+  Serial.println(headerLine);
 
   ina3221.begin();
 
@@ -231,13 +238,58 @@ void loop(void)
       setPWM();
     }
   }
+
   makeDataLine();
-  Serial.println(dataLine);
+  //Serial.println(dataLines[linePointer]);
   sendDataLine();
+
+  linePointer++;
+  if (linePointer >= maxLines)
+  {
+    linePointer = 0;
+
+    for (size_t i = 0; i < maxLines; i++) {
+      Serial.println(dataLines[i]);
+    }
+
+    if (DataFilesYesNo) {
+      writeDataFile(dateTime);
+    }
+  }
+
+  //debugMsgln("Keep every " + keepMeasurement + " measurements", 0);
+  //debugMsgln("count " + count + " remainder " + count % keepMeasurement, 0);
+  //    if (count % keepMeasurement == 0) {
+  //      bufferarray.push(line);
+  //    }
 
   delay(1000);
 
+}
 
+
+void writeDataFile(char* dateTime) {
+  char filename[25];
+  char year[5] = {'2', '0', '0', '0', '\0'};
+  char month[3] = {'0', '0', '\0'};
+  Serial.println(dateTime);
+
+  printHEX(year, 5);
+  Serial.println();
+
+  //dateTime[13] = '_';
+  //dateTime[16] = '_';
+  //charcpy(dateTime,year,  4);
+  //memcpy(year, dateTime, 4);
+  //memcpy(month, dateTime + 5, 2);
+  //Serial.println(year);
+  //Serial.println(month);
+
+  sprintf(filename, "/%s.txt", dateTime);
+  //  filename[14] = '_';
+  //  filename[17] = '_';
+  Serial.println(filename);
+  //writeFile(SD, filename, dataLines[0]);
 
 }
 
@@ -258,7 +310,7 @@ void sendDataLine() {
   StaticJsonDocument<200> doc;
   char json_string[256];
   doc["type"] = "livedata";
-  doc["data"] = dataLine;
+  doc["data"] = dataLines[linePointer];
   serializeJson(doc, json_string);
   //Serial.println(json_string);
 
@@ -267,20 +319,20 @@ void sendDataLine() {
 }
 
 void makeDataLine() {
-  char* myDate = "2019-09-09_14:57:34";
   makeDateTime();
-  sprintf(dataLine, "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d", dateTime, count, bv[CHS], cmA[CHS], pw[CHS], bv[CHB], cmA[CHB], pw[CHB], PWM_actual);
+  char* format = "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d";
+  sprintf(dataLines[linePointer], format, dateTime, count, bv[CHS], cmA[CHS], pw[CHS], bv[CHB], cmA[CHB], pw[CHB], PWM_actual);
 }
 
 void makeHeaderLine() {
-
-  sprintf(dataLine, "%19s %5s %6s %6s %6s %5s %5s %5s %3s", "Date", "no", "Volt", "mA", "mW", "Volt", "mA", "mW", "PWM");
+  char* format = "%19s %5s %6s %6s %6s %5s %5s %5s %3s";
+  sprintf(headerLine, format, "Date", "no", "Volt", "mA", "mW", "Volt", "mA", "mW", "PWM");
 }
 
 void makeDateTime() {
   DateTime now = rtc.now();
-
-  sprintf(dateTime, "%4d-%02d-%02d_%02d:%02d:%02d\0", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+  char* format = "%4d-%02d-%02d_%02d:%02d:%02d\0";
+  sprintf(dateTime, format, now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
 }
 
 void listDir(fs::FS & fs, const char * dirname, uint8_t levels) {
@@ -312,4 +364,35 @@ void listDir(fs::FS & fs, const char * dirname, uint8_t levels) {
     }
     file = root.openNextFile();
   }
+}
+
+void writeFile(fs::FS &fs, const char * path, const char * message) {
+  Serial.printf("Writing file:%s\n", path);
+
+  File file = fs.open(path, FILE_WRITE);
+  if (!file) {
+    Serial.println("Failed to open file for writing");
+    return;
+  }
+  if (file.print(message)) {
+    Serial.println("File written");
+  } else {
+    Serial.println("Write failed");
+  }
+  file.close();
+}
+
+
+void charcpy(char* from, char* to, int num)
+{
+  int i;
+  for (i = 0; i < num; i++)
+    to[i] = from[i];
+}
+void printHEX(char* cp, int num)
+{
+  int i;
+  for (i = 0; i < num; i++)
+    Serial.print(cp[i], HEX);
+
 }
