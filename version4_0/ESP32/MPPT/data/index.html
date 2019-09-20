@@ -94,58 +94,56 @@
     <div class="modal-content">
       <div class="modal-header">
         <span class="close" id="closeModal">&times; </span>
-        <h4>Settings</h4>
+        Settings
       </div>
       <div class="settings-body">
-
-
         <div style='display: table'>
           <div style='display: table-row'>
-            <div style='width: 60%; display: table-cell; white-space: nowrap;'>
-              <label><input type="checkbox" onclick="showMessages()" name="showMessages" id="showMessages" value="male"
-                  unchecked />
+            <div style='width: 5%; display: table-cell; white-space: nowrap;'></div>
+            <div style='width: 55%; display: table-cell; white-space: nowrap;'>
+              <p></p><label><input type="checkbox" onclick="showMessages()" name="showMessages" id="showMessages"
+                  value="male" unchecked />
                 show messages
               </label>
-              <button onclick="clearMessage('messages')">Clear messages</button>
-              <div style="width: 12%; display: table-cell; white-space: nowrap;">
-                <label style="white-space: nowrap"><input type="radio" name="mode" id="manual" onclick="PWMMode()"
-                    checked="true" />PWM manual</label>
-                <!-- -->
-                <label style="white-space: nowrap"><input type="radio" name="mode" id="MPPT"
-                    onclick="PWMMode()" />MPPT</label>
-              </div>
-              <br>
-              <div class="title_box" id="bill_to">
-                <div id="title">
-                  <label><input type="checkbox" onclick="enableDataFiles()" name="enableDataFiles" id="enableDataFiles"
-                      value="male" checked />
-                    Data Files<br />
-                    <!-- -->
-                  </label>
+              <button onclick="clearMessages()">Clear messages</button></p>
+              <p><button onclick="listSPIFFS()">List SPIFFS</button>
+                <button onclick="getSettings()">get Settings</button>
+              </p>
+              <p>
+                <div class="title_box" id="dataFilesBox">
+                  <div id="title">
+                    <label><input type="checkbox" onclick="enableDataFiles()" name="enableDataFiles"
+                        id="enableDataFiles" value="male" checked />
+                      Data Files<br />
+                      <!-- -->
+                    </label>
+                  </div>
+                  <!-- -->
+                  <div id="enableDataFilescontent">
+                    <p>Keep every
+                      <input id="keepMeasurement" name="value" value="query.." /> measurements
+                      <button onclick="setkeepMeasurementButton()" id="setkeepMeasurementButton">
+                        Set</button></p>
+                    <p>Save Data file every
+                      <input id="DataFileLines" name="value" value="query.." /> measurements
+                      <button onclick="setDataFileLinesButton()" id="setDataFileLinesButton">
+                        Set</button></p>
+                    <p>Measurements for next save
+                      <input id="bufferLength" name="value" value="query.." />
+                      <button onclick="requestStatus()" id="requestStatus">
+                        Refresh</button>
+                      <button onclick="saveNow()" id="saveNow">
+                        Save Now</button></p>
+                  </div>
                 </div>
-                <!-- -->
-                <div id="enableDataFilescontent">
-                  Keep every
-                  <input id="keepMeasurement" name="value" value="query.." /> measurements
-                  <button onclick="setkeepMeasurementButton()" id="setkeepMeasurementButton">
-                    Set</button><br />
-                  Save Data file every
-                  <input id="DataFileLines" name="value" value="query.." /> measurements
-                  <button onclick="setDataFileLinesButton()" id="setDataFileLinesButton">
-                    Set</button><br />
-                  Measurements for next save
-                  <input id="bufferLength" name="value" value="query.." />
-                  <button onclick="requestStatus()" id="requestStatus">
-                    Refresh</button>
-                  <button onclick="saveNow()" id="saveNow">
-                    Save Now</button><br />
-                </div>
-              </div>
+              </p>
             </div>
-            <div style='width: 40%; display: table-cell; white-space: nowrap;'>
+            <div style='width: 5%; display: table-cell; white-space: nowrap;'></div>
+
+            <div style='width: 35%; display: table-cell; white-space: nowrap;'>
               <button onclick="setRTC()">Set Real Time Clock</button><br>
-              <button onclick="showLog()">Show Log</button>
-              <button onclick="hideLog()">Hide Log</button> <br>
+              <p><button onclick="showLog()">Show Log</button>
+                <button onclick="hideLog()">Hide Log</button> </p>
               <button onclick="printCookies()">show cookies</button><br>
               <button onclick="attribution()">attribution</button> <br>
             </div>

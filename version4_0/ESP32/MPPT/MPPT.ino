@@ -70,8 +70,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     }
 
     String type = doc["type"];
-
-    Serial.println("JSON doc type");
+    Serial.print("message type: ");
     Serial.println(type);
     if (type == "PWM") {
       String PWM = doc["data"];
@@ -82,8 +81,27 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
       rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     }
-  }
 
+    if (type == "enableDataFiles") {
+      String enableDataFiles = doc["data"];
+      if (doc["data"] == "true") {
+        DataFilesYesNo = true;
+        Serial.println("save DataFiles to SD true");
+      } else {
+        DataFilesYesNo = false;
+        Serial.println("save DataFiles to SD false");
+      }
+    }
+    if (type == "listSPIFFS") {
+      File root = SPIFFS.open("/");
+      File file = root.openNextFile();
+      while (file) {
+        Serial.print("FILE: ");
+        Serial.println(file.name());
+        file = root.openNextFile();
+      }
+    }
+  }
 }
 
 

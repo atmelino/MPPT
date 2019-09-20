@@ -11,7 +11,7 @@ body {
   /* Stay in place */
   z-index: 1;
   /* Sit on top */
-  padding-top: 100px;
+  padding-top: 50px;
   /* Location of the box */
   left: 0;
   top: 0;
@@ -70,9 +70,9 @@ body {
 /* The Close Button */
 
 .close {
-  color: white;
+  color: black;
   float: right;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
 }
 
@@ -83,13 +83,13 @@ body {
 }
 
 .modal-header {
-  padding: 2px 16px;
+  padding: 2px 2px;
   background-color: #eeeeff;
-  color: white;
+  color:gray;
 }
 
 .modal-body {
-  padding: 2px 16px;
+  padding: 2px 6px;
 }
 
 .modal-footer {

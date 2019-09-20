@@ -112,6 +112,44 @@ function setPWMButton() {
     //   sim = 0;
 }
 
+function showMessages() {
+    if (document.getElementById("showMessages").checked) {
+        show("messagesDiv");
+    } else {
+        hide("messagesDiv");
+    }
+}
+
+function clearMessages() {
+    document.getElementById("messages").value = "";
+}
+
+function listSPIFFS() {
+    sendmessage.type = "listSPIFFS";
+    sendmessage.data = "now!";
+    socket.send(JSON.stringify(sendmessage));
+}
+
+function getSettings() {
+    sendmessage.type = "getSettings";
+    sendmessage.data = "now!";
+    socket.send(JSON.stringify(sendmessage));
+}
+
+function enableDataFiles() {
+    enableDataFileschecked = document.getElementById("enableDataFiles").checked;
+    sendmessage.type = "enableDataFiles";
+    if (enableDataFileschecked == true) {
+        document.getElementById("enableDataFilescontent").style.display = "block";
+        value = "true";
+    } else {
+        document.getElementById("enableDataFilescontent").style.display = "none";
+        value = "false";
+    }
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
 // Helper functions
 function printMessage(target, message) {
     elementId = document.getElementById(target);
@@ -139,6 +177,16 @@ function invisible(name) {
     x.style.visibility = "hidden";
 }
 
+
+function show(name) {
+    var x = document.getElementById(name);
+    x.style.display = "block";
+}
+
+function hide(name) {
+    var x = document.getElementById(name);
+    x.style.display = "none";
+}
 
 
 
