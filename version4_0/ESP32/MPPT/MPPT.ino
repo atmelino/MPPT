@@ -91,6 +91,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         DataFilesYesNo = false;
         Serial.println("save DataFiles to SD false");
       }
+      saveSettings();
     }
     if (type == "listSPIFFS") {
       File root = SPIFFS.open("/");
@@ -101,6 +102,24 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         file = root.openNextFile();
       }
     }
+
+    if (type == "getSettings") {
+      char data[100];
+
+      readFileSPIFFS("/settings.json",  data);
+      Serial.println(data);
+
+      StaticJsonDocument<200> doc;
+      char json_string[256];
+      doc["type"] = "getSettings";
+      doc["data"] = data;
+      serializeJson(doc, json_string);
+      //Serial.println(json_string);
+      ws.printfAll(json_string);
+
+    }
+
+
   }
 }
 
@@ -286,12 +305,25 @@ void loop(void)
 }
 
 
+void saveSettings()
+{
+  StaticJsonDocument<200> doc;
+  char json_string[256];
+  doc["DataFilesYesNo"] = (DataFilesYesNo ? "true" : "false");
+
+  serializeJson(doc, json_string);
+  writeFileSPIFFS( "/settings.json", json_string);
+
+  Serial.println(json_string);
+  ws.printfAll(json_string);
+}
+
+
 void writeDataFile(char* dateTime) {
   char filename[40];
   char year[5] = {'2', '0', '0', '0', '\0'};
   char month[3] = {'0', '0', '\0'};
   //Serial.println(dateTime);
-
 
   dateTime[13] = '_';
   dateTime[16] = '_';
@@ -306,38 +338,27 @@ void writeDataFile(char* dateTime) {
   //  filename[14] = '_';
   //  filename[17] = '_';
   Serial.println(filename);
-  writeFile(SD, filename, dataLines[0]);
-
+  writeFileSD(SD, filename, dataLines[0]);
 }
 
 
 void makeDataDir(char *year, char* month) {
-  //char *path = "/2000/01";
-  //char path[] = {'/', '2', '1', '1', '0', '/', '2', '1', '\0'};
-  //char path[] = {'/', '2', '1', '1', '0', '\0'};
-
   char yearpath[10];
   char yearmonthpath[10];
   sprintf(yearpath, "/%s", year);
   sprintf(yearmonthpath, "/%s/%s", year, month);
 
-  //  path[1] = year[0];
-  //  path[2] = year[1];
-  //  path[3] = year[2];
-  //Serial.print("path=");
-  //Serial.println(path);
-
   Serial.print(yearpath);
   if (!SD.exists(yearpath)) {
     Serial.println(" not exists");
-    createDir(SD, yearpath);
+    createDirSD(SD, yearpath);
   } else
     Serial.println(" exists");
 
   Serial.print(yearmonthpath);
   if (!SD.exists(yearmonthpath)) {
     Serial.println(" not exists");
-    createDir(SD, yearmonthpath);
+    createDirSD(SD, yearmonthpath);
   } else
     Serial.println(" exists");
 }
@@ -361,9 +382,7 @@ void sendDataLine() {
   doc["data"] = dataLines[linePointer];
   serializeJson(doc, json_string);
   //Serial.println(json_string);
-
   ws.printfAll(json_string);
-
 }
 
 void makeDataLine() {
@@ -414,7 +433,7 @@ void listDir(fs::FS & fs, const char * dirname, uint8_t levels) {
   }
 }
 
-void writeFile(fs::FS &fs, const char * path, const char * message) {
+void writeFileSD(fs::FS &fs, const char * path, const char * message) {
   Serial.printf("Writing file:%s\n", path);
 
   File file = fs.open(path, FILE_WRITE);
@@ -430,11 +449,53 @@ void writeFile(fs::FS &fs, const char * path, const char * message) {
   file.close();
 }
 
-void createDir(fs::FS & fs, const char * path) {
+void createDirSD(fs::FS & fs, const char * path) {
   Serial.printf("Creating Dir: %s\n", path);
   if (fs.mkdir(path)) {
     Serial.println("Dir created");
   } else {
     Serial.println("mkdir failed");
   }
+}
+
+
+
+void writeFileSPIFFS(char* name, char* data)
+{
+  File file = SPIFFS.open(name, FILE_WRITE);
+
+  if (!file) {
+    Serial.println("There was an error opening the file for writing");
+    return;
+  }
+  if (file.print(data)) {
+    Serial.println("File was written");
+  } else {
+    Serial.println("File write failed");
+  }
+  file.close();
+}
+
+
+void readFileSPIFFS(char* name, char* data)
+{
+  File file2 = SPIFFS.open(name);
+  char c;
+  int i = 0;
+
+  if (!file2) {
+    Serial.println("Failed to open file for reading");
+    return;
+  }
+  Serial.println("File Content:");
+  while (file2.available()) {
+
+    c = file2.read();
+    Serial.write(c);
+    data[i] = c;
+    i++;
+  }
+  file2.close();
+  data[i] = '\0';
+  Serial.println(data);
 }

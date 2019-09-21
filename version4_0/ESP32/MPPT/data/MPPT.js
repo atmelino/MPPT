@@ -46,6 +46,10 @@ function readMessage(event) {
         //document.getElementById("liveDatatmp").innerHTML = receivedmessage.data;
         refreshTable("liveTable", receivedmessage.data);
     }
+    if (receivedmessage.type == "getSettings") {
+        printlnMessage("messages", received_msg);
+
+    }
 }
 
 function refreshTable(tableName, data) {
