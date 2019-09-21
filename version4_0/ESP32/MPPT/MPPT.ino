@@ -46,7 +46,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
   StaticJsonDocument<256> doc;
-  Serial.println("WebSocket onWsEvent");
+  //Serial.println("WebSocket onWsEvent");
   if (type == WS_EVT_CONNECT) {
     Serial.println("Websocket client connection received");
     //client->text("Hello from ESP32 Server");
@@ -72,11 +72,13 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     String type = doc["type"];
     Serial.print("message type: ");
     Serial.println(type);
+
     if (type == "PWM") {
       String PWM = doc["data"];
       PWM_actual = PWM.toInt();
       ledcWrite(1, PWM_actual);
     }
+
     if (type == "SetRTC") {
       // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
       rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
@@ -86,13 +88,14 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       String enableDataFiles = doc["data"];
       if (doc["data"] == "true") {
         DataFilesYesNo = true;
-        Serial.println("save DataFiles to SD true");
+        //Serial.println("save DataFiles to SD true");
       } else {
         DataFilesYesNo = false;
-        Serial.println("save DataFiles to SD false");
+        //Serial.println("save DataFiles to SD false");
       }
       saveSettings();
     }
+
     if (type == "listSPIFFS") {
       File root = SPIFFS.open("/");
       File file = root.openNextFile();
@@ -105,18 +108,23 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
     if (type == "getSettings") {
       char data[100];
-
       readFileSPIFFS("/settings.json",  data);
       Serial.println(data);
-
       StaticJsonDocument<200> doc;
       char json_string[256];
       doc["type"] = "getSettings";
       doc["data"] = data;
       serializeJson(doc, json_string);
-      //Serial.println(json_string);
       ws.printfAll(json_string);
+    }
 
+    if (type == "getStatus") {
+      StaticJsonDocument<200> doc;
+      char json_string[256];
+      doc["type"] = "getSettings";
+      doc["DataFilesYesNo"] = (DataFilesYesNo ? "true" : "false");
+      serializeJson(doc, json_string);
+      ws.printfAll(json_string);
     }
 
 
@@ -140,8 +148,25 @@ void setup(void)
     return;
   }
   else {
-    digitalWrite(ledPin, HIGH);
-    delay(300);
+    StaticJsonDocument<200> doc;
+    char data[100];
+    readFileSPIFFS("/settings.json",  data);
+    Serial.println(data);
+    auto error = deserializeJson(doc, data);
+    if (error) {
+      Serial.print(F("deserializeJson() failed with code "));
+      Serial.println(error.c_str());
+      return;
+    }
+    String df = doc["DataFilesYesNo"];
+    Serial.println(df);
+    if (df == "true")
+      DataFilesYesNo = true;
+    else
+      DataFilesYesNo = false;
+
+    //digitalWrite(ledPin, HIGH);
+    //delay(300);
   }
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
@@ -310,10 +335,8 @@ void saveSettings()
   StaticJsonDocument<200> doc;
   char json_string[256];
   doc["DataFilesYesNo"] = (DataFilesYesNo ? "true" : "false");
-
   serializeJson(doc, json_string);
   writeFileSPIFFS( "/settings.json", json_string);
-
   Serial.println(json_string);
   ws.printfAll(json_string);
 }
@@ -335,8 +358,6 @@ void writeDataFile(char* dateTime) {
   makeDataDir(year, month);
 
   sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
-  //  filename[14] = '_';
-  //  filename[17] = '_';
   Serial.println(filename);
   writeFileSD(SD, filename, dataLines[0]);
 }
@@ -478,7 +499,7 @@ void writeFileSPIFFS(char* name, char* data)
 
 
 void readFileSPIFFS(char* name, char* data)
-{
+{ //todo: make sure it doesn't overflow
   File file2 = SPIFFS.open(name);
   char c;
   int i = 0;
@@ -487,15 +508,11 @@ void readFileSPIFFS(char* name, char* data)
     Serial.println("Failed to open file for reading");
     return;
   }
-  Serial.println("File Content:");
   while (file2.available()) {
-
     c = file2.read();
-    Serial.write(c);
     data[i] = c;
     i++;
   }
   file2.close();
   data[i] = '\0';
-  Serial.println(data);
 }

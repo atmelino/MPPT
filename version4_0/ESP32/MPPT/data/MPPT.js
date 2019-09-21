@@ -48,8 +48,11 @@ function readMessage(event) {
     }
     if (receivedmessage.type == "getSettings") {
         printlnMessage("messages", received_msg);
-
     }
+    if (receivedmessage.type == "getStatus") {
+        printlnMessage("messages", received_msg);
+    }
+    
 }
 
 function refreshTable(tableName, data) {
@@ -136,6 +139,12 @@ function listSPIFFS() {
 
 function getSettings() {
     sendmessage.type = "getSettings";
+    sendmessage.data = "now!";
+    socket.send(JSON.stringify(sendmessage));
+}
+
+function getStatus() {
+    sendmessage.type = "getStatus";
     sendmessage.data = "now!";
     socket.send(JSON.stringify(sendmessage));
 }
