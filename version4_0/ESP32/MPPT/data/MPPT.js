@@ -48,11 +48,26 @@ function readMessage(event) {
     }
     if (receivedmessage.type == "getSettings") {
         printlnMessage("messages", received_msg);
+        //received_msg = received_msg.replace(/\\/g, '')
+        //printlnMessage("messages", received_msg);
+        // printlnMessage("messages", "receivedmessage.data=" + receivedmessage.data);
+        printlnMessage("messages", "receivedmessage.data.DataFilesYesNo=" + receivedmessage.data.DataFilesYesNo);
+        document.getElementById("dataFilesBox").style.filter = "none";
+        if (receivedmessage.data.DataFilesYesNo == "true") {
+            printlnMessage("messages", "enableDataFiles true");
+            document.getElementById("enableDataFiles").checked = true;
+            document.getElementById("enableDataFilescontent").style.display = "block";
+        }
+        if (receivedmessage.data.DataFilesYesNo == "false") {
+            printlnMessage("messages", "enableDataFiles false");
+            document.getElementById("enableDataFiles").checked = false;
+            document.getElementById("enableDataFilescontent").style.display = "none";
+        }
     }
     if (receivedmessage.type == "getStatus") {
         printlnMessage("messages", received_msg);
     }
-    
+
 }
 
 function refreshTable(tableName, data) {
@@ -76,19 +91,30 @@ function refreshTable(tableName, data) {
 }
 
 function settingsClicked() {
-    requestStatus();
+    getSettings();
     var settings = document.getElementById("settings");
     settings.style.display = "block";
     //alert('status');
 }
 
-function requestStatus() {
+function getSettings() {
+    printlnMessage("messages", "getSettings");
     document.getElementById("keepMeasurement").value = "query..";
     document.getElementById("DataFileLines").value = "query..";
     document.getElementById("bufferLength").value = "query..";
-    // sendmessage.type = "status";
-    // sendmessage.data = " ";
-    // socket.send(JSON.stringify(sendmessage));
+    sendmessage.type = "getSettings";
+    sendmessage.data = "now!";
+    socket.send(JSON.stringify(sendmessage));
+}
+
+function getStatus() {
+    printlnMessage("messages", "getStatus");
+    document.getElementById("keepMeasurement").value = "query..";
+    document.getElementById("DataFileLines").value = "query..";
+    document.getElementById("bufferLength").value = "query..";
+    sendmessage.type = "getStatus";
+    sendmessage.data = "now!";
+    socket.send(JSON.stringify(sendmessage));
 }
 
 function PWMMode() {
@@ -143,11 +169,6 @@ function getSettings() {
     socket.send(JSON.stringify(sendmessage));
 }
 
-function getStatus() {
-    sendmessage.type = "getStatus";
-    sendmessage.data = "now!";
-    socket.send(JSON.stringify(sendmessage));
-}
 
 function enableDataFiles() {
     enableDataFileschecked = document.getElementById("enableDataFiles").checked;

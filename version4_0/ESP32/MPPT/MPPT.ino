@@ -110,11 +110,29 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       char data[100];
       readFileSPIFFS("/settings.json",  data);
       Serial.println(data);
+
+      StaticJsonDocument<100> docSettings;
+      char json_stringSettings[200];
+      DeserializationError error = deserializeJson(docSettings, data);
+//      if (error) {
+//        Serial.print(F("deserializeJson() failed: "));
+//        Serial.println(error.c_str());
+//      } else {
+//        Serial.println("no error");
+//
+//        char json_string[256];
+//        serializeJson(docSettings, json_stringSettings);
+//        Serial.println(json_stringSettings);
+//        const char* df = docSettings["DataFilesYesNo"];
+//        Serial.println(df);
+//      }
+
       StaticJsonDocument<200> doc;
       char json_string[256];
       doc["type"] = "getSettings";
-      doc["data"] = data;
+      doc["data"] = docSettings;
       serializeJson(doc, json_string);
+      Serial.println(json_string);
       ws.printfAll(json_string);
     }
 
