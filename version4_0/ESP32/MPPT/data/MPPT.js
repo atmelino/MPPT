@@ -163,6 +163,12 @@ function listSPIFFS() {
     socket.send(JSON.stringify(sendmessage));
 }
 
+function listSD() {
+    sendmessage.type = "listSD";
+    sendmessage.data = "now!";
+    socket.send(JSON.stringify(sendmessage));
+}
+
 function getSettings() {
     sendmessage.type = "getSettings";
     sendmessage.data = "now!";

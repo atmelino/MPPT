@@ -1,1 +1,4 @@
-{"DataFilesYesNo":"false"}
+{
+    "DataFilesYesNo": "false",
+    "DataFileLines": 30
+}
