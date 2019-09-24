@@ -1,4 +1,84 @@
+void saveSettings()
+{
+  StaticJsonDocument<200> doc;
+  char json_string[256];
+  doc["DataFilesYesNo"] = (DataFilesYesNo ? "true" : "false");
+  doc["DataFileLines"] = DataFileLines;
+  serializeJson(doc, json_string);
+  writeFileSPIFFS( "/settings.json", json_string);
+  Serial.println(json_string);
+  ws.printfAll(json_string);
+}
 
+void getSettings() {
+  StaticJsonDocument<200> doc;
+  char data[100];
+  readFileSPIFFS("/settings.json",  data);
+  Serial.println(data);
+  auto error = deserializeJson(doc, data);
+  if (error) {
+    Serial.print(F("deserializeJson() failed with code "));
+    Serial.println(error.c_str());
+    return;
+  }
+  String df = doc["DataFilesYesNo"];
+  Serial.println(df);
+  if (df == "true")
+    DataFilesYesNo = true;
+  else
+    DataFilesYesNo = false;
+
+  String dfls = doc["DataFileLines"];
+  DataFileLines = dfls.toInt();
+}
+
+
+void writeDataFile(char* dateTime) {
+  char filename[40];
+  char year[5] = {'2', '0', '0', '0', '\0'};
+  char month[3] = {'0', '0', '\0'};
+  //Serial.println(dateTime);
+
+  dateTime[13] = '_';
+  dateTime[16] = '_';
+  memcpy(year, dateTime, 4);
+  memcpy(month, dateTime + 5, 2);
+  //Serial.println(year);
+  //Serial.println(month);
+
+  makeDataDir(year, month);
+
+  sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
+  debugPrintln(filename);
+
+  writeFileSD(SD, filename, dataLines[0]);
+}
+
+
+void makeDataDir(char *year, char* month) {
+  char yearpath[10];
+  char yearmonthpath[10];
+  sprintf(yearpath, "/%s", year);
+  sprintf(yearmonthpath, "/%s/%s", year, month);
+
+  if (!SD.exists(yearpath)) {
+    debugPrint(yearpath);
+    debugPrintln(" not exists");
+    createDirSD(SD, yearpath);
+  } else {
+    debugPrint(yearpath);
+    debugPrintln(" exists");
+  }
+
+  if (!SD.exists(yearmonthpath)) {
+    debugPrint(yearmonthpath);
+    debugPrintln(" not exists");
+    createDirSD(SD, yearmonthpath);
+  } else {
+    debugPrint(yearmonthpath);
+    debugPrintln(" exists");
+  }
+}
 
 void listDir(fs::FS & fs, const char * dirname, uint8_t levels) {
   Serial.printf("Listing directory: %s\n", dirname);

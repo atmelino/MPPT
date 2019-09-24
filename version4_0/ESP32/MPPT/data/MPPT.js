@@ -51,18 +51,19 @@ function readMessage(event) {
         //received_msg = received_msg.replace(/\\/g, '')
         //printlnMessage("messages", received_msg);
         // printlnMessage("messages", "receivedmessage.data=" + receivedmessage.data);
-        printlnMessage("messages", "receivedmessage.data.DataFilesYesNo=" + receivedmessage.data.DataFilesYesNo);
+        //printlnMessage("messages", "receivedmessage.data.DataFilesYesNo=" + receivedmessage.data.DataFilesYesNo);
         document.getElementById("dataFilesBox").style.filter = "none";
         if (receivedmessage.data.DataFilesYesNo == "true") {
-            printlnMessage("messages", "enableDataFiles true");
+            //printlnMessage("messages", "enableDataFiles true");
             document.getElementById("enableDataFiles").checked = true;
             document.getElementById("enableDataFilescontent").style.display = "block";
         }
         if (receivedmessage.data.DataFilesYesNo == "false") {
-            printlnMessage("messages", "enableDataFiles false");
+            //printlnMessage("messages", "enableDataFiles false");
             document.getElementById("enableDataFiles").checked = false;
             document.getElementById("enableDataFilescontent").style.display = "none";
         }
+        document.getElementById("DataFileLines").value = receivedmessage.data.DataFileLines;
     }
     if (receivedmessage.type == "getStatus") {
         printlnMessage("messages", received_msg);
@@ -175,7 +176,6 @@ function getSettings() {
     socket.send(JSON.stringify(sendmessage));
 }
 
-
 function enableDataFiles() {
     enableDataFileschecked = document.getElementById("enableDataFiles").checked;
     sendmessage.type = "enableDataFiles";
@@ -189,6 +189,14 @@ function enableDataFiles() {
     sendmessage.data = value;
     socket.send(JSON.stringify(sendmessage));
 }
+
+function setDataFileLinesButton() {
+    var value = document.getElementById("DataFileLines").value;
+    sendmessage.type = "DataFileLines";
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
 
 // Helper functions
 function printMessage(target, message) {

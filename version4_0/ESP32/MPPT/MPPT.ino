@@ -10,6 +10,8 @@
 #include "SPI.h"
 #include "RTClib.h"
 
+#define DEBUG false
+
 // pin assignment
 const int ledPin = 2; // on-board blue led (also internally pulled up)
 const int PWM_OUT = 4;
@@ -45,115 +47,6 @@ int DataFileLines = 10;
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
-void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
-  StaticJsonDocument<256> doc;
-  //Serial.println("WebSocket onWsEvent");
-  if (type == WS_EVT_CONNECT) {
-    Serial.println("Websocket client connection received");
-    //client->text("Hello from ESP32 Server");
-  } else if (type == WS_EVT_DISCONNECT) {
-    Serial.println("Client disconnected");
-  } else if (type == WS_EVT_DATA) {
-    //Serial.println("WebSocket onWsEvent WS_EVT_DATA");
-    AwsFrameInfo * info = (AwsFrameInfo*)arg;
-    String msg = "";
-    Serial.printf("ws[%s][%u] text-message[%llu]: ", server->url(), client->id(), len);
-    for (size_t i = 0; i < len; i++) {
-      msg += (char) data[i];
-    }
-    Serial.printf("%s\n", msg.c_str());
-
-    auto error = deserializeJson(doc, msg);
-    if (error) {
-      Serial.print(F("deserializeJson() failed with code "));
-      Serial.println(error.c_str());
-      return;
-    }
-
-    String type = doc["type"];
-    Serial.print("message type: ");
-    Serial.println(type);
-
-    if (type == "PWM") {
-      String PWM = doc["data"];
-      PWM_actual = PWM.toInt();
-      ledcWrite(1, PWM_actual);
-    }
-
-    if (type == "SetRTC") {
-      // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-      rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    }
-
-    if (type == "enableDataFiles") {
-      String enableDataFiles = doc["data"];
-      if (doc["data"] == "true") {
-        DataFilesYesNo = true;
-        //Serial.println("save DataFiles to SD true");
-      } else {
-        DataFilesYesNo = false;
-        //Serial.println("save DataFiles to SD false");
-      }
-      saveSettings();
-    }
-
-    if (type == "listSPIFFS") {
-      File root = SPIFFS.open("/");
-      File file = root.openNextFile();
-      while (file) {
-        Serial.print("FILE: ");
-        Serial.println(file.name());
-        file = root.openNextFile();
-      }
-    }
-
-    if (type == "listSD") {
-      listDir(SD, "/", 2);
-    }
-
-    if (type == "getSettings") {
-      char data[100];
-      readFileSPIFFS("/settings.json",  data);
-      Serial.println(data);
-
-      StaticJsonDocument<100> docSettings;
-      char json_stringSettings[200];
-      DeserializationError error = deserializeJson(docSettings, data);
-      //      if (error) {
-      //        Serial.print(F("deserializeJson() failed: "));
-      //        Serial.println(error.c_str());
-      //      } else {
-      //        Serial.println("no error");
-      //
-      //        char json_string[256];
-      //        serializeJson(docSettings, json_stringSettings);
-      //        Serial.println(json_stringSettings);
-      //        const char* df = docSettings["DataFilesYesNo"];
-      //        Serial.println(df);
-      //      }
-
-      StaticJsonDocument<200> doc;
-      char json_string[256];
-      doc["type"] = "getSettings";
-      doc["data"] = docSettings;
-      serializeJson(doc, json_string);
-      Serial.println(json_string);
-      ws.printfAll(json_string);
-    }
-
-    if (type == "getStatus") {
-      StaticJsonDocument<200> doc;
-      char json_string[256];
-      doc["type"] = "getSettings";
-      doc["DataFilesYesNo"] = (DataFilesYesNo ? "true" : "false");
-      serializeJson(doc, json_string);
-      ws.printfAll(json_string);
-    }
-
-
-  }
-}
-
 
 void setup(void)
 {
@@ -171,26 +64,12 @@ void setup(void)
     return;
   }
   else {
-    StaticJsonDocument<200> doc;
-    char data[100];
-    readFileSPIFFS("/settings.json",  data);
-    Serial.println(data);
-    auto error = deserializeJson(doc, data);
-    if (error) {
-      Serial.print(F("deserializeJson() failed with code "));
-      Serial.println(error.c_str());
-      return;
-    }
-    String df = doc["DataFilesYesNo"];
-    Serial.println(df);
-    if (df == "true")
-      DataFilesYesNo = true;
-    else
-      DataFilesYesNo = false;
+    getSettings();
 
     //digitalWrite(ledPin, HIGH);
     //delay(300);
   }
+
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -353,59 +232,6 @@ void loop(void)
 }
 
 
-void saveSettings()
-{
-  StaticJsonDocument<200> doc;
-  char json_string[256];
-  doc["DataFilesYesNo"] = (DataFilesYesNo ? "true" : "false");
-  serializeJson(doc, json_string);
-  writeFileSPIFFS( "/settings.json", json_string);
-  Serial.println(json_string);
-  ws.printfAll(json_string);
-}
-
-
-void writeDataFile(char* dateTime) {
-  char filename[40];
-  char year[5] = {'2', '0', '0', '0', '\0'};
-  char month[3] = {'0', '0', '\0'};
-  //Serial.println(dateTime);
-
-  dateTime[13] = '_';
-  dateTime[16] = '_';
-  memcpy(year, dateTime, 4);
-  memcpy(month, dateTime + 5, 2);
-  //Serial.println(year);
-  //Serial.println(month);
-
-  makeDataDir(year, month);
-
-  sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
-  Serial.println(filename);
-  writeFileSD(SD, filename, dataLines[0]);
-}
-
-
-void makeDataDir(char *year, char* month) {
-  char yearpath[10];
-  char yearmonthpath[10];
-  sprintf(yearpath, "/%s", year);
-  sprintf(yearmonthpath, "/%s/%s", year, month);
-
-  Serial.print(yearpath);
-  if (!SD.exists(yearpath)) {
-    Serial.println(" not exists");
-    createDirSD(SD, yearpath);
-  } else
-    Serial.println(" exists");
-
-  Serial.print(yearmonthpath);
-  if (!SD.exists(yearmonthpath)) {
-    Serial.println(" not exists");
-    createDirSD(SD, yearmonthpath);
-  } else
-    Serial.println(" exists");
-}
 
 void setPWM() {
   digitalWrite(PWM_ENABLE_PIN, HIGH);  // PWM on, enable IR2104
@@ -444,4 +270,14 @@ void makeDateTime() {
   DateTime now = rtc.now();
   char* format = "%4d-%02d-%02d_%02d:%02d:%02d\0";
   sprintf(dateTime, format, now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+}
+
+void debugPrint(char* message) {
+  if (DEBUG)
+    Serial.print(message);
+}
+
+void debugPrintln(char* message) {
+  if (DEBUG)
+    Serial.println(message);
 }
