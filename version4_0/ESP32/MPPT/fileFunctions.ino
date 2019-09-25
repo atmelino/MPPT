@@ -50,8 +50,10 @@ void writeDataFile(char* dateTime) {
 
   sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
   debugPrintln(filename);
-
-  writeFileSD(SD, filename, dataLines[0]);
+  for (int i = 0; i < DataFileLines; i++) {
+    appendFileSD(SD, filename, dataLines[i]);
+  }
+  //writeFileSD(SD, filename, dataLines[0]);
 }
 
 
@@ -80,7 +82,7 @@ void makeDataDir(char *year, char* month) {
   }
 }
 
-void listDir(fs::FS & fs, const char * dirname, uint8_t levels) {
+void listDirSD(fs::FS & fs, const char * dirname, uint8_t levels) {
   Serial.printf("Listing directory: %s\n", dirname);
 
   File root = fs.open(dirname);
@@ -99,7 +101,7 @@ void listDir(fs::FS & fs, const char * dirname, uint8_t levels) {
       Serial.print("  DIR : ");
       Serial.println(file.name());
       if (levels) {
-        listDir(fs, file.name(), levels - 1);
+        listDirSD(fs, file.name(), levels - 1);
       }
     } else {
       Serial.print("  FILE: ");
@@ -108,6 +110,15 @@ void listDir(fs::FS & fs, const char * dirname, uint8_t levels) {
       Serial.println(file.size());
     }
     file = root.openNextFile();
+  }
+}
+
+void createDirSD(fs::FS & fs, const char * path) {
+  Serial.printf("Creating Dir: %s\n", path);
+  if (fs.mkdir(path)) {
+    Serial.println("Dir created");
+  } else {
+    Serial.println("mkdir failed");
   }
 }
 
@@ -127,12 +138,46 @@ void writeFileSD(fs::FS &fs, const char * path, const char * message) {
   file.close();
 }
 
-void createDirSD(fs::FS & fs, const char * path) {
-  Serial.printf("Creating Dir: %s\n", path);
-  if (fs.mkdir(path)) {
-    Serial.println("Dir created");
+void readFileSD(fs::FS &fs, const char * path) {
+  Serial.printf("Reading file: %s\n", path);
+
+  File file = fs.open(path);
+  if (!file) {
+    Serial.println("Failed to open file for reading");
+    return;
+  }
+
+  //Serial.println("Read from file: ");
+  while (file.available()) {
+    Serial.write(file.read());
+  }
+  file.close();
+  Serial.println("file end");
+}
+
+
+void appendFileSD(fs::FS &fs, const char * path, const char * message) {
+  Serial.printf("Appending to file: %s\n", path);
+
+  File file = fs.open(path, FILE_APPEND);
+  if (!file) {
+    Serial.println("Failed to open file for appending");
+    return;
+  }
+  if (file.print(message)) {
+    Serial.println("Message appended");
   } else {
-    Serial.println("mkdir failed");
+    Serial.println("Append failed");
+  }
+  file.close();
+}
+
+void deleteFileSD(fs::FS &fs, const char * path) {
+  Serial.printf("Deleting file: %s\n", path);
+  if (fs.remove(path)) {
+    Serial.println("File deleted");
+  } else {
+    Serial.println("Delete failed");
   }
 }
 
@@ -152,8 +197,6 @@ void writeFileSPIFFS(char* name, char* data)
   }
   file.close();
 }
-
-
 
 
 void readFileSPIFFS(char* name, char* data)

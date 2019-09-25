@@ -61,8 +61,17 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       }
     }
 
+    if (type == "printSDFile") {
+
+      String pathS = doc["data"];
+      char path[40];
+      pathS.toCharArray(path, sizeof(path));
+      readFileSD(SD, path);
+      //readFileSD(SD, "/2019/09/2019-09-24_01_45_37.txt");
+    }
+
     if (type == "listSD") {
-      listDir(SD, "/", 2);
+      listDirSD(SD, "/", 2);
     }
 
     if (type == "getSettings") {
@@ -89,7 +98,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       serializeJson(doc, json_string);
       ws.printfAll(json_string);
     }
-
 
     if (type == "DataFileLines") {
       String dfls = doc["data"];

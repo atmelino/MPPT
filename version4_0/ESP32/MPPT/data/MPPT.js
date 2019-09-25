@@ -170,6 +170,14 @@ function listSD() {
     socket.send(JSON.stringify(sendmessage));
 }
 
+function printSDFile() {
+    var value = document.getElementById("fileName").value;
+    sendmessage.type = "printSDFile";
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
+
 function getSettings() {
     sendmessage.type = "getSettings";
     sendmessage.data = "now!";

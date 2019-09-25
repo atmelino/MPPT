@@ -114,7 +114,7 @@ void setup(void)
     return;
   } else {
     Serial.println("Card Mount success");
-    listDir(SD, "/", 2);
+    listDirSD(SD, "/", 2);
   }
 
   // PWM
@@ -213,7 +213,7 @@ void loop(void)
     linePointer = 0;
 
     for (size_t i = 0; i < DataFileLines; i++) {
-      Serial.println(dataLines[i]);
+      Serial.print(dataLines[i]);
     }
 
     if (DataFilesYesNo) {
@@ -257,7 +257,7 @@ void sendDataLine() {
 
 void makeDataLine() {
   makeDateTime();
-  char* format = "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d";
+  char* format = "%s %5d %.3f %.3f %.3f %.3f %.3f %.3f %4d\n";
   sprintf(dataLines[linePointer], format, dateTime, count, bv[CHS], cmA[CHS], pw[CHS], bv[CHB], cmA[CHB], pw[CHB], PWM_actual);
 }
 
