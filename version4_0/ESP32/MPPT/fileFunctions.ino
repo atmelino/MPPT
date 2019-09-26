@@ -84,7 +84,6 @@ void makeDataDir(char *year, char* month) {
 
 void listDirSD(fs::FS & fs, const char * dirname, uint8_t levels) {
   Serial.printf("Listing directory: %s\n", dirname);
-
   File root = fs.open(dirname);
   if (!root) {
     Serial.println("Failed to open directory");
@@ -94,7 +93,6 @@ void listDirSD(fs::FS & fs, const char * dirname, uint8_t levels) {
     Serial.println("Not a directory");
     return;
   }
-
   File file = root.openNextFile();
   while (file) {
     if (file.isDirectory()) {
@@ -113,6 +111,24 @@ void listDirSD(fs::FS & fs, const char * dirname, uint8_t levels) {
   }
 }
 
+void  getDirSD(fs::FS & fs, const char * dirname, char* yearList) {
+  //String msg = "";
+  String msg = "[\"file1.js\",\"file2.js\"]";
+  File root = fs.open(dirname);
+  File file = root.openNextFile();
+  while (file) {
+    if (file.isDirectory()) {
+      Serial.print("  DIR : ");
+      Serial.println(file.name());
+    }
+    file = root.openNextFile();
+  }
+  Serial.print("length of msg=");
+  Serial.println(msg.length());
+  msg.toCharArray(yearList, msg.length()+1);
+  Serial.println(yearList);
+}
+
 void createDirSD(fs::FS & fs, const char * path) {
   Serial.printf("Creating Dir: %s\n", path);
   if (fs.mkdir(path)) {
@@ -122,7 +138,7 @@ void createDirSD(fs::FS & fs, const char * path) {
   }
 }
 
-void writeFileSD(fs::FS &fs, const char * path, const char * message) {
+void writeFileSD(fs::FS & fs, const char * path, const char * message) {
   Serial.printf("Writing file:%s\n", path);
 
   File file = fs.open(path, FILE_WRITE);
@@ -138,7 +154,7 @@ void writeFileSD(fs::FS &fs, const char * path, const char * message) {
   file.close();
 }
 
-void readFileSD(fs::FS &fs, const char * path) {
+void readFileSD(fs::FS & fs, const char * path) {
   Serial.printf("Reading file: %s\n", path);
 
   File file = fs.open(path);
@@ -156,7 +172,7 @@ void readFileSD(fs::FS &fs, const char * path) {
 }
 
 
-void appendFileSD(fs::FS &fs, const char * path, const char * message) {
+void appendFileSD(fs::FS & fs, const char * path, const char * message) {
   Serial.printf("Appending to file: %s\n", path);
 
   File file = fs.open(path, FILE_APPEND);
@@ -172,7 +188,7 @@ void appendFileSD(fs::FS &fs, const char * path, const char * message) {
   file.close();
 }
 
-void deleteFileSD(fs::FS &fs, const char * path) {
+void deleteFileSD(fs::FS & fs, const char * path) {
   Serial.printf("Deleting file: %s\n", path);
   if (fs.remove(path)) {
     Serial.println("File deleted");

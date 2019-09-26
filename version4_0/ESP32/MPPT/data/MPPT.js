@@ -46,12 +46,18 @@ function readMessage(event) {
         //document.getElementById("liveDatatmp").innerHTML = receivedmessage.data;
         refreshTable("liveTable", receivedmessage.data);
     }
+    if (receivedmessage.type == "listyears") {
+        printlnMessage("messages", "Message is received..." + event.data);
+        //printlnMessage("messages", "array for years " + receivedmessage.data);
+        setYearsComboBox(receivedmessage.data);
+        //filesComboSelect();
+    }
+    if (receivedmessage.type == "filedata") {
+        //str = receivedmessage.data.replace(/(?:\r\n|\r|\n)/g, "<br>");
+        //fillTable("storedTable", receivedmessage.data);
+    }
     if (receivedmessage.type == "getSettings") {
         printlnMessage("messages", received_msg);
-        //received_msg = received_msg.replace(/\\/g, '')
-        //printlnMessage("messages", received_msg);
-        // printlnMessage("messages", "receivedmessage.data=" + receivedmessage.data);
-        //printlnMessage("messages", "receivedmessage.data.DataFilesYesNo=" + receivedmessage.data.DataFilesYesNo);
         document.getElementById("dataFilesBox").style.filter = "none";
         if (receivedmessage.data.DataFilesYesNo == "true") {
             //printlnMessage("messages", "enableDataFiles true");
@@ -91,7 +97,43 @@ function refreshTable(tableName, data) {
     }
 }
 
+function liveStored() {
+    ldchecked = document.getElementById("live").checked;
+    //printlnMessage("messages", ldchecked);
+
+    if (ldchecked == true) {
+        show("liveData");
+        hide("storedData");
+        invisible("fileSelect");
+        //setCookie("livedata", 1, 365);
+    } else {
+        sendmessage.type = "listyears";
+        socket.send(JSON.stringify(sendmessage));
+        show("storedData");
+        visible("fileSelect");
+        hide("liveData");
+        //setCookie("livedata", 0, 365);
+    }
+}
+
+function setYearsComboBox(items) {
+    printlnMessage("messages", "setYearsComboBox items=" + items);
+    printlnMessage("messages", "items[1]=" + items[1]);
+
+    elementId = document.getElementById("yearsComboBox");
+    elementId.options.length = 0;
+
+    for (var i = 0; i < items.length; i++) {
+        AddItem("yearsComboBox", items[i], items[i]);
+    }
+    //yearsComboSelect();
+}
+
+
 function settingsClicked() {
+    //myitems = ['file1.js','file2.js','file3.js'];
+    //printlnMessage("messages", myitems[1]);
+
     getSettings();
     var settings = document.getElementById("settings");
     settings.style.display = "block";
@@ -244,5 +286,16 @@ function hide(name) {
     x.style.display = "none";
 }
 
+function AddItem(Element, Text, Value) {
+    // Create an Option object
+    var opt = document.createElement("option");
+
+    // Add an Option object to Drop Down/List Box
+    document.getElementById(Element).options.add(opt);
+
+    // Assign text and value to Option object
+    opt.text = Text;
+    opt.value = Value;
+}
 
 
