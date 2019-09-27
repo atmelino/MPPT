@@ -111,7 +111,7 @@ void listDirSD(fs::FS & fs, const char * dirname, uint8_t levels) {
   }
 }
 
-void  getDirSD(fs::FS & fs, const char * dirname, char* yearList) {
+void  getDirSDfixed(fs::FS & fs, const char * dirname, char* yearList) {
   //String msg = "";
   String msg = "[\"file1.js\",\"file2.js\"]";
   File root = fs.open(dirname);
@@ -125,7 +125,27 @@ void  getDirSD(fs::FS & fs, const char * dirname, char* yearList) {
   }
   Serial.print("length of msg=");
   Serial.println(msg.length());
-  msg.toCharArray(yearList, msg.length()+1);
+  msg.toCharArray(yearList, msg.length() + 1);
+  Serial.println(yearList);
+}
+
+void  getDirSD(fs::FS & fs, const char * dirname, char* yearList) {
+  String msg = "[\"";
+  //String msg = "[\"file1.js\",\"file2.js\"]";
+  File root = fs.open(dirname);
+  File file = root.openNextFile();
+  while (file) {
+    if (file.isDirectory()) {
+      msg += file.name();
+      Serial.println(file.name());
+    }
+    file = root.openNextFile();
+  }
+  msg += "\"]";
+
+  Serial.print("length of msg=");
+  Serial.println(msg.length());
+  msg.toCharArray(yearList, msg.length() + 1);
   Serial.println(yearList);
 }
 

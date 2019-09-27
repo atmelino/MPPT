@@ -100,19 +100,33 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     }
 
     if (type == "listyears") {
-      char json_string[200];
-      StaticJsonDocument<200> doc;
-      char yearList[200];;
-      getDirSD(SD, "/", yearList);
-      Serial.println(yearList);
-      doc["type"] = "listyears";
-      doc["data"] = yearList;
-      serializeJson(doc, json_string);
-      Serial.println(json_string);
+      //      char json_string[200];
+      //      StaticJsonDocument<200> doc;
+      //      char yearList[200];;
+      //      getDirSD(SD, "/", yearList);
+      //      Serial.println(yearList);
+      //      doc["type"] = "listyears";
+      //      doc["data"] = yearList;
+      //      serializeJson(doc, json_string);
+      //      Serial.println(json_string);
       //ws.printfAll(json_string);
 
+
+      char yearList[200];
+      getDirSD(SD, "/", yearList);
+      Serial.println(yearList);
+      String msg = "{\"type\":\"listyears\",\"data\":";
+      msg += yearList;
+      msg += "}";
+      Serial.println(msg.c_str());
+      Serial.println(msg.length());
+      char jsonmsg[200];
+      msg.toCharArray(jsonmsg, msg.length() + 1);
+
+      ws.printfAll(jsonmsg);
+
       char* mymsg = "{\"type\":\"listyears\",\"data\":[\"file1.js\",\"file2.js\"]}";
-      ws.printfAll(mymsg);
+      //ws.printfAll(mymsg);
 
     }
 
