@@ -126,9 +126,17 @@ function setYearsComboBox(items) {
     for (var i = 0; i < items.length; i++) {
         AddItem("yearsComboBox", items[i], items[i]);
     }
-    //yearsComboSelect();
+    yearsComboSelect();
 }
 
+function yearsComboSelect() {
+    const year = getSelectedText("yearsComboBox");
+    sendmessage.type = "listmonths";
+    sendmessage.data = {
+        year: year
+    };
+    socket.send(JSON.stringify(sendmessage));
+}
 
 function settingsClicked() {
     //myitems = ['file1.js','file2.js','file3.js'];
@@ -298,4 +306,10 @@ function AddItem(Element, Text, Value) {
     opt.value = Value;
 }
 
+
+function getSelectedText(elementId) {
+    var elt = document.getElementById(elementId);
+    if (elt.selectedIndex == -1) return null;
+    return elt.options[elt.selectedIndex].text;
+}
 
