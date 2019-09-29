@@ -52,6 +52,11 @@ function readMessage(event) {
         setYearsComboBox(receivedmessage.data);
         //filesComboSelect();
     }
+    if (receivedmessage.type == "listmonths") {
+        printlnMessage("messages", "Message is received..." + event.data);
+        setMonthsComboBox(receivedmessage.data);
+        //filesComboSelect();
+    }
     if (receivedmessage.type == "filedata") {
         //str = receivedmessage.data.replace(/(?:\r\n|\r|\n)/g, "<br>");
         //fillTable("storedTable", receivedmessage.data);
@@ -132,10 +137,17 @@ function setYearsComboBox(items) {
 function yearsComboSelect() {
     const year = getSelectedText("yearsComboBox");
     sendmessage.type = "listmonths";
-    sendmessage.data = {
-        year: year
-    };
+    sendmessage.data = year;
     socket.send(JSON.stringify(sendmessage));
+}
+
+function setMonthsComboBox(items) {
+    elementId = document.getElementById("monthsComboBox");
+    elementId.options.length = 0;
+    for (var i = 0; i < items.length; i++) {
+        AddItem("monthsComboBox", items[i], items[i]);
+    }
+   // monthsComboSelect();
 }
 
 function settingsClicked() {
@@ -165,6 +177,21 @@ function getStatus() {
     document.getElementById("bufferLength").value = "query..";
     sendmessage.type = "getStatus";
     sendmessage.data = "now!";
+    socket.send(JSON.stringify(sendmessage));
+}
+
+function DebugLevel() {
+    if (document.getElementById("debug0").checked)
+        debugLevel = 0;
+    if (document.getElementById("debug1").checked)
+        debugLevel = 1;
+    if (document.getElementById("debug2").checked)
+        debugLevel = 2;
+    if (document.getElementById("debug3").checked)
+        debugLevel = 3;
+    printlnMessage("messages", "Serial Debug Level=" + debugLevel);
+    sendmessage.type = "debugLevel";
+    sendmessage.data = debugLevel;
     socket.send(JSON.stringify(sendmessage));
 }
 

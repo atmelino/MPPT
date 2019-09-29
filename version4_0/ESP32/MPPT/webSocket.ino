@@ -90,6 +90,11 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       ws.printfAll(json_string);
     }
 
+    if (type == "debugLevel") {
+      String dl = doc["data"];
+      debugLevel = dl.toInt();
+    }
+
     if (type == "DataFileLines") {
       String dfls = doc["data"];
       //Serial.println(dfls);
@@ -114,8 +119,16 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     }
 
     if (type == "listmonths") {
+      String param = doc["data"];
+      String param2 = "/" + param;
+      //Serial.println(param2.c_str());
+      char path[6];
+      param2.toCharArray(path, param2.length() + 1);
+      debugPrint("function onWsEvent path=", 1);
+      debugPrintln(path, 1);
       char monthList[200];
-      getDirSD(SD, "/2019", monthList);
+      getDirSD(SD, path, monthList);
+      //getDirSD(SD, "/2019", monthList);
       Serial.println(monthList);
       String msg = "{\"type\":\"listmonths\",\"data\":";
       msg += monthList;

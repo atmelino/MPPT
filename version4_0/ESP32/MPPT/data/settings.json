@@ -1,4 +1,5 @@
 {
     "DataFilesYesNo": "false",
-    "DataFileLines": 30
+    "DataFileLines": 30,
+    "debugLevel":2
 }

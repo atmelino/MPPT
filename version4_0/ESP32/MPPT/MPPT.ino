@@ -10,7 +10,7 @@
 #include "SPI.h"
 #include "RTClib.h"
 
-#define DEBUG false
+int debugLevel = 2; // 0=print nothing
 
 // pin assignment
 const int ledPin = 2; // on-board blue led (also internally pulled up)
@@ -52,7 +52,7 @@ void setup(void)
 {
 
   Serial.begin(115200);
-  Serial.println("MPPT ESP32");
+  debugPrintln("MPPT ESP32", 1);
 
   if (! rtc.begin()) {
     Serial.println("Couldn't find RTC");
@@ -206,6 +206,7 @@ void loop(void)
   }
 
   makeDataLine();
+  debugPrint(dataLines[linePointer], 3);
   //Serial.println(dataLines[linePointer]);
   sendDataLine();
 
@@ -215,7 +216,8 @@ void loop(void)
     linePointer = 0;
 
     for (size_t i = 0; i < DataFileLines; i++) {
-      Serial.print(dataLines[i]);
+      //Serial.print(dataLines[i]);
+      debugPrint(dataLines[i], 4);
     }
 
     if (DataFilesYesNo) {
@@ -274,12 +276,13 @@ void makeDateTime() {
   sprintf(dateTime, format, now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
 }
 
-void debugPrint(char* message) {
-  if (DEBUG)
+void debugPrint(const char* message, int level) {
+  //Serial.printf("level=%d debugLevel=%d\n", level, debugLevel);
+  if (level <= debugLevel)
     Serial.print(message);
 }
 
-void debugPrintln(char* message) {
-  if (DEBUG)
+void debugPrintln(const char* message, int level) {
+  if (level <= debugLevel)
     Serial.println(message);
 }

@@ -49,7 +49,7 @@ void writeDataFile(char* dateTime) {
   makeDataDir(year, month);
 
   sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
-  debugPrintln(filename);
+  debugPrintln(filename, 1);
   for (int i = 0; i < DataFileLines; i++) {
     appendFileSD(SD, filename, dataLines[i]);
   }
@@ -64,21 +64,21 @@ void makeDataDir(char *year, char* month) {
   sprintf(yearmonthpath, "/%s/%s", year, month);
 
   if (!SD.exists(yearpath)) {
-    debugPrint(yearpath);
-    debugPrintln(" not exists");
+    debugPrint(yearpath, 1);
+    debugPrintln(" not exists", 1);
     createDirSD(SD, yearpath);
   } else {
-    debugPrint(yearpath);
-    debugPrintln(" exists");
+    debugPrint(yearpath, 1);
+    debugPrintln(" exists", 1);
   }
 
   if (!SD.exists(yearmonthpath)) {
-    debugPrint(yearmonthpath);
-    debugPrintln(" not exists");
+    debugPrint(yearmonthpath, 1);
+    debugPrintln(" not exists", 1);
     createDirSD(SD, yearmonthpath);
   } else {
-    debugPrint(yearmonthpath);
-    debugPrintln(" exists");
+    debugPrint(yearmonthpath, 1);
+    debugPrintln(" exists", 1);
   }
 }
 
@@ -113,22 +113,34 @@ void listDirSD(fs::FS & fs, const char * dirname, uint8_t levels) {
 
 
 void  getDirSD(fs::FS & fs, const char * dirname, char* dirArray) {
+  int len = strlen(dirname);
+  int trim;
+  if (len == 1) trim = 1; else trim = len + 1;
+  char debugMessage[100];
+  sprintf(debugMessage, "function getDirSD dirname=%s len=%d", dirname, len);
+  debugPrintln(debugMessage, 1);
+  boolean first = true;
+  String fullPath;
   String msg = "[";
   File root = fs.open(dirname);
   File file = root.openNextFile();
   while (file) {
     if (file.isDirectory()) {
-      //Serial.println(file.name());
+      Serial.println(file.name());
+      if (!first)
+        msg += ",";
+      first = false;
+      fullPath = file.name();
+      sprintf(debugMessage, "function getDirSD fullPath=%s", fullPath.c_str() );
+      debugPrintln(debugMessage, 1);
       msg += "\"";
-      msg += file.name();
-      msg += "\",";
+      msg += fullPath.substring(trim);
+      msg += "\"";
       Serial.println(msg);
     }
     file = root.openNextFile();
   }
-  msg.remove(msg.length() - 1);
   msg += "]";
-
   Serial.print("length of msg=");
   Serial.println(msg.length());
   msg.toCharArray(dirArray, msg.length() + 1);

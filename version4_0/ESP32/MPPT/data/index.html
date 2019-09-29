@@ -109,9 +109,16 @@
               <p><button onclick="listSPIFFS()">List SPIFFS</button>
                 <button onclick="listSD()">List SD</button>
               </p>
-              <p><input id="fileName" name="value" value="" /> 
+              <p><input id="fileName" name="value" value="" />
                 <button onclick="printSDFile()">print SD File</button>
               </p>
+              <p>Serial Debug<br>
+                <label><input type="radio" name="Serial" id="debug0" onclick="DebugLevel()" />Off</label>
+                <label><input type="radio" name="Serial" id="debug1" onclick="DebugLevel()" />1</label>
+                <label><input type="radio" name="Serial" id="debug2" onclick="DebugLevel()" />2</label>
+                <label><input type="radio" name="Serial" id="debug3" onclick="DebugLevel()" />3</label>
+              </p>
+
               <p> <button onclick="getSettings()">get Settings</button>
                 <button onclick="getStatus()">get Status</button>
               </p>
@@ -145,7 +152,6 @@
               </p>
             </div>
             <div style='width: 5%; display: table-cell; white-space: nowrap;'></div>
-
             <div style='width: 35%; display: table-cell; white-space: nowrap;'>
               <button onclick="setRTC()">Set Real Time Clock</button><br>
               <p><button onclick="showLog()">Show Log</button>
