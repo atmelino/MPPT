@@ -147,6 +147,19 @@ void  getDirSD(fs::FS & fs, const char * dirname, char* dirArray) {
   Serial.println(dirArray);
 }
 
+
+void  getFilesSD(fs::FS & fs, const char * dirname, char* dirArray) {
+  Serial.printf("Listing directory: %s\n", dirname);
+  File root = fs.open(dirname);
+  File file = root.openNextFile();
+  while (file) {
+    if (!file.isDirectory()) {
+      Serial.println(file.name());
+    }
+    file = root.openNextFile();
+  }
+}
+
 void createDirSD(fs::FS & fs, const char * path) {
   Serial.printf("Creating Dir: %s\n", path);
   if (fs.mkdir(path)) {

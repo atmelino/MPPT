@@ -120,10 +120,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
     if (type == "listmonths") {
       String param = doc["data"];
-      String param2 = "/" + param;
-      //Serial.println(param2.c_str());
       char path[6];
-      param2.toCharArray(path, param2.length() + 1);
+      param.toCharArray(path, param.length() + 1);
       debugPrint("function onWsEvent path=", 1);
       debugPrintln(path, 1);
       char monthList[200];
@@ -138,6 +136,13 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       char jsonmsg[200];
       msg.toCharArray(jsonmsg, msg.length() + 1);
       ws.printfAll(jsonmsg);
+    }
+
+    if (type == "listdays") {
+      char daysList[200];
+
+      getFilesSD(SD, "/2019/09", daysList);
+
     }
 
     if (type == "printSDFile") {

@@ -137,7 +137,7 @@ function setYearsComboBox(items) {
 function yearsComboSelect() {
     const year = getSelectedText("yearsComboBox");
     sendmessage.type = "listmonths";
-    sendmessage.data = year;
+    sendmessage.data = "/" + year;
     socket.send(JSON.stringify(sendmessage));
 }
 
@@ -147,7 +147,15 @@ function setMonthsComboBox(items) {
     for (var i = 0; i < items.length; i++) {
         AddItem("monthsComboBox", items[i], items[i]);
     }
-   // monthsComboSelect();
+    monthsComboSelect();
+}
+
+function monthsComboSelect() {
+    year = getSelectedText("yearsComboBox");
+    month = getSelectedText("monthsComboBox");
+    sendmessage.type = "listdays";
+    sendmessage.data = "/" + year + "/" + month;
+    socket.send(JSON.stringify(sendmessage));
 }
 
 function settingsClicked() {
