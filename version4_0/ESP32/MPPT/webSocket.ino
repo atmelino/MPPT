@@ -25,8 +25,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     }
 
     String type = doc["type"];
-    Serial.print("message type: ");
-    Serial.println(type);
+    //Serial.print("message type: ");
+    //Serial.println(type);
 
     if (type == "PWM") {
       String PWM = doc["data"];
@@ -97,7 +97,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
     if (type == "DataFileLines") {
       String dfls = doc["data"];
-      //Serial.println(dfls);
       DataFileLines = dfls.toInt();
       //Serial.println("new DataFileLines=");
       //Serial.println(DataFileLines);
@@ -107,15 +106,16 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     if (type == "listyears") {
       char yearList[200];
       getDirSD(SD, "/", yearList);
-      Serial.println(yearList);
       String msg = "{\"type\":\"listyears\",\"data\":";
       msg += yearList;
       msg += "}";
-      Serial.println(msg.c_str());
-      Serial.println(msg.length());
       char jsonmsg[200];
       msg.toCharArray(jsonmsg, msg.length() + 1);
       ws.printfAll(jsonmsg);
+      debugPrintln(msg.c_str(), 1);
+      char debugMessage[20];
+      sprintf(debugMessage, "length=%d", msg.length());
+      debugPrintln(debugMessage, 1);
     }
 
     if (type == "listmonths") {
@@ -126,22 +126,32 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       debugPrintln(path, 1);
       char monthList[200];
       getDirSD(SD, path, monthList);
-      //getDirSD(SD, "/2019", monthList);
-      Serial.println(monthList);
       String msg = "{\"type\":\"listmonths\",\"data\":";
       msg += monthList;
       msg += "}";
-      Serial.println(msg.c_str());
-      Serial.println(msg.length());
       char jsonmsg[200];
       msg.toCharArray(jsonmsg, msg.length() + 1);
       ws.printfAll(jsonmsg);
+      debugPrintln(msg.c_str(), 1);
+      char debugMessage[20];
+      sprintf(debugMessage, "length=%d", msg.length());
+      debugPrintln(debugMessage, 1);
     }
 
     if (type == "listdays") {
-      char daysList[200];
-
-      getFilesSD(SD, "/2019/09", daysList);
+      String param = doc["data"];
+      char path[6];
+      param.toCharArray(path, param.length() + 1);
+      debugPrint("function onWsEvent path=", 1);
+      debugPrintln(path, 1);
+      char daysList[2000];
+      getFilesSD(SD, path, daysList);
+      String msg = "{\"type\":\"listdays\",\"data\":";
+      msg += daysList;
+      msg += "}";
+      char jsonmsg[2100];
+      msg.toCharArray(jsonmsg, msg.length() + 1);
+      ws.printfAll(jsonmsg);
 
     }
 

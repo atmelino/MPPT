@@ -116,9 +116,9 @@ void  getDirSD(fs::FS & fs, const char * dirname, char* dirArray) {
   int len = strlen(dirname);
   int trim;
   if (len == 1) trim = 1; else trim = len + 1;
-  char debugMessage[100];
-  sprintf(debugMessage, "function getDirSD dirname=%s len=%d", dirname, len);
-  debugPrintln(debugMessage, 1);
+  //char debugMessage[100];
+  //sprintf(debugMessage, "function getDirSD dirname=%s len=%d", dirname, len);
+  //debugPrintln(debugMessage, 1);
   boolean first = true;
   String fullPath;
   String msg = "[";
@@ -126,38 +126,54 @@ void  getDirSD(fs::FS & fs, const char * dirname, char* dirArray) {
   File file = root.openNextFile();
   while (file) {
     if (file.isDirectory()) {
-      Serial.println(file.name());
+      //Serial.println(file.name());
       if (!first)
         msg += ",";
       first = false;
       fullPath = file.name();
-      sprintf(debugMessage, "function getDirSD fullPath=%s", fullPath.c_str() );
-      debugPrintln(debugMessage, 1);
+      //sprintf(debugMessage, "function getDirSD fullPath=%s", fullPath.c_str() );
+      //debugPrintln(debugMessage, 1);
       msg += "\"";
       msg += fullPath.substring(trim);
       msg += "\"";
-      Serial.println(msg);
+      //Serial.println(msg);
     }
     file = root.openNextFile();
   }
   msg += "]";
-  Serial.print("length of msg=");
-  Serial.println(msg.length());
+  //Serial.print("length of msg=");
+  //Serial.println(msg.length());
   msg.toCharArray(dirArray, msg.length() + 1);
-  Serial.println(dirArray);
+  //Serial.println(dirArray);
 }
 
 
 void  getFilesSD(fs::FS & fs, const char * dirname, char* dirArray) {
   Serial.printf("Listing directory: %s\n", dirname);
+  int len = strlen(dirname);
+  boolean first = true;
+  String fullPath;
+  String msg = "[";
   File root = fs.open(dirname);
   File file = root.openNextFile();
   while (file) {
     if (!file.isDirectory()) {
-      Serial.println(file.name());
+      if (!first)
+        msg += ",";
+      first = false;
+      fullPath = file.name();
+      msg += "\"";
+      msg += fullPath.substring(len + 1);
+      msg += "\"";
     }
     file = root.openNextFile();
   }
+  msg += "]";
+  msg.toCharArray(dirArray, msg.length() + 1);
+  //debugPrintln(msg.c_str(), 1);
+  char debugMessage[20];
+  sprintf(debugMessage, "length=%d", msg.length());
+  debugPrintln(debugMessage, 1);
 }
 
 void createDirSD(fs::FS & fs, const char * path) {

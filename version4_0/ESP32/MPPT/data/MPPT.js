@@ -57,10 +57,14 @@ function readMessage(event) {
         setMonthsComboBox(receivedmessage.data);
         //filesComboSelect();
     }
-    if (receivedmessage.type == "filedata") {
-        //str = receivedmessage.data.replace(/(?:\r\n|\r|\n)/g, "<br>");
-        //fillTable("storedTable", receivedmessage.data);
+    if (receivedmessage.type == "listdays") {
+        printlnMessage("messages", "Message is received...listdays");
+        //printlnMessage("messages", "Message is received..." + event.data);
+        setDaysComboBox(receivedmessage.data);
+        daysComboSelect();
     }
+
+
     if (receivedmessage.type == "getSettings") {
         printlnMessage("messages", received_msg);
         document.getElementById("dataFilesBox").style.filter = "none";
@@ -157,6 +161,18 @@ function monthsComboSelect() {
     sendmessage.data = "/" + year + "/" + month;
     socket.send(JSON.stringify(sendmessage));
 }
+
+function setDaysComboBox(items) {
+    // printlnMessage('messages',items);
+    elementId = document.getElementById("daysComboBox");
+    elementId.options.length = 0;
+    for (var i = 0; i < items.length; i++) {
+        AddItem("daysComboBox", items[i], items[i]);
+    }
+}
+
+
+
 
 function settingsClicked() {
     //myitems = ['file1.js','file2.js','file3.js'];

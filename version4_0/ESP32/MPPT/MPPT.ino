@@ -114,8 +114,7 @@ void setup(void)
     return;
   } else {
     Serial.println("Card Mount success");
-    createDirSD(SD, "/mydir");
-
+    //createDirSD(SD, "/mydir");
     listDirSD(SD, "/", 2);
   }
 
