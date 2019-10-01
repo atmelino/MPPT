@@ -50,12 +50,10 @@ function readMessage(event) {
         printlnMessage("messages", "Message is received..." + event.data);
         //printlnMessage("messages", "array for years " + receivedmessage.data);
         setYearsComboBox(receivedmessage.data);
-        //filesComboSelect();
     }
     if (receivedmessage.type == "listmonths") {
         printlnMessage("messages", "Message is received..." + event.data);
         setMonthsComboBox(receivedmessage.data);
-        //filesComboSelect();
     }
     if (receivedmessage.type == "listdays") {
         printlnMessage("messages", "Message is received...listdays");
@@ -63,8 +61,6 @@ function readMessage(event) {
         setDaysComboBox(receivedmessage.data);
         daysComboSelect();
     }
-
-
     if (receivedmessage.type == "getSettings") {
         printlnMessage("messages", received_msg);
         document.getElementById("dataFilesBox").style.filter = "none";
@@ -83,7 +79,6 @@ function readMessage(event) {
     if (receivedmessage.type == "getStatus") {
         printlnMessage("messages", received_msg);
     }
-
 }
 
 function refreshTable(tableName, data) {
@@ -126,12 +121,11 @@ function liveStored() {
 }
 
 function setYearsComboBox(items) {
+    items.sort();
     printlnMessage("messages", "setYearsComboBox items=" + items);
     printlnMessage("messages", "items[1]=" + items[1]);
-
     elementId = document.getElementById("yearsComboBox");
     elementId.options.length = 0;
-
     for (var i = 0; i < items.length; i++) {
         AddItem("yearsComboBox", items[i], items[i]);
     }
@@ -146,6 +140,7 @@ function yearsComboSelect() {
 }
 
 function setMonthsComboBox(items) {
+    items.sort();
     elementId = document.getElementById("monthsComboBox");
     elementId.options.length = 0;
     for (var i = 0; i < items.length; i++) {
@@ -164,6 +159,7 @@ function monthsComboSelect() {
 
 function setDaysComboBox(items) {
     // printlnMessage('messages',items);
+    items.sort();
     elementId = document.getElementById("daysComboBox");
     elementId.options.length = 0;
     for (var i = 0; i < items.length; i++) {
@@ -171,7 +167,14 @@ function setDaysComboBox(items) {
     }
 }
 
-
+function daysComboSelect() {
+    year = getSelectedText("yearsComboBox");
+    month = getSelectedText("monthsComboBox");
+    fileName = getSelectedText("daysComboBox");
+    sendmessage.type = "readfile";
+    sendmessage.data = "/" + year + "/" + month + "/" + fileName;
+    socket.send(JSON.stringify(sendmessage));
+}
 
 
 function settingsClicked() {

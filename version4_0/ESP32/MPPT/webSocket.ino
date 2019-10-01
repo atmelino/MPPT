@@ -152,8 +152,15 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       char jsonmsg[2100];
       msg.toCharArray(jsonmsg, msg.length() + 1);
       ws.printfAll(jsonmsg);
-
     }
+
+    if (type == "readfile") {
+      String pathS = doc["data"];
+      char path[40];
+      pathS.toCharArray(path, sizeof(path));
+      readFileSD(SD, path);
+    }
+
 
     if (type == "printSDFile") {
       String pathS = doc["data"];

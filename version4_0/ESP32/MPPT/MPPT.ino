@@ -91,6 +91,9 @@ void setup(void)
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, "/index.html", "text/html");
   });
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/favicon.png", "image/png");
+  });
   server.on("/MPPT.css", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, "/MPPT.css", "text/css");
   });
