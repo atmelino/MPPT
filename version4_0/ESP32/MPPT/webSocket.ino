@@ -145,7 +145,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       debugPrint("function onWsEvent path=", 1);
       debugPrintln(path, 1);
       char daysList[2000];
-      getFilesSD(SD, path, daysList);
+      getFileListSD(SD, path, daysList);
       String msg = "{\"type\":\"listdays\",\"data\":";
       msg += daysList;
       msg += "}";
@@ -156,9 +156,18 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
     if (type == "readfile") {
       String pathS = doc["data"];
+      String content;
       char path[40];
       pathS.toCharArray(path, sizeof(path));
-      readFileSD(SD, path);
+      //readFileSD(SD, path);
+      getFileSD(SD, path, content);
+      //debugPrint(content.c_str(), 2);
+      String msg = "{\"type\":\"filedata\",\"data\":\"";
+      msg += content.c_str();
+      msg += "\"}";
+      debugPrintln("JSON to send:", 4);
+      debugPrintln(msg.c_str(), 4);
+      ws.printfAll(msg.c_str());
     }
 
 

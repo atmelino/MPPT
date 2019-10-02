@@ -61,6 +61,12 @@ function readMessage(event) {
         setDaysComboBox(receivedmessage.data);
         daysComboSelect();
     }
+    if (receivedmessage.type == "filedata") {
+        printlnMessage("messages", "Message is received...filedata");
+        //printlnMessage("messages", "Message is received..." + event.data);
+        //str = receivedmessage.data.replace(/(?:\r\n|\r|\n)/g, "<br>");
+        fillTable("storedTable", receivedmessage.data);
+    }
     if (receivedmessage.type == "getSettings") {
         printlnMessage("messages", received_msg);
         document.getElementById("dataFilesBox").style.filter = "none";
@@ -97,6 +103,29 @@ function refreshTable(tableName, data) {
         cell[j].innerHTML = splitString[j];
         if (j == 9) {
             document.getElementById("PWMact").value = splitString[j];
+        }
+    }
+}
+
+function fillTable(tableName, data) {
+    const singleWhiteSpaceData = data.replace(/  +/g, " ");
+    const lines = singleWhiteSpaceData.split("\n");
+    //printlnMessage('messages', "number of lines=" + lines.length);
+
+    var table = document.getElementById(tableName);
+    for (var i = table.rows.length - 1; i > 0; i--) {
+        table.deleteRow(i);
+    }
+    // for (var i in lines) {
+    //   printlnMessage('messages', lines[i]);
+    // }
+    for (var i = 0; i < lines.length - 1; i++) {
+        const splitString = lines[i].replace(/  +/g, " ").split(" ");
+        var row = table.insertRow(i + 1);
+        var cell = [];
+        for (var j = 0; j < 9; j++) {
+            cell[j] = row.insertCell(j);
+            cell[j].innerHTML = splitString[j];
         }
     }
 }

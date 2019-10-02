@@ -32,7 +32,6 @@ void getSettings() {
   DataFileLines = dfls.toInt();
 }
 
-
 void writeDataFile(char* dateTime) {
   char filename[40];
   char year[5] = {'2', '0', '0', '0', '\0'};
@@ -45,9 +44,7 @@ void writeDataFile(char* dateTime) {
   memcpy(month, dateTime + 5, 2);
   //Serial.println(year);
   //Serial.println(month);
-
   makeDataDir(year, month);
-
   sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
   debugPrintln(filename, 1);
   for (int i = 0; i < DataFileLines; i++) {
@@ -147,8 +144,7 @@ void  getDirSD(fs::FS & fs, const char * dirname, char* dirArray) {
   //Serial.println(dirArray);
 }
 
-
-void  getFilesSD(fs::FS & fs, const char * dirname, char* dirArray) {
+void  getFileListSD(fs::FS & fs, const char * dirname, char* dirArray) {
   Serial.printf("Listing directory: %s\n", dirname);
   int len = strlen(dirname);
   boolean first = true;
@@ -174,6 +170,29 @@ void  getFilesSD(fs::FS & fs, const char * dirname, char* dirArray) {
   char debugMessage[20];
   sprintf(debugMessage, "length=%d", msg.length());
   debugPrintln(debugMessage, 1);
+}
+
+
+void getFileSD(fs::FS & fs, const char * path, String &content) {
+  //void getFileSD(fs::FS & fs, const char * path, String content) {
+  debugPrint("Reading file: ", 1);
+  debugPrintln(path, 1);
+  char c;
+  File file = fs.open(path);
+  if (!file) {
+    debugPrintln("Failed to open file for reading", 1);
+    return;
+  }
+  while (file.available()) {
+    c = file.read();
+    if (c == '\n')
+      content += "\\n";
+    else
+      content += c;
+  }
+  file.close();
+  debugPrint(content.c_str(), 3);
+  debugPrintln("file end", 1);
 }
 
 void createDirSD(fs::FS & fs, const char * path) {
@@ -203,13 +222,11 @@ void writeFileSD(fs::FS & fs, const char * path, const char * message) {
 
 void readFileSD(fs::FS & fs, const char * path) {
   Serial.printf("Reading file: %s\n", path);
-
   File file = fs.open(path);
   if (!file) {
     Serial.println("Failed to open file for reading");
     return;
   }
-
   //Serial.println("Read from file: ");
   while (file.available()) {
     Serial.write(file.read());
