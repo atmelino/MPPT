@@ -144,32 +144,62 @@ void  getDirSD(fs::FS & fs, const char * dirname, char* dirArray) {
   //Serial.println(dirArray);
 }
 
-void  getFileListSD(fs::FS & fs, const char * dirname, char* dirArray) {
-  Serial.printf("Listing directory: %s\n", dirname);
-  int len = strlen(dirname);
+//void  getFileListSD(fs::FS & fs, const char * dirname, char* dirArray) {
+//  Serial.printf("Listing directory: %s\n", dirname);
+//  int len = strlen(dirname);
+//  boolean first = true;
+//  String fullPath;
+//  String msg = "[";
+//  File root = fs.open(dirname);
+//  File file = root.openNextFile();
+//  while (file) {
+//    if (!file.isDirectory()) {
+//      if (!first)
+//        msg += ",";
+//      first = false;
+//      fullPath = file.name();
+//      msg += "\"";
+//      msg += fullPath.substring(len + 1);
+//      msg += "\"";
+//    }
+//    file = root.openNextFile();
+//  }
+//  msg += "]";
+//  msg.toCharArray(dirArray, msg.length() + 1);
+//  //debugPrintln(msg.c_str(), 1);
+//  char debugMessage[20];
+//  sprintf(debugMessage, "length=%d", msg.length());
+//  debugPrintln(debugMessage, 1);
+//}
+
+void  getFileListSD(fs::FS & fs, const char * path, String &content) {
+  debugPrint("Listing directory: ", 1);
+  debugPrintln(path, 1);
+  int len = strlen(path);
   boolean first = true;
   String fullPath;
-  String msg = "[";
-  File root = fs.open(dirname);
+  content += "[";
+  File root = fs.open(path);
   File file = root.openNextFile();
   while (file) {
     if (!file.isDirectory()) {
       if (!first)
-        msg += ",";
+        content += ",";
       first = false;
       fullPath = file.name();
-      msg += "\"";
-      msg += fullPath.substring(len + 1);
-      msg += "\"";
+      content += "\"";
+      content += fullPath.substring(len + 1);
+      content += "\"";
     }
     file = root.openNextFile();
   }
-  msg += "]";
-  msg.toCharArray(dirArray, msg.length() + 1);
+  content += "]";
+  debugPrint(content.c_str(), 3);
+  //msg.toCharArray(dirArray, msg.length() + 1);
   //debugPrintln(msg.c_str(), 1);
-  char debugMessage[20];
-  sprintf(debugMessage, "length=%d", msg.length());
-  debugPrintln(debugMessage, 1);
+  //  char debugMessage[20];
+  //  sprintf(debugMessage, "length=%d", msg.length());
+  //  debugPrintln(debugMessage, 1);
 }
 
 

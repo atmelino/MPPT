@@ -119,51 +119,34 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     }
 
     if (type == "listmonths") {
-      String param = doc["data"];
-      char path[6];
-      param.toCharArray(path, param.length() + 1);
-      debugPrint("function onWsEvent path=", 1);
-      debugPrintln(path, 1);
+      String path = doc["data"];
       char monthList[200];
-      getDirSD(SD, path, monthList);
+      getDirSD(SD, path.c_str(), monthList);
       String msg = "{\"type\":\"listmonths\",\"data\":";
       msg += monthList;
       msg += "}";
-      char jsonmsg[200];
-      msg.toCharArray(jsonmsg, msg.length() + 1);
-      ws.printfAll(jsonmsg);
-      debugPrintln(msg.c_str(), 1);
-      char debugMessage[20];
-      sprintf(debugMessage, "length=%d", msg.length());
-      debugPrintln(debugMessage, 1);
+      debugPrintln("JSON to send:", 4);
+      debugPrintln(msg.c_str(), 4);
+      ws.printfAll(msg.c_str());
     }
 
     if (type == "listdays") {
-      String param = doc["data"];
-      char path[6];
-      param.toCharArray(path, param.length() + 1);
-      debugPrint("function onWsEvent path=", 1);
-      debugPrintln(path, 1);
-      char daysList[2000];
-      getFileListSD(SD, path, daysList);
+      String path = doc["data"];
+      //char daysList[2000];
+      //getFileListSD(SD, path.c_str(), daysList);
       String msg = "{\"type\":\"listdays\",\"data\":";
-      msg += daysList;
+      getFileListSD(SD, path.c_str(), msg);
+      //msg += daysList;
       msg += "}";
-      char jsonmsg[2100];
-      msg.toCharArray(jsonmsg, msg.length() + 1);
-      ws.printfAll(jsonmsg);
+      debugPrintln("JSON to send:", 4);
+      debugPrintln(msg.c_str(), 4);
+      ws.printfAll(msg.c_str());
     }
 
     if (type == "readfile") {
-      String pathS = doc["data"];
-      String content;
-      char path[40];
-      pathS.toCharArray(path, sizeof(path));
-      //readFileSD(SD, path);
-      getFileSD(SD, path, content);
-      //debugPrint(content.c_str(), 2);
+      String path = doc["data"];
       String msg = "{\"type\":\"filedata\",\"data\":\"";
-      msg += content.c_str();
+      getFileSD(SD, path.c_str(), msg);
       msg += "\"}";
       debugPrintln("JSON to send:", 4);
       debugPrintln(msg.c_str(), 4);
