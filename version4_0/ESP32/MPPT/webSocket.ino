@@ -93,53 +93,41 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     if (type == "debugLevel") {
       String dl = doc["data"];
       debugLevel = dl.toInt();
+      saveSettings();
     }
 
     if (type == "DataFileLines") {
       String dfls = doc["data"];
       DataFileLines = dfls.toInt();
-      //Serial.println("new DataFileLines=");
-      //Serial.println(DataFileLines);
       saveSettings();
     }
 
     if (type == "listyears") {
-      char yearList[200];
-      getDirSD(SD, "/", yearList);
       String msg = "{\"type\":\"listyears\",\"data\":";
-      msg += yearList;
+      getDirSD(SD, "/", msg);
       msg += "}";
-      char jsonmsg[200];
-      msg.toCharArray(jsonmsg, msg.length() + 1);
-      ws.printfAll(jsonmsg);
-      debugPrintln(msg.c_str(), 1);
-      char debugMessage[20];
-      sprintf(debugMessage, "length=%d", msg.length());
-      debugPrintln(debugMessage, 1);
+      debugPrintln("JSON to send:", 3);
+      debugPrintln(msg.c_str(), 3);
+      ws.printfAll(msg.c_str());
     }
 
     if (type == "listmonths") {
       String path = doc["data"];
-      char monthList[200];
-      getDirSD(SD, path.c_str(), monthList);
       String msg = "{\"type\":\"listmonths\",\"data\":";
-      msg += monthList;
+      getDirSD(SD, path.c_str(), msg);
       msg += "}";
-      debugPrintln("JSON to send:", 4);
-      debugPrintln(msg.c_str(), 4);
+      debugPrintln("JSON to send:", 3);
+      debugPrintln(msg.c_str(), 3);
       ws.printfAll(msg.c_str());
     }
 
     if (type == "listdays") {
       String path = doc["data"];
-      //char daysList[2000];
-      //getFileListSD(SD, path.c_str(), daysList);
       String msg = "{\"type\":\"listdays\",\"data\":";
       getFileListSD(SD, path.c_str(), msg);
-      //msg += daysList;
       msg += "}";
-      debugPrintln("JSON to send:", 4);
-      debugPrintln(msg.c_str(), 4);
+      debugPrintln("JSON to send:", 3);
+      debugPrintln(msg.c_str(), 3);
       ws.printfAll(msg.c_str());
     }
 
@@ -148,8 +136,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       String msg = "{\"type\":\"filedata\",\"data\":\"";
       getFileSD(SD, path.c_str(), msg);
       msg += "\"}";
-      debugPrintln("JSON to send:", 4);
-      debugPrintln(msg.c_str(), 4);
+      debugPrintln("JSON to send:", 3);
+      debugPrintln(msg.c_str(), 3);
       ws.printfAll(msg.c_str());
     }
 

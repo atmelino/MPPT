@@ -4,6 +4,7 @@ void saveSettings()
   char json_string[256];
   doc["DataFilesYesNo"] = (DataFilesYesNo ? "true" : "false");
   doc["DataFileLines"] = DataFileLines;
+  doc["debugLevel"] = debugLevel;
   serializeJson(doc, json_string);
   writeFileSPIFFS( "/settings.json", json_string);
   Serial.println(json_string);
@@ -12,7 +13,7 @@ void saveSettings()
 
 void getSettings() {
   StaticJsonDocument<200> doc;
-  char data[100];
+  char data[200];
   readFileSPIFFS("/settings.json",  data);
   Serial.println(data);
   auto error = deserializeJson(doc, data);
@@ -22,7 +23,7 @@ void getSettings() {
     return;
   }
   String df = doc["DataFilesYesNo"];
-  Serial.println(df);
+  //Serial.println(df);
   if (df == "true")
     DataFilesYesNo = true;
   else
@@ -30,6 +31,8 @@ void getSettings() {
 
   String dfls = doc["DataFileLines"];
   DataFileLines = dfls.toInt();
+  String dl = doc["debugLevel"];
+  debugLevel = dl.toInt();
 }
 
 void writeDataFile(char* dateTime) {
@@ -108,69 +111,34 @@ void listDirSD(fs::FS & fs, const char * dirname, uint8_t levels) {
   }
 }
 
-
-void  getDirSD(fs::FS & fs, const char * dirname, char* dirArray) {
-  int len = strlen(dirname);
+void  getDirSD(fs::FS & fs, const char * path, String &content) {
+  int len = strlen(path);
   int trim;
   if (len == 1) trim = 1; else trim = len + 1;
-  //char debugMessage[100];
-  //sprintf(debugMessage, "function getDirSD dirname=%s len=%d", dirname, len);
-  //debugPrintln(debugMessage, 1);
   boolean first = true;
   String fullPath;
-  String msg = "[";
-  File root = fs.open(dirname);
+  content += "[";
+  File root = fs.open(path);
   File file = root.openNextFile();
   while (file) {
     if (file.isDirectory()) {
-      //Serial.println(file.name());
       if (!first)
-        msg += ",";
+        content += ",";
       first = false;
       fullPath = file.name();
-      //sprintf(debugMessage, "function getDirSD fullPath=%s", fullPath.c_str() );
-      //debugPrintln(debugMessage, 1);
-      msg += "\"";
-      msg += fullPath.substring(trim);
-      msg += "\"";
-      //Serial.println(msg);
+      char debugMessage[100];
+      sprintf(debugMessage, "file.name() returns %s length %d", file.name(), len );
+      debugPrintln(debugMessage, 2);
+      content += "\"";
+      content += fullPath.substring(trim);
+      content += "\"";
     }
     file = root.openNextFile();
   }
-  msg += "]";
-  //Serial.print("length of msg=");
-  //Serial.println(msg.length());
-  msg.toCharArray(dirArray, msg.length() + 1);
-  //Serial.println(dirArray);
+  content += "]";
+  debugPrint(content.c_str(), 2);
 }
 
-//void  getFileListSD(fs::FS & fs, const char * dirname, char* dirArray) {
-//  Serial.printf("Listing directory: %s\n", dirname);
-//  int len = strlen(dirname);
-//  boolean first = true;
-//  String fullPath;
-//  String msg = "[";
-//  File root = fs.open(dirname);
-//  File file = root.openNextFile();
-//  while (file) {
-//    if (!file.isDirectory()) {
-//      if (!first)
-//        msg += ",";
-//      first = false;
-//      fullPath = file.name();
-//      msg += "\"";
-//      msg += fullPath.substring(len + 1);
-//      msg += "\"";
-//    }
-//    file = root.openNextFile();
-//  }
-//  msg += "]";
-//  msg.toCharArray(dirArray, msg.length() + 1);
-//  //debugPrintln(msg.c_str(), 1);
-//  char debugMessage[20];
-//  sprintf(debugMessage, "length=%d", msg.length());
-//  debugPrintln(debugMessage, 1);
-//}
 
 void  getFileListSD(fs::FS & fs, const char * path, String &content) {
   debugPrint("Listing directory: ", 1);
@@ -194,12 +162,7 @@ void  getFileListSD(fs::FS & fs, const char * path, String &content) {
     file = root.openNextFile();
   }
   content += "]";
-  debugPrint(content.c_str(), 3);
-  //msg.toCharArray(dirArray, msg.length() + 1);
-  //debugPrintln(msg.c_str(), 1);
-  //  char debugMessage[20];
-  //  sprintf(debugMessage, "length=%d", msg.length());
-  //  debugPrintln(debugMessage, 1);
+  debugPrint(content.c_str(), 2);
 }
 
 
@@ -221,7 +184,7 @@ void getFileSD(fs::FS & fs, const char * path, String &content) {
       content += c;
   }
   file.close();
-  debugPrint(content.c_str(), 3);
+  debugPrint(content.c_str(), 2);
   debugPrintln("file end", 1);
 }
 

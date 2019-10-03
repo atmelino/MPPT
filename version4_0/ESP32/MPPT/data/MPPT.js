@@ -81,6 +81,14 @@ function readMessage(event) {
             document.getElementById("enableDataFilescontent").style.display = "none";
         }
         document.getElementById("DataFileLines").value = receivedmessage.data.DataFileLines;
+        if (receivedmessage.data.debugLevel == 0)
+            document.getElementById("debug0").checked = true;
+        if (receivedmessage.data.debugLevel == 1)
+            document.getElementById("debug1").checked = true;
+        if (receivedmessage.data.debugLevel == 2)
+            document.getElementById("debug2").checked = true;
+        if (receivedmessage.data.debugLevel == 3)
+            document.getElementById("debug3").checked = true;
     }
     if (receivedmessage.type == "getStatus") {
         printlnMessage("messages", received_msg);
