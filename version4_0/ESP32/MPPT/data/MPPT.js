@@ -45,6 +45,11 @@ function readMessage(event) {
         //printlnMessage("messages", event.data);
         //document.getElementById("liveDatatmp").innerHTML = receivedmessage.data;
         refreshTable("liveTable", receivedmessage.data);
+        if(document.getElementById("settings").style.display == "block"){
+            //printlnMessage("messages", "Settings open");
+            sendmessage.type = "measCount";
+            socket.send(JSON.stringify(sendmessage));
+        }
     }
     if (receivedmessage.type == "listyears") {
         printlnMessage("messages", "Message is received..." + event.data);
@@ -80,6 +85,7 @@ function readMessage(event) {
             document.getElementById("enableDataFiles").checked = false;
             document.getElementById("enableDataFilescontent").style.display = "none";
         }
+        document.getElementById("keepMeasurement").value = receivedmessage.data.keepMeasurement;
         document.getElementById("DataFileLines").value = receivedmessage.data.DataFileLines;
         if (receivedmessage.data.debugLevel == 0)
             document.getElementById("debug0").checked = true;
@@ -90,8 +96,13 @@ function readMessage(event) {
         if (receivedmessage.data.debugLevel == 3)
             document.getElementById("debug3").checked = true;
     }
+
     if (receivedmessage.type == "getStatus") {
         printlnMessage("messages", received_msg);
+    }
+    if (receivedmessage.type == "measCount") {
+        //printlnMessage("messages", received_msg);
+        document.getElementById("measCount").value = receivedmessage.data;
     }
 }
 
@@ -109,10 +120,8 @@ function refreshTable(tableName, data) {
     for (var j = 0; j < 9; j++) {
         cell[j] = row.insertCell(j);
         cell[j].innerHTML = splitString[j];
-        if (j == 9) {
-            document.getElementById("PWMact").value = splitString[j];
-        }
     }
+    //var PWMact = parseInt(splitString[7], 10);
 }
 
 function fillTable(tableName, data) {
@@ -159,8 +168,8 @@ function liveStored() {
 
 function setYearsComboBox(items) {
     items.sort();
-    printlnMessage("messages", "setYearsComboBox items=" + items);
-    printlnMessage("messages", "items[1]=" + items[1]);
+    //printlnMessage("messages", "setYearsComboBox items=" + items);
+    //printlnMessage("messages", "items[1]=" + items[1]);
     elementId = document.getElementById("yearsComboBox");
     elementId.options.length = 0;
     for (var i = 0; i < items.length; i++) {
@@ -318,7 +327,6 @@ function printSDFile() {
     socket.send(JSON.stringify(sendmessage));
 }
 
-
 function getSettings() {
     sendmessage.type = "getSettings";
     sendmessage.data = "now!";
@@ -338,6 +346,14 @@ function enableDataFiles() {
     sendmessage.data = value;
     socket.send(JSON.stringify(sendmessage));
 }
+
+function setkeepMeasurementButton() {
+    var value = document.getElementById("keepMeasurement").value;
+    sendmessage.type = "keepMeasurement";
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
 
 function setDataFileLinesButton() {
     var value = document.getElementById("DataFileLines").value;

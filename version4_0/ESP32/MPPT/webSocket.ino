@@ -10,14 +10,17 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   } else if (type == WS_EVT_DATA) {
     //Serial.println("WebSocket onWsEvent WS_EVT_DATA");
     AwsFrameInfo * info = (AwsFrameInfo*)arg;
-    String msg = "";
-    Serial.printf("ws[%s][%u] text-message[%llu]: ", server->url(), client->id(), len);
+    String socketMsg = "";
     for (size_t i = 0; i < len; i++) {
-      msg += (char) data[i];
+      socketMsg += (char) data[i];
     }
-    Serial.printf("%s\n", msg.c_str());
 
-    auto error = deserializeJson(doc, msg);
+    char debugMessage[200];
+    sprintf(debugMessage, "ws[%s][%u] text-message[%llu]: ", server->url(), client->id(), len);
+    debugPrint(debugMessage, 1);
+    debugPrintln(socketMsg.c_str(), 1);
+
+    auto error = deserializeJson(doc, socketMsg);
     if (error) {
       Serial.print(F("deserializeJson() failed with code "));
       Serial.println(error.c_str());
@@ -66,19 +69,15 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     }
 
     if (type == "getSettings") {
-      char data[100];
+      char data[300];
       readFileSPIFFS("/settings.json",  data);
-      Serial.println(data);
-      StaticJsonDocument<100> docSettings;
-      char json_stringSettings[200];
-      DeserializationError error = deserializeJson(docSettings, data);
-      StaticJsonDocument<200> doc;
-      char json_string[256];
-      doc["type"] = "getSettings";
-      doc["data"] = docSettings;
-      serializeJson(doc, json_string);
-      Serial.println(json_string);
-      ws.printfAll(json_string);
+      debugPrintln(data, 2);
+      String msg = "{\"type\":\"getSettings\",\"data\":";
+      msg += data;
+      msg += "}";
+      debugPrintln("JSON to send:", 2);
+      debugPrintln(msg.c_str(), 2);
+      ws.printfAll(msg.c_str());
     }
 
     if (type == "getStatus") {
@@ -96,10 +95,28 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       saveSettings();
     }
 
+    if (type == "keepMeasurement") {
+      String km = doc["data"];
+      keepMeasurement = km.toInt();
+      saveSettings();
+    }
+
     if (type == "DataFileLines") {
       String dfls = doc["data"];
       DataFileLines = dfls.toInt();
       saveSettings();
+    }
+
+    if (type == "measCount") {
+      char debugMessage[100];
+      sprintf(debugMessage, "measurements buffered : %d", linePointer );
+      debugPrintln(debugMessage, 1);
+      String msg = "{\"type\":\"measCount\",\"data\":";
+      msg += linePointer;
+      msg += "}";
+      //debugPrintln("JSON to send:", 3);
+      //debugPrintln(msg.c_str(), 3);
+      ws.printfAll(msg.c_str());
     }
 
     if (type == "listyears") {

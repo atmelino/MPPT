@@ -1,5 +1,6 @@
 {
     "DataFilesYesNo": "false",
+    "keepMeasurement": 1,
     "DataFileLines": 30,
-    "debugLevel":2
+    "debugLevel": 2
 }

@@ -3,6 +3,7 @@ void saveSettings()
   StaticJsonDocument<200> doc;
   char json_string[256];
   doc["DataFilesYesNo"] = (DataFilesYesNo ? "true" : "false");
+  doc["keepMeasurement"] = keepMeasurement;
   doc["DataFileLines"] = DataFileLines;
   doc["debugLevel"] = debugLevel;
   serializeJson(doc, json_string);
@@ -23,12 +24,12 @@ void getSettings() {
     return;
   }
   String df = doc["DataFilesYesNo"];
-  //Serial.println(df);
   if (df == "true")
     DataFilesYesNo = true;
   else
     DataFilesYesNo = false;
-
+  String km = doc["keepMeasurement"];
+  keepMeasurement = km.toInt();
   String dfls = doc["DataFileLines"];
   DataFileLines = dfls.toInt();
   String dl = doc["debugLevel"];
@@ -49,13 +50,12 @@ void writeDataFile(char* dateTime) {
   //Serial.println(month);
   makeDataDir(year, month);
   sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
-  debugPrintln(filename, 1);
   for (int i = 0; i < DataFileLines; i++) {
     appendFileSD(SD, filename, dataLines[i]);
   }
-  //writeFileSD(SD, filename, dataLines[0]);
+  debugPrint("Saved file ", 1);
+  debugPrintln(filename, 1);
 }
-
 
 void makeDataDir(char *year, char* month) {
   char yearpath[10];
@@ -64,21 +64,21 @@ void makeDataDir(char *year, char* month) {
   sprintf(yearmonthpath, "/%s/%s", year, month);
 
   if (!SD.exists(yearpath)) {
-    debugPrint(yearpath, 1);
-    debugPrintln(" not exists", 1);
+    debugPrint(yearpath, 3);
+    debugPrintln(" not exists", 3);
     createDirSD(SD, yearpath);
   } else {
-    debugPrint(yearpath, 1);
-    debugPrintln(" exists", 1);
+    debugPrint(yearpath, 3);
+    debugPrintln(" exists", 3);
   }
 
   if (!SD.exists(yearmonthpath)) {
-    debugPrint(yearmonthpath, 1);
-    debugPrintln(" not exists", 1);
+    debugPrint(yearmonthpath, 3);
+    debugPrintln(" not exists", 3);
     createDirSD(SD, yearmonthpath);
   } else {
-    debugPrint(yearmonthpath, 1);
-    debugPrintln(" exists", 1);
+    debugPrint(yearmonthpath, 3);
+    debugPrintln(" exists", 3);
   }
 }
 
@@ -126,9 +126,9 @@ void  getDirSD(fs::FS & fs, const char * path, String &content) {
         content += ",";
       first = false;
       fullPath = file.name();
-      char debugMessage[100];
-      sprintf(debugMessage, "file.name() returns %s length %d", file.name(), len );
-      debugPrintln(debugMessage, 2);
+      //char debugMessage[100];
+      //sprintf(debugMessage, "file.name() returns %s length %d", file.name(), len );
+      //debugPrintln(debugMessage, 2);
       content += "\"";
       content += fullPath.substring(trim);
       content += "\"";
@@ -138,7 +138,6 @@ void  getDirSD(fs::FS & fs, const char * path, String &content) {
   content += "]";
   debugPrint(content.c_str(), 2);
 }
-
 
 void  getFileListSD(fs::FS & fs, const char * path, String &content) {
   debugPrint("Listing directory: ", 1);
@@ -164,7 +163,6 @@ void  getFileListSD(fs::FS & fs, const char * path, String &content) {
   content += "]";
   debugPrint(content.c_str(), 2);
 }
-
 
 void getFileSD(fs::FS & fs, const char * path, String &content) {
   //void getFileSD(fs::FS & fs, const char * path, String content) {
@@ -230,15 +228,14 @@ void readFileSD(fs::FS & fs, const char * path) {
 
 
 void appendFileSD(fs::FS & fs, const char * path, const char * message) {
-  Serial.printf("Appending to file: %s\n", path);
-
+  //Serial.printf("Appending to file: %s\n", path);
   File file = fs.open(path, FILE_APPEND);
   if (!file) {
     Serial.println("Failed to open file for appending");
     return;
   }
   if (file.print(message)) {
-    Serial.println("Message appended");
+    debugPrintln("Message appended", 3);
   } else {
     Serial.println("Append failed");
   }

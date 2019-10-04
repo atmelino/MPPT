@@ -43,6 +43,7 @@ char headerLine[80];
 char dataLines[maxLines][80];
 int linePointer = 0;
 boolean DataFilesYesNo = true;
+int keepMeasurement=1;
 int DataFileLines = 10;
 
 AsyncWebServer server(80);
