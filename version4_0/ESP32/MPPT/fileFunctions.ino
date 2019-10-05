@@ -50,9 +50,13 @@ void writeDataFile(char* dateTime) {
   //Serial.println(month);
   makeDataDir(year, month);
   sprintf(filename, "/%s/%s/%s.txt", year, month, dateTime);
+  String content;
   for (int i = 0; i < DataFileLines; i++) {
-    appendFileSD(SD, filename, dataLines[i]);
+    //    appendFileSD(SD, filename, dataLines[i]);
+    content += dataLines[i];
   }
+  writeFileSD(SD, filename, content.c_str());
+
   debugPrint("Saved file ", 1);
   debugPrintln(filename, 1);
 }
@@ -161,7 +165,7 @@ void  getFileListSD(fs::FS & fs, const char * path, String &content) {
     file = root.openNextFile();
   }
   content += "]";
-  debugPrint(content.c_str(), 2);
+  debugPrint(content.c_str(), 3);
 }
 
 void getFileSD(fs::FS & fs, const char * path, String &content) {
@@ -182,7 +186,7 @@ void getFileSD(fs::FS & fs, const char * path, String &content) {
       content += c;
   }
   file.close();
-  debugPrint(content.c_str(), 2);
+  debugPrint(content.c_str(), 3);
   debugPrintln("file end", 1);
 }
 

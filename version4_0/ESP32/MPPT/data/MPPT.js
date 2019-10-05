@@ -45,7 +45,7 @@ function readMessage(event) {
         //printlnMessage("messages", event.data);
         //document.getElementById("liveDatatmp").innerHTML = receivedmessage.data;
         refreshTable("liveTable", receivedmessage.data);
-        if(document.getElementById("settings").style.display == "block"){
+        if (document.getElementById("settings").style.display == "block") {
             //printlnMessage("messages", "Settings open");
             sendmessage.type = "measCount";
             socket.send(JSON.stringify(sendmessage));
@@ -95,6 +95,8 @@ function readMessage(event) {
             document.getElementById("debug2").checked = true;
         if (receivedmessage.data.debugLevel == 3)
             document.getElementById("debug3").checked = true;
+        if (receivedmessage.data.debugLevel == 4)
+            document.getElementById("debug4").checked = true;
     }
 
     if (receivedmessage.type == "getStatus") {
@@ -262,6 +264,8 @@ function DebugLevel() {
         debugLevel = 2;
     if (document.getElementById("debug3").checked)
         debugLevel = 3;
+    if (document.getElementById("debug4").checked)
+        debugLevel = 4;
     printlnMessage("messages", "Serial Debug Level=" + debugLevel);
     sendmessage.type = "debugLevel";
     sendmessage.data = debugLevel;

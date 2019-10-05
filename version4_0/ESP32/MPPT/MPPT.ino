@@ -43,7 +43,7 @@ char headerLine[80];
 char dataLines[maxLines][80];
 int linePointer = 0;
 boolean DataFilesYesNo = true;
-int keepMeasurement=1;
+int keepMeasurement = 1;
 int DataFileLines = 10;
 
 AsyncWebServer server(80);
@@ -157,7 +157,7 @@ void loop(void)
 
   if (PWMModeMPPT) {
     if (batteryVoltage > 8.4) { // prevent battery overvoltage
-      //Serial.println("battery over voltage");
+      debugPrintln("battery over voltage, decrease PWM", 4);
       PWM_actual -= 5;
       setPWM();
     }
@@ -167,21 +167,22 @@ void loop(void)
       setPWM();
     }
     if (solarVoltage > 10.0 && batteryVoltage >= 8.2) {
-      //Serial.println("increase voltage slow");
+      debugPrintln("increase PWM slow", 4);
       PWM_actual += 1;
       setPWM();
     }
     if (solarVoltage > 10.0 && batteryVoltage < 8.2) {
-      //Serial.println("increase voltage fast");
+      debugPrintln("increase PWM fast", 4);
       PWM_actual += 5;
       setPWM();
     }
     if (solarVoltage <= 10.0 && batteryVoltage >= 7.6) {
-      //Serial.println("solar under voltage");
+      debugPrintln("solar under voltage, stop PWM", 4);
       stopPWM();
     }
     if (solarVoltage <= 10.0 && batteryVoltage < 7.6) { // prevent battery over discharge
       //Serial.println("solar and battery under voltage");
+      debugPrintln("solar and battery under voltage, low battery shutdown", 4);
       //logEntry("low battery shutdown");
       stopPWM();
       //DataFilesYesNo = false;
@@ -210,7 +211,6 @@ void loop(void)
 
   makeDataLine();
   debugPrint(dataLines[linePointer], 3);
-  //Serial.println(dataLines[linePointer]);
   sendDataLine();
 
   linePointer++;
@@ -218,10 +218,9 @@ void loop(void)
   {
     linePointer = 0;
 
-    for (size_t i = 0; i < DataFileLines; i++) {
-      //Serial.print(dataLines[i]);
-      debugPrint(dataLines[i], 4);
-    }
+    //    for (size_t i = 0; i < DataFileLines; i++) {
+    //      debugPrint(dataLines[i], 4);
+    //    }
 
     if (DataFilesYesNo) {
       writeDataFile(dateTime);

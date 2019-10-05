@@ -17,8 +17,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
     char debugMessage[200];
     sprintf(debugMessage, "ws[%s][%u] text-message[%llu]: ", server->url(), client->id(), len);
-    debugPrint(debugMessage, 1);
-    debugPrintln(socketMsg.c_str(), 1);
+    debugPrint(debugMessage, 3);
+    debugPrintln(socketMsg.c_str(), 3);
 
     auto error = deserializeJson(doc, socketMsg);
     if (error) {
@@ -110,7 +110,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     if (type == "measCount") {
       char debugMessage[100];
       sprintf(debugMessage, "measurements buffered : %d", linePointer );
-      debugPrintln(debugMessage, 1);
+      debugPrintln(debugMessage, 4);
       String msg = "{\"type\":\"measCount\",\"data\":";
       msg += linePointer;
       msg += "}";
