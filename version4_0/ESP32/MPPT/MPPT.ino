@@ -14,6 +14,7 @@ int debugLevel = 2; // 0=print nothing
 
 // pin assignment
 const int ledPin = 2; // on-board blue led (also internally pulled up)
+const int green_LED = 14;
 const int PWM_OUT = 4;
 const int PWM_ENABLE_PIN = 15;
 const int RelayPin = 32;
@@ -111,6 +112,8 @@ void setup(void)
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);// Turn off on-board blue led
   //digitalWrite(ledPin, HIGH);
+  pinMode(green_LED, OUTPUT);
+  digitalWrite(green_LED, HIGH);
 
 
   if (!SD.begin()) {
