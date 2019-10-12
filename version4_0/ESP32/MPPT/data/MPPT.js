@@ -366,6 +366,42 @@ function setDataFileLinesButton() {
     socket.send(JSON.stringify(sendmessage));
 }
 
+function setRTC() {
+    var currentDate = new Date(Date.now());
+    var year = currentDate.getFullYear();
+    var month = currentDate.getMonth() + 1;
+    var day = currentDate.getDate();
+    var hours = currentDate.getHours();
+    var minutes = currentDate.getMinutes();
+    var seconds = currentDate.getSeconds();
+    var dayofweek = currentDate.getDay();
+
+    sendmessage.type = "SetRTC";
+    sendmessage.data = {
+        year: year,
+        month: month,
+        day: day,
+        hours: hours,
+        minutes: minutes,
+        seconds: seconds,
+        dayofweek: dayofweek
+    };
+    socket.send(JSON.stringify(sendmessage));
+    const msg =
+        year +
+        " " +
+        month +
+        " " +
+        day +
+        " " +
+        hours +
+        " " +
+        minutes +
+        " " +
+        seconds;
+
+    alert("Date set to " + msg);
+}
 
 // Helper functions
 function printMessage(target, message) {

@@ -22,7 +22,8 @@ const int RelayPin = 32;
 // PWM
 uint8_t PWM_actual = 100; // a value from 0 to 255
 uint8_t PWM_requested = 130;
-boolean PWMModeMPPT = true;
+//boolean PWMModeMPPT = true;
+boolean PWMModeMPPT = false;
 //uint32_t freq = 82000;
 uint32_t freq = 80000;
 uint8_t resolution_bits = 8;
@@ -36,7 +37,7 @@ int count = 0;
 RTC_DS1307 rtc;
 char dateTime[20];
 SDL_Arduino_INA3221 ina3221;
-#define CHB 1 // Battery INA channel 2 but 1 for array
+#define CHB 0 // Battery INA channel 1 but 0 for array
 #define CHS 2// Solar INA channel 3 but 2 for array
 float sv[3], bv[3], cmA[3], lv[3], pw[3];
 char headerLine[80];
@@ -131,7 +132,6 @@ void setup(void)
   ledcAttachPin(PWM_OUT, 1); // assign IR2104 PWM signal to channels
   // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
   ledcSetup( channel,  freq, resolution_bits);
-  //PWM_actual += 5;
   PWM_actual = 190;
   ledcWrite(1, PWM_actual); //
 
@@ -202,12 +202,13 @@ void loop(void)
   } else {
     if (batteryVoltage > 8.4) // prevent battery overvoltage
     {
-      //Serial.println("battery over voltage");
+      Serial.println("battery over voltage");
       PWM_actual -= 5;
       PWM_requested = PWM_actual;
       setPWM();
     } else {
-      PWM_actual = PWM_requested;
+      //PWM_actual = PWM_requested;
+      debugPrintln("manual mode set PWM", 4);
       setPWM();
     }
   }

@@ -17,8 +17,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
     char debugMessage[200];
     sprintf(debugMessage, "ws[%s][%u] text-message[%llu]: ", server->url(), client->id(), len);
-    debugPrint(debugMessage, 3);
-    debugPrintln(socketMsg.c_str(), 3);
+    debugPrint(debugMessage, 4);
+    debugPrintln(socketMsg.c_str(), 4);
 
     auto error = deserializeJson(doc, socketMsg);
     if (error) {
@@ -157,6 +157,14 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       debugPrintln(msg.c_str(), 3);
       ws.printfAll(msg.c_str());
     }
+
+    if (type == "SetRTC") {
+      String ys = doc["year"];
+      int year = ys.toInt();
+      debugPrintln("setRTC:", 3);
+      rtc.adjust(DateTime(year, 1, 21, 3, 0, 0));
+    }
+
 
 
     if (type == "printSDFile") {
