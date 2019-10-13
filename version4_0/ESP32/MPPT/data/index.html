@@ -99,13 +99,13 @@
       <div class="settings-body">
         <div style='display: table'>
           <div style='display: table-row'>
-            <div style='width: 5%; display: table-cell; white-space: nowrap;'></div>
-            <div style='width: 55%; display: table-cell; white-space: nowrap;'>
-              <p></p><label><input type="checkbox" onclick="showMessages()" name="showMessages" id="showMessages"
-                  value="male" checked />
-                show messages
-              </label>
-              <button onclick="clearMessages()">Clear messages</button></p>
+            <div style='width: 2%; display: table-cell; white-space: nowrap;'></div>
+            <div style='width: 50%; display: table-cell; white-space: nowrap;'>
+              <p><label><input type="checkbox" onclick="showMessages()" name="showMessages" id="showMessages"
+                    value="male" checked />
+                  show messages
+                </label>
+                <button onclick="clearMessages()">Clear messages</button></p>
               <p><button onclick="listSPIFFS()">List SPIFFS</button>
                 <button onclick="listSD()">List SD</button>
               </p>
@@ -134,24 +134,46 @@
                   </div>
                   <!-- -->
                   <div id="enableDataFilescontent">
-                    <p>Keep every
-                      <input id="keepMeasurement" name="value" value="query.." /> measurements
+                    <p>Keep every<br>
+                      <input id="keepMeasurement" style="width: 30%;" name="value" value="query.." /> measurements
                       <button onclick="setkeepMeasurementButton()" id="setkeepMeasurementButton">
                         Set</button></p>
-                    <p>Save Data file every
-                      <input id="DataFileLines" name="value" value="query.." /> measurements
+                    <p>Save Data file every<br>
+                      <input id="DataFileLines" style="width: 30%;" name="value" value="query.." /> measurements
                       <button onclick="setDataFileLinesButton()" id="setDataFileLinesButton">
                         Set</button></p>
-                    <p>Measurements buffered
-                      <input id="measCount" name="value" value="query.." />
+                    <p>Measurements buffered<br>
+                      <input id="measCount" style="width: 30%;" name="value" value="query.." />
                       <button onclick="saveNow()" id="saveNow">
                         Save Now</button></p>
                   </div>
                 </div>
               </p>
             </div>
-            <div style='width: 5%; display: table-cell; white-space: nowrap;'></div>
-            <div style='width: 35%; display: table-cell; white-space: nowrap;'>
+            <div style='width: 2%; display: table-cell; white-space: nowrap;'></div>
+            <div style='width: 46%; display: table-cell; white-space: nowrap;'>
+              <div class="title_box" id="manualBox">
+                <div id="title">
+                  <label><input type="checkbox" onclick="manualMode()" name="manualMode" id="manualMode" value="male"
+                      unchecked />
+                    Manual<br />
+                    <!-- -->
+                  </label>
+                </div>
+                <!-- -->
+                <label><input type="checkbox" onclick="greenLED()" id="greenLED" value=" male" unchecked />
+                  green LED
+                </label><br>
+                <label><input type="checkbox" onclick="orangeLED()" id="orangeLED" value=" male" unchecked />
+                  orange LED
+                </label><br>
+                <label><input type="checkbox" onclick="redLED()" id="redLED" value=" male" unchecked />
+                  red LED
+                </label><br>
+                <label><input type="checkbox" onclick="batteryRelay()" value=" male" unchecked />
+                  battery relay
+                </label><br>
+              </div>
               <button onclick="setRTC()">Set Real Time Clock</button><br>
               <p><button onclick="showLog()">Show Log</button>
                 <button onclick="hideLog()">Hide Log</button> </p>

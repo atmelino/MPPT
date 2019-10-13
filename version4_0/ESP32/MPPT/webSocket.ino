@@ -37,11 +37,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       ledcWrite(1, PWM_actual);
     }
 
-    if (type == "SetRTC") {
-      // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-      rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    }
-
     if (type == "enableDataFiles") {
       String enableDataFiles = doc["data"];
       if (doc["data"] == "true") {
@@ -158,11 +153,42 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       ws.printfAll(msg.c_str());
     }
 
+    if (type == "greenLED") {
+      String greenLED = doc["data"];
+      if (doc["data"] == "true") {
+        digitalWrite(green_LED, HIGH);
+      } else {
+        digitalWrite(green_LED, LOW);
+      }
+    }
+
+    if (type == "orangeLED") {
+      String orangeLED = doc["data"];
+      if (doc["data"] == "true") {
+        digitalWrite(orange_LED, HIGH);
+      } else {
+        digitalWrite(orange_LED, LOW);
+      }
+    }
+
+    if (type == "redLED") {
+      String redLED = doc["data"];
+      if (doc["data"] == "true") {
+        digitalWrite(red_LED, HIGH);
+      } else {
+        digitalWrite(red_LED, LOW);
+      }
+    }
+
     if (type == "SetRTC") {
       String ys = doc["year"];
       int year = ys.toInt();
-      debugPrintln("setRTC:", 3);
-      rtc.adjust(DateTime(year, 1, 21, 3, 0, 0));
+      String mo = doc["month"];
+      int month = mo.toInt();
+      char debugMessage[200];
+      sprintf(debugMessage, "setRTC %d %d", year, month);
+      debugPrintln(debugMessage, 3);
+      rtc.adjust(DateTime(year, month, 21, 3, 0, 0));
     }
 
 

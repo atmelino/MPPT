@@ -358,10 +358,45 @@ function setkeepMeasurementButton() {
     socket.send(JSON.stringify(sendmessage));
 }
 
-
 function setDataFileLinesButton() {
     var value = document.getElementById("DataFileLines").value;
     sendmessage.type = "DataFileLines";
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
+function greenLED() {
+    greenLEDchecked = document.getElementById("greenLED").checked;
+    sendmessage.type = "greenLED";
+    if (greenLEDchecked == true) {
+        value = "true";
+    } else {
+        value = "false";
+    }
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
+function orangeLED() {
+    orangeLEDchecked = document.getElementById("orangeLED").checked;
+    sendmessage.type = "orangeLED";
+    if (orangeLEDchecked == true) {
+        value = "true";
+    } else {
+        value = "false";
+    }
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
+function redLED() {
+    redLEDchecked = document.getElementById("redLED").checked;
+    sendmessage.type = "redLED";
+    if (redLEDchecked == true) {
+        value = "true";
+    } else {
+        value = "false";
+    }
     sendmessage.data = value;
     socket.send(JSON.stringify(sendmessage));
 }
@@ -377,15 +412,17 @@ function setRTC() {
     var dayofweek = currentDate.getDay();
 
     sendmessage.type = "SetRTC";
-    sendmessage.data = {
-        year: year,
-        month: month,
-        day: day,
-        hours: hours,
-        minutes: minutes,
-        seconds: seconds,
-        dayofweek: dayofweek
-    };
+    sendmessage.year = year;
+    sendmessage.month= month;
+    // sendmessage.data = {
+    //     year: year,
+    //     month: month,
+    //     day: day,
+    //     hours: hours,
+    //     minutes: minutes,
+    //     seconds: seconds,
+    //     dayofweek: dayofweek
+    // };
     socket.send(JSON.stringify(sendmessage));
     const msg =
         year +
