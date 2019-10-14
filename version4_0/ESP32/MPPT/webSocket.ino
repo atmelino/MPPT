@@ -180,15 +180,32 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       }
     }
 
+    if (type == "batteryRelay") {
+      String batteryRelay = doc["data"];
+      if (doc["data"] == "true") {
+        debugPrintln("manual mode battery relay on", 3);
+        digitalWrite(RelayPin, HIGH);
+      } else {
+        debugPrintln("manual mode battery relay off", 3);
+        digitalWrite(RelayPin, LOW);
+      }
+    }
+
     if (type == "SetRTC") {
       String ys = doc["year"];
       int year = ys.toInt();
       String mo = doc["month"];
       int month = mo.toInt();
+      String dy = doc["day"];
+      int day = dy.toInt();
+      String hr = doc["hours"];
+      int hours = hr.toInt();
+      String mn = doc["minutes"];
+      int minutes = mn.toInt();
       char debugMessage[200];
-      sprintf(debugMessage, "setRTC %d %d", year, month);
+      sprintf(debugMessage, "setRTC %d %d %d %d %d", year, month, day, hours, minutes);
       debugPrintln(debugMessage, 3);
-      rtc.adjust(DateTime(year, month, 21, 3, 0, 0));
+      rtc.adjust(DateTime(year, month, day, hours, minutes, 0));
     }
 
 

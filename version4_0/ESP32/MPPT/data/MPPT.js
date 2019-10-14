@@ -401,6 +401,18 @@ function redLED() {
     socket.send(JSON.stringify(sendmessage));
 }
 
+function batteryRelay() {
+    batteryRelaychecked = document.getElementById("batteryRelay").checked;
+    sendmessage.type = "batteryRelay";
+    if (batteryRelaychecked == true) {
+        value = "true";
+    } else {
+        value = "false";
+    }
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
 function setRTC() {
     var currentDate = new Date(Date.now());
     var year = currentDate.getFullYear();
@@ -413,30 +425,13 @@ function setRTC() {
 
     sendmessage.type = "SetRTC";
     sendmessage.year = year;
-    sendmessage.month= month;
-    // sendmessage.data = {
-    //     year: year,
-    //     month: month,
-    //     day: day,
-    //     hours: hours,
-    //     minutes: minutes,
-    //     seconds: seconds,
-    //     dayofweek: dayofweek
-    // };
+    sendmessage.month = month;
+    sendmessage.day = day;
+    sendmessage.hours = hours;
+    sendmessage.minutes = minutes;
+    sendmessage.seconds = seconds;
     socket.send(JSON.stringify(sendmessage));
-    const msg =
-        year +
-        " " +
-        month +
-        " " +
-        day +
-        " " +
-        hours +
-        " " +
-        minutes +
-        " " +
-        seconds;
-
+    const msg = year + " " + month + " " + day + " " + hours + " " + minutes + " " + seconds;
     alert("Date set to " + msg);
 }
 
