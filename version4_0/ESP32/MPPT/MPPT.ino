@@ -247,8 +247,13 @@ void loop(void)
 
 
 void setPWM() {
-  digitalWrite(PWM_ENABLE_PIN, HIGH);  // PWM on, enable IR2104
   //if (PWM_actual > 254)    PWM_actual = 254;
+  ledcWrite(1, PWM_actual); //
+}
+
+void startPWM() {
+  PWM_actual = 100;
+  digitalWrite(PWM_ENABLE_PIN, HIGH); // PWM on, enable IR2104
   ledcWrite(1, PWM_actual); //
 }
 
@@ -256,7 +261,6 @@ void stopPWM() {
   PWM_actual = 0;
   digitalWrite(PWM_ENABLE_PIN, LOW); // PWM off, disable IR2104
 }
-
 
 void sendDataLine() {
   StaticJsonDocument<200> doc;

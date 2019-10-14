@@ -401,6 +401,18 @@ function redLED() {
     socket.send(JSON.stringify(sendmessage));
 }
 
+function PWMDriver() {
+    PWMDriverchecked = document.getElementById("PWMDriver").checked;
+    sendmessage.type = "PWMDriver";
+    if (PWMDriverchecked == true) {
+        value = "true";
+    } else {
+        value = "false";
+    }
+    sendmessage.data = value;
+    socket.send(JSON.stringify(sendmessage));
+}
+
 function batteryRelay() {
     batteryRelaychecked = document.getElementById("batteryRelay").checked;
     sendmessage.type = "batteryRelay";

@@ -180,6 +180,17 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       }
     }
 
+    if (type == "PWMDriver") {
+      String PWMDriver = doc["data"];
+      if (doc["data"] == "true") {
+        debugPrintln("manual mode PWMDriver on", 3);
+        startPWM();
+      } else {
+        debugPrintln("manual mode PWMDriver off", 3);
+        stopPWM();
+      }
+    }
+
     if (type == "batteryRelay") {
       String batteryRelay = doc["data"];
       if (doc["data"] == "true") {
