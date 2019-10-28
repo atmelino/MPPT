@@ -1,7 +1,6 @@
 {
   "name": "ina3221",
   "version": "1.0.0",
-  "description": "",
   "main": "INA3221.js",
   "dependencies": {
     "latest-version": "^5.1.0"
@@ -11,5 +10,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "description": ""
 }
