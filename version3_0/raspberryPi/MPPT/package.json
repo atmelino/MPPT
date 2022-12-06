@@ -4,7 +4,7 @@
   "description": "MPPT RPi",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "fs-extra": "^7.0.1",
     "raspi": "^6.0.1",
     "raspi-pwm": "^6.0.0",
